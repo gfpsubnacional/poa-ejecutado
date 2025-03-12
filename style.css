@@ -1,0 +1,21 @@
+body {
+    font-family: sans-serif;
+}
+#login-container, #form-container, #admin-container {
+    width: 300px;
+    margin: 50px auto;
+    border: 1px solid #ccc;
+    padding: 20px;
+}
+.error {
+    color: red;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th, td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: left;
+}
