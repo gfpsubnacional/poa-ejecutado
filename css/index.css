@@ -1,0 +1,159 @@
+body {
+    font-family: sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+#login-container, #form-container, #admin-container {
+    width: 350px;
+    margin: 30px auto;
+    border-radius: 10px;
+    padding: 50px;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+    color: #1C4574;
+}
+
+button {
+    background-color: #EA232B;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background-color: #F5811E;
+}
+
+
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.error {
+    color: red;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #1C4574;
+    color: white;
+}
+
+/* Logos en encabezados */
+
+.header-logos img {
+    max-height:40px;
+    height:auto ;
+}
+
+.header-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Espaciado entre logos */
+    margin-bottom: 20px;
+}
+
+.logo-container {
+    display: flex;
+    gap: 20px;
+}
+
+/* Boton de mostrar contraseña */
+.password-container {
+    position: relative;
+    align-items: center;
+}
+
+
+.toggle-password {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right: -20px;
+    top: 30%;
+    transform: translateY(-50%);
+}
+
+.toggle-password i {
+    color: #808080; /* Gris */
+}
+
+.toggle-password:hover i {
+    color: #4d4d4d; /* Un poco más oscuro al pasar el mouse */
+}
+
+
+
+.footer {
+    background-color: #1C4574;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+.footer-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 20px;
+}
+.footer-section {
+    margin: 10px;
+}
+.footer-section img {
+    height: 50px;
+    margin: 0 10px;
+}
+.contact-info ul {
+    list-style: none;
+    padding: 0;
+}
+.contact-info li {
+    margin: 5px 0;
+}
+.social-icons a {
+    color: white;
+    font-size: 20px;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+.social-icons a:hover {
+    color: #F5811E;
+}
+.footer-bottom {
+    background-color: #EA232B;
+    padding: 1px;
+}
+.footer-bottom a {
+    color: white;
+    text-decoration: none;
+}
+.footer-bottom a:hover {
+    text-decoration: underline;
+}
+
