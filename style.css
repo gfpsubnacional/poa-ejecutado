@@ -108,6 +108,10 @@ h2 {
     padding-bottom: 60px;
 }
 
+.sidebar-toggle, .logout {
+    min-width: fit-content; /* Evita que desaparezcan */
+}
+
 .sidebar-toggle {
     background: none;
     border: none;
