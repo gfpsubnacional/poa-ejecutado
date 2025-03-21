@@ -84,8 +84,10 @@ h2 {
     align-items: center;
     flex-grow: 1; /* Distribuye mejor los logos */
     justify-content: center; /* Asegura que los logos estén centrados */
-    gap: 30px; /* Mayor separación entre los logos */
+    gap: 10px; /* Mayor separación entre los logos */
+    overflow: hidden; /* Evita desbordamientos */
 }
+
 .logos img { height: 40px; width: auto; }
 .logout {
     background: #EA232B;
@@ -106,10 +108,6 @@ h2 {
     flex: 1;
     padding-top: 60px;
     padding-bottom: 60px;
-}
-
-.sidebar-toggle, .logout {
-    min-width: fit-content; /* Evita que desaparezcan */
 }
 
 .sidebar-toggle {
