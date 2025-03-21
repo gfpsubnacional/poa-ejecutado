@@ -16,6 +16,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+//////////// BARRA LATERAL 
+
+document.addEventListener("DOMContentLoaded", function() {
+    const sidebar = document.getElementById("sidebar");
+    const contentContainer = document.getElementById("content-container");
+    const toggleButton = document.getElementById("sidebar-toggle");
+
+    toggleButton.addEventListener("click", function() {
+        sidebar.classList.toggle("hidden");
+        contentContainer.classList.toggle("expanded");
+    });
+});
 
 
 //////////// FUNCIONES

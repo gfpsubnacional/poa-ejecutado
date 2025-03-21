@@ -107,7 +107,19 @@ h2 {
     padding-top: 60px;
     padding-bottom: 60px;
 }
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+    margin-right: 20px;
+}
+
+
 .sidebar {
+    transition: width 0.3s ease-in-out;
     width: 230px;
     background: #444444;
     color: white;
@@ -120,6 +132,29 @@ h2 {
     z-index: 10;
     font-size: 10pt ; 
 }
+
+.sidebar.hidden {
+    width: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.sidebar.hidden + .content-container {
+    margin-left: 0;
+    width: 100vw;
+}
+
+
 .sidebar button {
     display: block;
     width: 100%;
@@ -141,6 +176,7 @@ h2 {
     color: black;
 }
 .content-container {
+    transition: margin-left 0.3s ease-in-out;
     margin-left: 230px;
     display: flex;
     flex-direction: column;

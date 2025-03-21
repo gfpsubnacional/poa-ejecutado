@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro POA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            background: #007BFF;
+            padding: 10px 20px;
+            color: white;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
+            margin-right: 20px;
+        }
+
+        .logos {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .logos img {
+            height: 40px;
+            margin: 0 10px;
+        }
+
+        .sidebar {
+            width: 250px;
+            transition: width 0.3s ease-in-out;
+            background: #f4f4f4;
+            height: calc(100vh - 60px);
+            position: fixed;
+            left: 0;
+            top: 60px;
+            padding-top: 20px;
+            z-index: 5;
+        }
+
+        .sidebar.hidden {
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .content-container {
+            transition: margin-left 0.3s ease-in-out;
+            margin-left: 250px;
+            padding: 80px 20px 60px;
+        }
+
+        .sidebar.hidden + .content-container {
+            margin-left: 0;
+        }
+
+        .footer {
+            background: #007BFF;
+            padding: 10px;
+            text-align: center;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <button class="sidebar-toggle" id="sidebar-toggle">☰</button>
+        <div class="logos">
+            <a href="https://www.example.com"><img src="https://via.placeholder.com/150" alt="Logo 1"></a>
+            <a href="https://www.example.com"><img src="https://via.placeholder.com/150" alt="Logo 2"></a>
+            <a href="https://www.example.com"><img src="https://via.placeholder.com/150" alt="Logo 3"></a>
+            <h5>Registro de POA ejecutado</h5>    
+        </div>
+        <button class="logout hidden" id="logout-btn">Cerrar sesión</button>
+    </header>
+    
+    <div class="main-container">
+        <nav class="sidebar hidden" id="sidebar">
+            <ul>
+                <li>Inicio</li>
+                <li>Reportes</li>
+                <li>Configuración</li>
+                <li>Ayuda</li>
+            </ul>
+        </nav>
+        <div class="content-container" id="content-container">
+            <main class="content" id="content">
+                <h2>Bienvenido al Registro de POA</h2>
+                <p>Aquí puedes gestionar y visualizar los datos del Plan Operativo Anual (POA).</p>
+                <h3>Últimos Reportes</h3>
+                <ul>
+                    <li>Reporte 1 - Enero 2025</li>
+                    <li>Reporte 2 - Febrero 2025</li>
+                    <li>Reporte 3 - Marzo 2025</li>
+                </ul>
+            </main>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="logos">
+            <a href="https://www.example.com"><img src="https://via.placeholder.com/150" alt="Logo 1"></a>
+            <a href="https://www.example.com"><img src="https://via.placeholder.com/150" alt="Logo 2"></a>
+            <a href="https://www.example.com"><img src="https://via.placeholder.com/150" alt="Logo 3"></a>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const sidebar = document.getElementById("sidebar");
+            const contentContainer = document.getElementById("content-container");
+            const toggleButton = document.getElementById("sidebar-toggle");
+    
+            toggleButton.addEventListener("click", function() {
+                sidebar.classList.toggle("hidden");
+                contentContainer.classList.toggle("expanded");
+            });
+        });
+    </script>
+</body>
+</html>
