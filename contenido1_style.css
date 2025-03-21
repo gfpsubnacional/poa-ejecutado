@@ -1,0 +1,180 @@
+#login-container, #admin-container {
+    width: 350px;
+    margin: 30px auto;
+    border-radius: 10px;
+    padding: 50px;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#form-container {
+    display: flex;
+    flex-direction: row; /* Asegura que los elementos estén en una fila */
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin: 0;
+    width: 100%; /* Que ocupe todo el ancho disponible */
+}
+
+
+h2 {
+    color: #1C4574;
+    text-align: left;
+    margin: 0
+}
+
+
+#submitButton {
+    background-color: #EA232B;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+#submitButton:hover {
+    background-color: #F5811E;
+}
+
+
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#main-container {
+    display: flex;
+    flex-direction: row; /* Asegura que los elementos estén en una fila */
+    align-items: flex-start;
+    width: 100%;
+}
+
+.error {
+    color: red;
+}
+
+
+/* Estilos para todas las tablas*/
+table {
+}
+
+th, td {
+    padding: 0px 2px; 
+    vertical-align: middle; /* Centrar verticalmente */
+}
+
+th {
+    background-color: #1C4574;
+    color: white;
+    text-align: center;
+}
+
+td {
+    text-align: left;
+}
+
+/* Estilo particular para tabla de formulario */
+
+
+.meta-container {
+    border: 2px solid #1C4574;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 50px auto -15px;
+    max-width: 620px;
+    position: relative;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Sombra */
+}
+
+.meta-title {
+    font-weight: bold;
+    color: #1C4574;
+    background: white;
+    padding: 0 10px;
+    position: absolute;
+    top: -12px;
+    left: 15px;
+}
+
+.minimize-meta, .delete-meta {
+    position: absolute;
+    top: -15px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 3px 7px;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+
+.minimize-meta {
+    right: 15px;
+    background: #1C4574;
+}
+
+.delete-meta {
+    right: -10px;
+    background: #cf0909;
+}
+
+.table-container {
+    max-width: 600px;
+}
+
+.table-formulario {
+    border-collapse: separate;
+    border-spacing: 8px;
+    width: 100%;
+}
+
+.table-formulario td {
+    vertical-align: top;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+}
+
+.table-formulario td:first-child {
+    width: 100px;
+    vertical-align: middle;
+}
+
+.table-formulario td:nth-child(2) {
+    width: 250px;
+    border: 2px solid #000;
+    border-radius: 10px;
+    padding: 8px;
+    vertical-align: middle;
+}
+
+.table-formulario select, .table-formulario input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: inherit;
+    font-family: inherit;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.add-meta {
+    position:relative;
+    margin: auto; /* Agrega espacio arriba y mantiene centrado */
+    display: block;
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 10; /* Asegura que esté encima */
+    background: #1C4574;
+    color: white;
+}
+
+

@@ -1,111 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Registro de POA ejecutado</title>
-    <!-- Enlaces a estilos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro POA</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
-<body>
-    <!-- Sección de logos de cabecera -->
-    <section class="header-logos">
-        <a href="https://www.gfpsubnacional.pe/inicio/"><img src="images/gfp_lightbg.png" alt="GFP Logo"></a>
-        <a href="https://cooperacionsuiza.pe/seco" target="_blank" rel="nofollow"><img src="images/suiza_lightbg.png" alt="Suiza Logo"></a>
-        <a href="https://baselgovernance.org" target="_blank" rel="nofollow"><img src="images/basel_lightbg.png" alt="Basel Logo"></a>
-        <h4>Registro de POA ejecutado</h4>
-    </section>
-    
-    <!-- Sección de autenticación -->
-    <div id="login-container">
-        <h3>Iniciar Sesión</h3>
-        <input type="text" id="username" placeholder="Usuario">
-        <div class="password-container">
-            <input type="password" id="password" placeholder="Contraseña">
-            <button type="button" class="toggle-password" id="togglePassword">
-                <i class="fas fa-eye"></i>
-            </button>
-        </div>
-        <button id="loginButton">Entrar</button>
-        <p id="login-error" class="error"></p>
-    </div>
 
-    <!-- Sección del formulario de Registro -->
-    <div id="form-container" style="display: none;">
-        <h2>Registro</h2>
-        <form id="myForm">
-            <label for="name">Nombre:</label>
-            <input type="text" id="name" name="name" required><br><br>
-            <label for="email">Correo:</label>
-            <input type="email" id="email" name="email" required><br><br>
-            <button type="button" id="submitButton">Enviar</button>
-        </form>
-        <button id="logoutButton">Cerrar Sesión</button>
-        
-        <!-- Tabla de envíos del usuario -->
-        <div id="user-submissions">
-            <h2>Mis envíos</h2>
-            <table id="submissions-table">
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Correo</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+<body>
+    <div class="login-container" id="login-container">
+        <div class="login-box">
+            <h2>Iniciar Sesión</h2>
+            <input type="text" id="username" placeholder="Usuario">
+            <input type="password" id="password" placeholder="Contraseña">
+            <button id="login-btn">Login</button>
         </div>
     </div>
     
-    <!-- Panel de Administrador -->
-    <div id="admin-container" style="display: none;">
-        <h2>Panel de Administrador</h2>
-        <table id="admin-table">
-            <thead>
-                <tr>
-                    <th>Usuario</th>
-                    <th>Nombre</th>
-                    <th>Correo</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <button id="exportButton">Descargar Excel</button>
-        <button onclick="logout()">Cerrar Sesión</button>
-    </div>
-        
-    <!-- Pie de página -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="header-logos">
-                <img src="images/gfp_darkbg.png" alt="Logo GFP">
-                <img src="images/suiza_darkbg.png" alt="Logo Suiza">
-                <img src="images/basel_darkbg.png" alt="Logo Basel">
-            </div>
-            
-            <!-- Información de contacto -->
-            <div class="footer-section contact-info">
-                <ul>
-                    <li><i class="fas fa-phone-alt"></i> (511) 6851622</li>
-                    <li><i class="fas fa-envelope"></i> contacto@gfpsubnacional.pe</li>
-                    <li><i class="fas fa-map-marker-alt"></i> Av. Jorge Basadre 870, San Isidro, Lima - Perú, Código Postal: 15036</li>
-                </ul>
-            </div>
-            
-            <!-- Redes sociales -->
-            <div class="footer-section social-icons">
-                <a href="https://web.facebook.com/GFPsubnacional" target="_blank"><i class="fab fa-facebook"></i></a>
-                <a href="https://www.youtube.com/channel/UCuFvzdjqfyI1cpr-O_tB1Iw" target="_blank"><i class="fab fa-youtube"></i></a>
-                <a href="https://twitter.com/programa_gfp" target="_blank"><i class="fab fa-twitter"></i></a>
-                <a href="https://www.linkedin.com/company/programa-gfp-subnacional" target="_blank"><i class="fab fa-linkedin"></i></a>
-            </div>
+    <header class="header">
+        <div class="logos">
+            <a href="https://www.gfpsubnacional.pe/inicio/"><img src="images/gfp_darkbg.png" alt="GFP Logo"></a>
+            <a href="https://cooperacionsuiza.pe/seco" target="_blank" rel="nofollow"><img src="images/suiza_darkbg.png" alt="Suiza Logo"></a>
+            <a href="https://baselgovernance.org" target="_blank" rel="nofollow"><img src="images/basel_darkbg.png" alt="Basel Logo"></a>
+            <h5>Registro de POA ejecutado</h5>    
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 GFP Subnacional</p>
+        <button class="logout hidden" id="logout-btn">Cerrar sesión</button>
+    </header>
+    
+    <div class="main-container">
+        <nav class="sidebar hidden" id="sidebar"></nav>
+        <div class="content-container">
+            <main class="content" id="content"></main>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        <div class="logos">
+            <a href="https://www.gfpsubnacional.pe/inicio/"><img src="images/gfp_darkbg.png" alt="GFP Logo"></a>
+            <a href="https://cooperacionsuiza.pe/seco" target="_blank" rel="nofollow"><img src="images/suiza_darkbg.png" alt="Suiza Logo"></a>
+            <a href="https://baselgovernance.org" target="_blank" rel="nofollow"><img src="images/basel_darkbg.png" alt="Basel Logo"></a>
         </div>
     </footer>
-
-    <!-- Script principal -->
-    <script type="module" src="js/index.js"></script>
-
+    
+    <script type="module" src="script.js"></script>
 </body>
 </html>
