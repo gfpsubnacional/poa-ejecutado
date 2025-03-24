@@ -59,16 +59,16 @@ h2 {
     display: flex;
     align-items: center;
     color: white;
-    padding: 10px 20px;
     width: 100%;
     position: fixed;
     height: 60px;
     z-index: 8;
     justify-content: space-between; /* Centra los elementos */
+    background-color: #1C4574;
+    padding: 5px;
 }
 .header { 
     top: 0; 
-    background-color: #1C4574;
 }
 .header h5 {
     font-size: 0.8em;
@@ -77,14 +77,13 @@ h2 {
 }
 .footer { 
     bottom: 0;   
-    background-color: #1C4574;  
 }
 .logos {
     display: flex;
     align-items: center;
-    flex-grow: 1; /* Distribuye mejor los logos */
-    justify-content: center; /* Asegura que los logos estén centrados */
-    gap: 10px; /* Mayor separación entre los logos */
+    flex-grow: 1; /* Distribuye mejor  */
+    justify-content: center; /* Asegura que  estén centrados */
+    gap: 10px; /* Mayor separación entre  */
     overflow: hidden; /* Evita desbordamientos */
 }
 
@@ -116,12 +115,11 @@ h2 {
     font-size: 24px;
     cursor: pointer;
     color: white;
-    margin-right: 20px;
+    margin: 10px;
 }
 
 
 .sidebar {
-    transition: width 0.3s ease-in-out;
     width: 230px;
     background: #444444;
     color: white;
@@ -189,4 +187,5 @@ h2 {
 .content {
     padding: 20px;
     padding-bottom:200px;
+    min-width: 300px;
 }

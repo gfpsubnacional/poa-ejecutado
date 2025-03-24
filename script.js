@@ -32,9 +32,67 @@ document.addEventListener("DOMContentLoaded", function() {
 
 //////////// FUNCIONES
 
+
+document.addEventListener("DOMContentLoaded", function () {
+    function ajustarLogos(contenedor, esHeader = false) {
+        const parent = contenedor.closest(".header, .footer"); // Encuentra si es header o footer
+        const sidebarToggle = esHeader ? document.getElementById("sidebar-toggle") : null;
+        const logoutBtn = esHeader ? document.getElementById("logout-btn") : null;
+        const texto = contenedor.querySelector("h5"); // Texto "Registro de POA ejecutado" en el header
+        const logos = Array.from(contenedor.querySelectorAll("a")); // Logos en el contenedor
+
+        let espacioDisponible = parent.clientWidth;
+
+        // Si es el header, restar el ancho de los botones si existen y son visibles
+        function obtenerAnchoElemento(elemento) {
+            return elemento && elemento.offsetParent !== null ? elemento.offsetWidth : 0;
+        }
+
+        if (esHeader) {
+            const anchoSidebar = obtenerAnchoElemento(sidebarToggle);
+            const anchoLogout = obtenerAnchoElemento(logoutBtn);
+            espacioDisponible -= (anchoSidebar + anchoLogout + 40); // Restar ancho de botones + margen extra
+        }
+
+        // Resetear visibilidad
+        if (texto) texto.style.display = "inline-block"; // Mostrar el texto antes de ocultarlo si es necesario
+        logos.forEach((logo) => (logo.style.display = "inline-block"));
+
+        let espacioOcupado = texto ? texto.offsetWidth : 0; // Contar el texto primero (si hay)
+
+        // Ocultar logos si no caben
+        for (let logo of logos) {
+            const anchoLogo = logo.offsetWidth;
+            if (espacioOcupado + anchoLogo > espacioDisponible) {
+                logo.style.display = "none";
+            } else {
+                espacioOcupado += anchoLogo;
+            }
+        }
+
+        // Si después de ocultar logos el texto no cabe, también se oculta
+        if (texto && espacioOcupado > espacioDisponible) {
+            texto.style.display = "none";
+        }
+    }
+
+    function ajustarAmbos() {
+        const headerLogos = document.querySelector(".header .logos");
+        const footerLogos = document.querySelector(".footer .logos");
+
+        if (headerLogos) ajustarLogos(headerLogos, true);
+        if (footerLogos) ajustarLogos(footerLogos, false);
+    }
+
+    // Ejecutar en carga y en resize
+    ajustarAmbos();
+    window.addEventListener("resize", ajustarAmbos);
+});
+
+
+
+
 document.getElementById("login-btn")?.addEventListener("click", login);
-
-
 
 let datosConsultores = []; // Declare globally
 let usuarioActual = ""; // Variable global para almacenar el usuario
@@ -106,6 +164,7 @@ function mostrarMenu(userData) {
     document.getElementById('sidebar').innerHTML = userInfoHTML + buttons;
     document.getElementById('sidebar').classList.remove('hidden');
     document.querySelector('.logout').classList.remove('hidden');
+    document.querySelector('.sidebar-toggle').classList.remove('hidden');
     document.getElementById('content').innerHTML = `<p id="welcome-message">Bienvenid@, ${userData.Consultor}</p>`;
 
     document.querySelectorAll('.menu-btn').forEach((button, index) => {
