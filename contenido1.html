@@ -12,18 +12,18 @@
     <form id="Formulario">
         <h2>Registro</h2>
         <div class="table-container">
-            <table class="table-formulario">
+            <table id="table-formulario-general" class="table-formulario">
                 <tr>
                     <td>Fecha de inicio de reporte:</td>
-                    <td><input type="date" id="fecha-inicio" min="2025-01-01" max="2025-12-31" onchange="actualizarMes()"></td>
+                    <td><input type="date" id="fecha-inicio" min="2025-01-01" max="2025-12-31"></td>
                 </tr>
                 <tr>
                     <td>Fecha de fin de reporte:</td>
-                    <td><input type="date" id="fecha-fin" min="2025-01-01" max="2025-12-31" onchange="actualizarMes()"></td>
+                    <td><input type="date" id="fecha-fin" min="2025-01-01" max="2025-12-31"></td>
                 </tr>
                 <tr>
                     <td>Mes del reporte:</td>
-                    <td><input type="text" id="mes-reporte" readonly></td>
+                    <td><input id="mes-reporte" readonly></td>
                 </tr>
             </table>
         </div>
@@ -40,9 +40,7 @@
                             <td>Actividad POA:</td>
                             <td>
                                 <select id="actividad-1">
-                                    <option value="curso1">Actividad 1</option>
-                                    <option value="curso2">Actividad 2</option>
-                                    <option value="curso3">Actividad 3</option>
+                                    <option hidden>-- Seleccione --</option>
                                 </select>
                             </td>
                         </tr>
@@ -50,8 +48,7 @@
                             <td>¿Meta nueva?:</td>
                             <td>
                                 <select id="metaNueva-1">
-                                    <option value="si">Sí</option>
-                                    <option value="no">No</option>
+                                    <option hidden>-- Seleccione --</option>
                                 </select>
                             </td>
                         </tr>
@@ -63,8 +60,7 @@
                             <td>Estado de meta:</td>
                             <td>
                                 <select id="estadoMeta-1">
-                                    <option value="concluida">Concluida</option>
-                                    <option value="en-proceso">En proceso</option>
+                                    <option hidden>-- Seleccione --</option>
                                 </select>
                             </td>
                         </tr>
@@ -80,25 +76,31 @@
                             <td>Fecha fin:</td>
                             <td><input type="date" id="fechaFin-1" min="2025-01-01" max="2025-12-31"></td>
                         </tr>
+
                         <tr>
-                            <td>Entidad:</td>
                             <td>
-                                <select id="entidad-1">
-                                    <option value="entidad1">Entidad 1</option>
-                                    <option value="entidad2">Entidad 2</option>
-                                    <option value="entidad3">Entidad 3</option>
-                                </select>
+                                Entidad:
                             </td>
+                            <td>
+                                <div class="multipleSelect-container">
+                                    <div class="multipleSelect-boton">
+                                        <span id="entidad-1">-- Seleccione --</span>
+                                        <span class="multipleSelect-icon">▼</span>
+                                    </div>
+                                    <ul id="entidad-1-opciones" class="multipleSelect-opciones">                                        
+                                    </ul>
+                                </div>
+                            </td>
+
                         </tr>
-                        <tr>
+                        <!-- <tr>
                             <td>Intervino más de un consultor:</td>
                             <td>
                                 <select id="variosConsultores-1">
-                                    <option value="si">Sí</option>
-                                    <option value="no">No</option>
+                                    <option hidden>-- Seleccione --</option>
                                 </select>
                             </td>
-                        </tr>
+                        </tr> -->
                         <tr>
                             <td>Número de participantes:</td>
                             <td><input type="number" id="participantes-1" min="0"></td>
@@ -126,6 +128,5 @@
 
     <!-- Script principal -->
     <script type="module" src="script.js"></script>
-
 </body>
 </html>
