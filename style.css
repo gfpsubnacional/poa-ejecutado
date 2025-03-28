@@ -62,7 +62,7 @@ h2 {
     width: 100%;
     position: fixed;
     height: 60px;
-    z-index: 8;
+    z-index: 20;
     justify-content: space-between; /* Centra los elementos */
     background-color: #1C4574;
     padding: 5px;
