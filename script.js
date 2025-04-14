@@ -26,19 +26,17 @@ const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", function() {
     const sidebar = document.getElementById("sidebar");
-    const contentContainer = document.getElementById("content-container");
+    // const contentContainer = document.getElementById("content-container");
     const toggleButton = document.getElementById("sidebar-toggle");
 
     toggleButton.addEventListener("click", function() {
         sidebar.classList.toggle("hidden");
-        contentContainer.classList.toggle("expanded");
+        // contentContainer.classList.toggle("expanded");
     });
 });
 
 
 //////////// FUNCIONES
-
-
 
 ///// Acomodar header y footer para ventanas pequeñas
 
@@ -122,8 +120,8 @@ let varios = [];
 
 
 function login() {
-    usuarioActual = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
+    usuarioActual = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
     fetch('POA 2025_bd.xlsx')
         .then(response => response.arrayBuffer())
@@ -133,8 +131,8 @@ function login() {
 
             // Buscar usuario en la tabla
             const userData = datosConsultores.find(row =>
-                row.Usuario?.toString().trim() === usuarioActual &&
-                row.Password?.toString().trim() === password
+                row.Usuario?.toString() === usuarioActual &&
+                row.Password?.toString() === password
             );
 
             if (!userData) {
@@ -167,7 +165,7 @@ function mostrarMenu(userData) {
     let buttons = "";
 
     const adminButtons = ["Contenido 6", "Contenido 7", "Contenido 8", "Contenido 9"];
-    const userButtons = ["Registro POA", "Ver POA 2025", "Mis envíos", "Contenido 4", "Contenido 5"];
+    const userButtons = ["Registro POA", "Mis envíos","POA 2025", "Mi POA 2025","Llenar Ficha (residente)","Ver Fichas (itinerante)"];
 
     if (userData.Tipo === 'admin') {
         buttons = adminButtons.map((name, i) =>
@@ -268,11 +266,12 @@ function showContent(fileName, button) {
 }
 
 
-//////// Cargar envios anteriores a LS en multiples casos
+
+//////// Cargar MisEnvios anteriores a LS en multiples casos
 let enProceso = false; // Para evitar consultas duplicadas
 
-async function ejecutarConsulta() {
-    if (localStorage.getItem("memoriaSubmissions") || enProceso) {
+async function ConsultarMisEnvios() {
+    if (localStorage.getItem("misEnvios") || enProceso) {
         return;
     }
 
@@ -295,49 +294,49 @@ async function ejecutarConsulta() {
 
         const q = query(collection(db, "metas"), where("usuario", "==", usuarioActual));
         const snapshot = await getDocs(q);
-        let memoriaSubmissions = [];
+        let misEnvios = [];
 
         snapshot.forEach(doc => {
-            memoriaSubmissions.push(doc.data());
+            misEnvios.push(doc.data());
         });
 
-        localStorage.setItem("memoriaSubmissions", JSON.stringify(memoriaSubmissions));
-        console.log("Consultado Mis envíos en LS:", memoriaSubmissions);
+        localStorage.setItem("misEnvios", JSON.stringify(misEnvios));
+        console.log("Mis envíos en LS:", misEnvios);
 
-        // Obtener memoriaSubmissions del localStorage
-        memoriaSubmissions = JSON.parse(localStorage.getItem("memoriaSubmissions")) || [];
+        // Obtener misEnvios del localStorage
+        misEnvios = JSON.parse(localStorage.getItem("misEnvios")) || [];
 
-        // Crear un conjunto de nombres de metas concluidas y metas abiertas (sin duplicados)
-        let metasConcluidasSet = new Set(
-            memoriaSubmissions
-                .filter(item => item.estadoMeta === "Concluída")
-                .map(item => item.nombreMeta)
-        );
-        let metasAbiertasSet = new Set(
-            memoriaSubmissions
-                .filter(item => !metasConcluidasSet.has(item.nombreMeta))
-                .map(item => item.nombreMeta)
-        );
+        // // Crear un conjunto de nombres de metas concluidas y metas abiertas (sin duplicados)
+        // let metasConcluidasSet = new Set(
+        //     misEnvios
+        //         .filter(item => item.estadoMeta === "Concluída")
+        //         .map(item => item.nombreMeta)
+        // );
+        // let metasAbiertasSet = new Set(
+        //     misEnvios
+        //         .filter(item => !metasConcluidasSet.has(item.nombreMeta))
+        //         .map(item => item.nombreMeta)
+        // );
 
-        // Convertir los Sets a arrays para almacenarlos en localStorage
-        let metasConcluidas = [...metasConcluidasSet];
-        let metasAbiertas = [...metasAbiertasSet];
+        // // Convertir los Sets a arrays para almacenarlos en localStorage
+        // let metasConcluidas = [...metasConcluidasSet];
+        // let metasAbiertas = [...metasAbiertasSet];
 
-        // Filtrar memoriaSubmissions para separar en abiertas y concluidas
-        let memoriaSubmissionsAbiertas = memoriaSubmissions.filter(item => metasAbiertasSet.has(item.nombreMeta));
-        let memoriaSubmissionsConcluidas = memoriaSubmissions.filter(item => metasConcluidasSet.has(item.nombreMeta));
+        // // Filtrar misEnvios para separar en abiertas y concluidas
+        // let misEnviosAbiertas = misEnvios.filter(item => metasAbiertasSet.has(item.nombreMeta));
+        // let misEnviosConcluidas = misEnvios.filter(item => metasConcluidasSet.has(item.nombreMeta));
 
-        // Guardar en localStorage
-        localStorage.setItem("metasAbiertas", JSON.stringify(metasAbiertas));
-        localStorage.setItem("metasConcluidas", JSON.stringify(metasConcluidas));
-        localStorage.setItem("memoriaSubmissionsAbiertas", JSON.stringify(memoriaSubmissionsAbiertas));
-        localStorage.setItem("memoriaSubmissionsConcluidas", JSON.stringify(memoriaSubmissionsConcluidas));
+        // // Guardar en localStorage
+        // localStorage.setItem("metasAbiertas", JSON.stringify(metasAbiertas));
+        // localStorage.setItem("metasConcluidas", JSON.stringify(metasConcluidas));
+        // localStorage.setItem("misEnviosAbiertas", JSON.stringify(misEnviosAbiertas));
+        // localStorage.setItem("misEnviosConcluidas", JSON.stringify(misEnviosConcluidas));
 
-        // Mostrar resultados en consola
-        console.log("Metas Abiertas (sin duplicados y sin Concluídas):", metasAbiertas);
-        console.log("Metas Concluidas (sin duplicados):", metasConcluidas);
-        console.log("Memoria Submissions Abiertas:", memoriaSubmissionsAbiertas);
-        console.log("Memoria Submissions Concluidas:", memoriaSubmissionsConcluidas);
+        // // Mostrar resultados en consola
+        // console.log("Metas Abiertas (sin duplicados y sin Concluídas):", metasAbiertas);
+        // console.log("Metas Concluidas (sin duplicados):", metasConcluidas);
+        // console.log("Memoria Submissions Abiertas:", misEnviosAbiertas);
+        // console.log("Memoria Submissions Concluidas:", misEnviosConcluidas);
 
     } catch (error) {
         console.error("Error al ejecutar consulta:", error);
@@ -353,28 +352,28 @@ async function ejecutarConsulta() {
 }
 
 // 🔹 Función para observar todos los selects dinámicos continuamente
-function observarSelects() {
-    document.querySelectorAll("select[id^='metaNueva-']").forEach(select => {
-        if (!select.dataset.listener) { // Evita agregar el listener varias veces
-            select.dataset.listener = "true";
-            select.addEventListener("change", () => {
-                // console.log(`Cambio detectado en select ${select.id}: ${select.value}`);
-                if (select.value === "No" || select.value === "Sí") {
-                    ejecutarConsulta();
-                }
-            });
-            // console.log(`Evento agregado a select ${select.id}`);
-        }
-    });
-}
+// function observarSelects() {
+//     document.querySelectorAll("select[id^='metaNueva-']").forEach(select => {
+//         if (!select.dataset.listener) { // Evita agregar el listener varias veces
+//             select.dataset.listener = "true";
+//             select.addEventListener("change", () => {
+//                 // console.log(`Cambio detectado en select ${select.id}: ${select.value}`);
+//                 if (select.value === "No" || select.value === "Sí") {
+//                     ConsultarMisEnvios();
+//                 }
+//             });
+//             // console.log(`Evento agregado a select ${select.id}`);
+//         }
+//     });
+// }
 
 // 🔹 Función para observar botones (solo una vez)
 function observarBotones() {
-    ["boton3", "boton4", "boton5"].forEach(id => {
+    ["boton2", "boton4"].forEach(id => {
         const btn = document.getElementById(id);
         if (btn && !btn.dataset.listener) {
             btn.dataset.listener = "true";
-            btn.addEventListener("click", ejecutarConsulta, { once: true });
+            btn.addEventListener("click", ConsultarMisEnvios, { once: true });
             // console.log(`Evento agregado a ${id}`);
         }
     });
@@ -382,7 +381,7 @@ function observarBotones() {
 
 // 🔹 Configurar el MutationObserver para detectar cambios en el DOM
 function iniciarObserver() {
-    if (localStorage.getItem("memoriaSubmissions")) {
+    if (localStorage.getItem("misEnvios")) {
         // console.log("Se omite observer porque ya hay datos en LS.");
         return;
     }
@@ -394,13 +393,13 @@ function iniciarObserver() {
             mutation.addedNodes.forEach(node => {
                 if (node.nodeType === 1) { // Solo nodos tipo elemento
                     // Si se añade un select dinámico, observarlo
-                    if (node.matches("select[id^='metaNueva-']") || node.querySelector("select[id^='metaNueva-']")) {
-                        // console.log("Nuevo select detectado, agregando evento...");
-                        observarSelects();
-                    }
+                    // if (node.matches("select[id^='metaNueva-']") || node.querySelector("select[id^='metaNueva-']")) {
+                    //     // console.log("Nuevo select detectado, agregando evento...");
+                    //     observarSelects();
+                    // }
 
                     // Si se añade un botón dinámico, observarlo
-                    if (["boton3", "boton4", "boton5"].includes(node.id) || node.querySelector("#boton3, #boton4, #boton5")) {
+                    if (["boton2", "boton3", "boton4"].includes(node.id) || node.querySelector("#boton2, #boton3, #boton4")) {
                         // console.log("Nuevo botón detectado, agregando evento...");
                         observarBotones();
                     }
@@ -412,15 +411,410 @@ function iniciarObserver() {
     observer.observe(document.body, { childList: true, subtree: true });
 
     // Observar los elementos iniciales en la página
-    observarSelects();
+    // observarSelects();
     observarBotones();
 }
 
 iniciarObserver();
 
+
+
+
+
+//////// Cargar Envios anteriores (de todos los consultores) a LS en multiples casos
+let enProceso2 = false; // Para evitar consultas duplicadas
+
+async function ConsultarEnvios() {
+    if (localStorage.getItem("Envios") || enProceso2) {
+        return;
+    }
+
+    enProceso2 = true; // Bloquea futuras ejecuciones mientras esta termina
+
+    try {
+        // Mostrar pop-up de carga
+        const loader = document.createElement("div");
+        loader.id = "loaderPopup";
+        loader.style.position = "fixed";
+        loader.style.top = "50%";
+        loader.style.left = "50%";
+        loader.style.transform = "translate(-50%, -50%)";
+        loader.style.padding = "20px";
+        loader.style.background = "rgba(0,0,0,0.8)";
+        loader.style.color = "#fff";
+        loader.style.borderRadius = "5px";
+        loader.innerText = "Cargando...";
+        document.body.appendChild(loader);
+
+        const q = query(collection(db, "metas"));
+        const snapshot = await getDocs(q);
+        let Envios = [];
+
+        snapshot.forEach(doc => {
+            Envios.push(doc.data());
+        });
+
+        localStorage.setItem("Envios", JSON.stringify(Envios));
+        console.log("Envios (todos) en LS:", Envios);
+
+        // Obtener Envios del localStorage
+        Envios = JSON.parse(localStorage.getItem("Envios")) || [];
+
+    } catch (error) {
+        console.error("Error al ejecutar consulta:", error);
+    } finally {
+        // Ocultar el pop-up de carga
+        const loaderPopup = document.getElementById("loaderPopup");
+        if (loaderPopup) {
+            loaderPopup.remove();
+        }
+
+        enProceso2 = false; // Permite futuras ejecuciones
+    }
+}
+
+
+// 🔹 Función para observar botones (solo una vez)
+function observarBotones2() {
+    ["boton3"].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn && !btn.dataset.listener) {
+            btn.dataset.listener = "true";
+            btn.addEventListener("click", ConsultarEnvios, { once: true });
+            // console.log(`Evento agregado a ${id}`);
+        }
+    });
+}
+
+// 🔹 Configurar el MutationObserver para detectar cambios en el DOM
+function iniciarObserver2() {
+    if (localStorage.getItem("Envios")) {
+        // console.log("Se omite observer porque ya hay datos en LS.");
+        return;
+    }
+
+    // console.log("Iniciando MutationObserver...");
+
+    const observer = new MutationObserver((mutationsList) => {
+        mutationsList.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === 1) { // Solo nodos tipo elemento
+                    // Si se añade un select dinámico, observarlo
+                    // if (node.matches("select[id^='metaNueva-']") || node.querySelector("select[id^='metaNueva-']")) {
+                    //     // console.log("Nuevo select detectado, agregando evento...");
+                    //     observarSelects();
+                    // }
+
+                    // Si se añade un botón dinámico, observarlo
+                    if (["boton3"].includes(node.id) || node.querySelector("#boton3")) {
+                        // console.log("Nuevo botón detectado, agregando evento...");
+                        observarBotones2();
+                    }
+                }
+            });
+        });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Observar los elementos iniciales en la página
+    // observarSelects();
+    observarBotones2();
+}
+
+iniciarObserver2();
+
+
+///// Descargar PDF
+
+function waitForElementsAndInit(callback) {
+    const checkInterval = 100; // milisegundos
+
+    const intervalId = setInterval(() => {
+        const content = document.getElementById('content');
+
+        if (content) {
+            clearInterval(intervalId);
+            callback(content); // Pasar solo el contenido, ya que el evento se delegará
+        }
+    }, checkInterval);
+}
+
+function generateRandomCode() {
+    // Genera un código aleatorio de 6 números
+    return Math.floor(100000 + Math.random() * 900000);
+}
+
+function setupDownloadPDF(content) {
+    document.addEventListener('click', function (event) {
+        if (event.target && event.target.classList.contains('download-btn')) {
+            // Obtener los datos del usuario desde localStorage
+            const usuario = JSON.parse(localStorage.getItem("usuarioDatos"));
+            const usuarioNombre = usuario ? usuario.Usuario : "Usuario desconocido"; // Fallback en caso de que no exista
+
+            // Generar el código aleatorio
+            const codigoAleatorio = generateRandomCode();
+
+            // Obtener la fecha y hora actual
+            const now = new Date();
+            const fechaDescarga = now.toLocaleDateString();
+            const horaDescarga = now.toLocaleTimeString();
+
+            const opt = {
+                margin: [40, 10, 20, 10], // Margenes: [top, right, bottom, left] en puntos (pt)
+                filename: 'contenido.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'pt', format: 'a4', orientation: 'landscape' },
+                html2canvas: {
+                    useCORS: true,
+                    allowTaint: false,
+                    logging: false,
+                    letterRendering: true
+                },
+                width: 800,
+                maxWidth: 700,
+                pagebreak: { mode: 'avoid-all', before: '.page-break' }
+            };
+
+            // Crear el PDF
+            html2pdf()
+                .set(opt)
+                .from(content)
+                .toPdf()
+                .get('pdf')
+                .then(function (pdf) {
+                    const totalPages = pdf.internal.getNumberOfPages();
+                    const headerText = `Descargado desde la plataforma (${codigoAleatorio}) el ${fechaDescarga} a las ${horaDescarga}. Usuario: ${usuarioNombre}`;
+                    const headerFontSize = 10;
+                    const headerMarginTop = 25;
+                    const footerFontSize = 10;
+                    const footerMarginBottom = 10;
+                    const textColorGray = [128, 128, 128]; // Código RGB para gris
+
+                    pdf.setFontSize(headerFontSize);
+                    pdf.setTextColor(...textColorGray);
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        pdf.setPage(i);
+
+                        // Agregar el encabezado
+                        pdf.setFontSize(headerFontSize);
+                        pdf.setTextColor(...textColorGray);
+                        const headerWidth = pdf.getTextWidth(headerText);
+                        const pageWidth = pdf.internal.pageSize.getWidth();
+                        const headerX = (pageWidth - headerWidth) / 2; // Centrar el encabezado
+                        pdf.text(headerText, headerX, headerMarginTop);
+
+                        // Agregar el número de página al pie de página
+                        pdf.setFontSize(footerFontSize);
+                        pdf.setTextColor(...textColorGray);
+                        const pageNumberText = `Página ${i} de ${totalPages}`;
+                        const footerWidth = pdf.getTextWidth(pageNumberText);
+                        const footerX = (pageWidth - footerWidth) / 2; // Centrar el pie de página
+                        const pageHeight = pdf.internal.pageSize.getHeight();
+                        pdf.text(pageNumberText, footerX, pageHeight - footerMarginBottom);
+                    }
+
+                    // Renderizar el contenido principal después de agregar encabezado y pie de página
+                    html2canvas(content, {
+                        scale: opt.html2canvas.scale,
+                        useCORS: true,
+                        allowTaint: false,
+                        logging: false,
+                        // No necesitamos un margen superior aquí, ya que el margen del PDF lo controla
+                    }).then(function(canvas) {
+                        // Ajustar la altura si excede el espacio disponible
+                        pdf.save();
+                    });
+                });
+        }
+    });
+}
+
+// Iniciar cuando la página esté lista
+document.addEventListener('DOMContentLoaded', () => {
+    waitForElementsAndInit(setupDownloadPDF);
+});
 ///////////////// CONTENIDO1 ////////////////////
 
 // 2.1. USER. FORMULARIO.
+
+// Cargar POADatos del localStorage
+
+// Función principal de actualización
+function actualizarTitulos() {
+  // Seleccionar todos los inputs cuyo id comience con "titulo-"
+  const titulos = document.querySelectorAll('input[id^="titulo-"]');
+
+  titulos.forEach(titulo => {
+    const id = titulo.id;
+    const n = id.split("titulo-")[1];
+    const actividad = document.querySelector(`#actividad-${n}`);
+    const numerometas = document.querySelector(`#numerometas-${n}`);
+    if (numerometas) {
+        numerometas.style.pointerEvents = 'auto';
+    }
+
+    if (!actividad) {
+    //   console.log(`No se encontró #actividad-${n} para #${id}`);
+      return;
+    }
+
+    const textoSeleccionado = actividad.options[actividad.selectedIndex]?.text || "";
+    // console.log(`Texto seleccionado en actividad-${n}:`, textoSeleccionado);
+
+    if (textoSeleccionado.includes(".P1.") || textoSeleccionado.includes(".P6.")) {
+        // Buscar en POADatos
+      titulo.setAttribute("readonly", true);
+      const poaItem = datosPOA.find(item => item.Actividad === textoSeleccionado);
+      if (poaItem) {
+        titulo.value = poaItem.Actividad_name;
+        // console.log(`Actualizado #${id} con nombre:`, poaItem.Actividad_name);
+      } else {
+        titulo.value = "";
+        console.warn(`No se encontró Actividad "${textoSeleccionado}" en POADatos`);
+      }
+    } else if (textoSeleccionado.includes("Seleccione")) {
+        titulo.value = "";
+        titulo.setAttribute("readonly", true);
+        if (numerometas) {
+            numerometas.value = "";
+            numerometas.readonly = true;
+            numerometas.style.pointerEvents = 'none';
+        }
+        // console.log(`El texto contiene "Seleccione", borrando el contenido en #${id} y estableciendo como no editable`);
+        return;
+    } else {
+      titulo.value = "";
+      titulo.removeAttribute("readonly");
+      numerometas.value = 1;
+      numerometas.readonly = true;
+      numerometas.style.pointerEvents = 'none';
+    //   console.log(`Elemento #${id} editable`);
+    }
+  });
+}
+
+// Observar cambios en el DOM por si se agregan o modifican elementos
+const observer = new MutationObserver(() => {
+//   console.log("Cambio detectado en el DOM. Actualizando títulos...");
+  actualizarTitulos();
+});
+
+// Observar el body completo (o puedes reducirlo a un contenedor específico si sabes cuál)
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+});
+
+// Escuchar cambios en todos los selects con id que empiece con "actividad-"
+const observarCambiosEnSelects = () => {
+  document.querySelectorAll('select[id^="actividad-"]').forEach(select => {
+    if (!select.dataset.listenerAdded) {
+      select.addEventListener("change", () => {
+        // console.log(`Cambio detectado en ${select.id}`);
+        actualizarTitulos();
+      });
+      select.dataset.listenerAdded = "true";
+    }
+  });
+};
+
+// Llamar inicialmente
+actualizarTitulos();
+observarCambiosEnSelects();
+
+// Volver a observar nuevos selects periódicamente por seguridad
+setInterval(observarCambiosEnSelects, 1000);
+
+
+// document.addEventListener('DOMContentLoaded', function() {
+//     const elementosConfigurados = new Set(); // Conjunto para almacenar IDs de elementos ya configurados
+
+//     function setupTodosLosSelectores() {
+//         document.querySelectorAll('[id^="selectortiporegistro-"]').forEach(selectorTipoRegistro => {
+//             const idNumero = selectorTipoRegistro.id.split('-').pop();
+
+//             // Evitar reconfiguración si ya se procesó este ID
+//             if (elementosConfigurados.has(selectorTipoRegistro.id)) {
+//                 return;
+//             }
+
+//             const indicadorTipoRegistro = document.getElementById(`indicadortiporegistro-${idNumero}`);
+//             const opcionIndividual = document.getElementById(`opcionindividualtiporegistro-${idNumero}`);
+//             const opcionMultiple = document.getElementById(`opcionmultipletiporegistro-${idNumero}`);
+//             // const nombreMeta = document.getElementById(`nnombreMeta-${idNumero}`);
+//             const filaNumeroMetas = document.getElementById(`numerometas-${idNumero}`)?.closest('tr');
+//             const tipoRegistro = document.getElementById(`tiporegistro-${idNumero}`);
+            
+//             let seleccionIndividual = true;
+    
+//             function cambiarEstado(esIndividual) {
+//                 if (esIndividual) {
+//                     indicadorTipoRegistro.style.left = '0';
+//                     opcionIndividual.classList.add('opcion-tiporegistro-seleccionada');
+//                     opcionIndividual.classList.remove('opcion-tiporegistro-no-seleccionada');
+//                     opcionMultiple.classList.add('opcion-tiporegistro-no-seleccionada');
+//                     opcionMultiple.classList.remove('opcion-tiporegistro-seleccionada');
+                    
+//                     // if (nombreMeta) nombreMeta.textContent = "Nombre de meta:";
+//                     if (filaNumeroMetas) filaNumeroMetas.style.display = 'none';
+//                     if (tipoRegistro) tipoRegistro.textContent = "Individual";
+//                 } else {
+//                     indicadorTipoRegistro.style.left = '50%';
+//                     opcionIndividual.classList.remove('opcion-tiporegistro-seleccionada');
+//                     opcionIndividual.classList.add('opcion-tiporegistro-no-seleccionada');
+//                     opcionMultiple.classList.remove('opcion-tiporegistro-no-seleccionada');
+//                     opcionMultiple.classList.add('opcion-tiporegistro-seleccionada');
+                    
+//                     // if (nombreMeta) nombreMeta.textContent = "Nombre de bloque de metas:";
+//                     if (filaNumeroMetas) filaNumeroMetas.style.display = 'table-row';
+//                     if (tipoRegistro) tipoRegistro.textContent = "Multiple";
+//                 }
+//                 seleccionIndividual = esIndividual;
+//             }
+    
+//             selectorTipoRegistro.addEventListener('click', () => {
+//                 cambiarEstado(!seleccionIndividual);
+//             });
+
+//             cambiarEstado(true);
+
+//             // Agregar el ID al conjunto para evitar reconfiguraciones
+//             elementosConfigurados.add(selectorTipoRegistro.id);
+//         });
+//     }
+    
+//     setupTodosLosSelectores();
+    
+//     const observer = new MutationObserver(function(mutations) {
+//         let nuevosElementos = false;
+//         mutations.forEach(mutation => {
+//             mutation.addedNodes.forEach(node => {
+//                 if (node.nodeType === 1 && node.matches('[id^="selectortiporegistro-"]')) {
+//                     nuevosElementos = true;
+//                 } else if (node.nodeType === 1) {
+//                     // Buscar dentro de los nodos agregados si hay selectores
+//                     if (node.querySelector('[id^="selectortiporegistro-"]')) {
+//                         nuevosElementos = true;
+//                     }
+//                 }
+//             });
+//         });
+
+//         if (nuevosElementos) {
+//             setupTodosLosSelectores();
+//         }
+//     });
+
+//     // Observa el cuerpo para detectar cambios en la estructura de los nodos
+//     observer.observe(document.body, {
+//         childList: true,
+//         subtree: true
+//     });
+// });
+
 
 ///// Configurar boton de nuevas metas:
 function inicializarEventosMetas() {
@@ -472,8 +866,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function filtrarActividades(actividadesDropdown) {
         const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos")) || {};
         const POADatos = JSON.parse(localStorage.getItem("POADatos")) || [];
-
-        const actividadesFiltradas = POADatos.filter(item => item.Resultado_cod.startsWith(usuarioDatos.Resultado));
+        const actividadesFiltradas = POADatos.filter(item => item.Actividad_cod.startsWith(usuarioDatos.Resultado));
 
         actividadesFiltradas.forEach(actividad => {
             const option = document.createElement("option");
@@ -484,7 +877,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function agregarOpcionesEntidad1() {
-        const entidad = document.getElementById("entidad-1-opciones");
+        const entidad = document.getElementById("entidadopciones-1");
         if (entidad) {
             entidad.innerHTML = ""; // Limpiar opciones anteriores
             entidad.style.maxHeight = "200px"; // Altura máxima para scroll
@@ -512,7 +905,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    let totalCargas = 4;
+    let totalCargas = 2;
     let cargasCompletadas = 0;
 
     function verificarCargaCompleta() {
@@ -522,10 +915,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    esperarElementoYAplicar("estadoMeta-1", select => cargarOpciones(select, "estado"), verificarCargaCompleta);
-    esperarElementoYAplicar("entidad-1-opciones", agregarOpcionesEntidad1, verificarCargaCompleta);
-    // esperarElementoYAplicar("variosConsultores-1", select => cargarOpciones(select, "masdeunconsultor"), verificarCargaCompleta);
-    esperarElementoYAplicar("metaNueva-1", select => cargarOpciones(select, "sino"), verificarCargaCompleta);
+    // esperarElementoYAplicar("estadoMeta-1", select => cargarOpciones(select, "estado"), verificarCargaCompleta);
+    esperarElementoYAplicar("entidadopciones-1", agregarOpcionesEntidad1, verificarCargaCompleta);
+    esperarElementoYAplicar("variosConsultores-1", select => cargarOpciones(select, "masdeunconsultor"), verificarCargaCompleta);
+    // esperarElementoYAplicar("metaNueva-1", select => cargarOpciones(select, "sino"), verificarCargaCompleta);
+    esperarElementoYAplicar("estadoMeta-1", select => cargarOpciones(select, "etapa"), verificarCargaCompleta);
     esperarElementoYAplicar("actividad-1", filtrarActividades, verificarCargaCompleta);
 
     function activarScriptFecha() {
@@ -571,9 +965,10 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             const nombresMeses = [
-                "ene", "feb", "mar", "abr", "may", "jun",
-                "jul", "ago", "sep", "oct", "nov", "dic"
-            ];
+                "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                "Julio", "Agosto", "Setiembre", "Octubre", "Noviembre", "Diciembre"
+            ]
+
             mesReporteInput.value = nombresMeses[mesMaximo];
         }
 
@@ -622,24 +1017,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
     observeSelects();
 
-    const metasContainer = document.getElementById("metas-container");
-    const addMetaButton = document.querySelector(".add-meta");
-    const submitButton = document.getElementById("submitButton");
 
     window.actualizarNumeracionMetas = actualizarNumeracionMetas
     function actualizarNumeracionMetas() {
         document.querySelectorAll(".meta-container").forEach((meta, index) => {
-            meta.querySelector(".meta-title").textContent = `Registrar Meta ${index + 1}`;
+            // Actualizar el título de la meta
+            meta.querySelector(".meta-title").textContent = `Registro ${index + 1}`;
             meta.dataset.index = index + 1;
-            meta.querySelectorAll("input, select, td[contenteditable]").forEach(input => {
-                if (input.id) {
-                    const baseId = input.id.split("-")[0];
+    
+            // Actualizar el ID del contenedor .meta-container (si sigue el formato esperado)
+            const metaIdPartes = meta.id.split("-");
+            if (metaIdPartes.length > 1 && !isNaN(metaIdPartes.pop())) {
+                meta.id = `${metaIdPartes.join("-")}-${index + 1}`;
+            }
+    
+            // Actualizar los IDs de los elementos dentro del meta-container
+            meta.querySelectorAll("[id]").forEach(input => {
+                const partes = input.id.split("-");
+                if (partes.length < 2) return; // Ignorar elementos con IDs no esperados
+    
+                const idActual = partes.pop(); // Último segmento del ID
+                const baseId = partes.join("-"); // Resto del ID sin el número
+                
+                // Solo actualizar si el ID termina en un número diferente al nuevo índice
+                if (!isNaN(idActual) && parseInt(idActual) !== index + 1) {
                     input.id = `${baseId}-${index + 1}`;
                 }
             });
         });
     }
-
+    
     function minimizarMeta(event) {
         const metaContainer = event.target.closest(".meta-container");
         const tableContainer = metaContainer.querySelector(".table-container");
@@ -691,7 +1098,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     async function enviarDatos() {
+        if (!confirm("¿Está seguro de enviar este reporte?")) {
+            return; // El usuario canceló → detener ejecución
+        }
+
         try {
+            // Mostrar pop-up de carga
+            const loader = document.createElement("div");
+            loader.id = "loaderPopup";
+            loader.style.position = "fixed";
+            loader.style.top = "50%";
+            loader.style.left = "50%";
+            loader.style.transform = "translate(-50%, -50%)";
+            loader.style.padding = "20px";
+            loader.style.background = "rgba(0,0,0,0.8)";
+            loader.style.color = "#fff";
+            loader.style.borderRadius = "5px";
+            loader.innerText = "Enviando...";
+            document.body.appendChild(loader);
+
+
+
             let formularioValido = true;
             let camposInvalidos = [];
 
@@ -734,9 +1161,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (esSelect) {
                     valor = elemento.options[elemento.selectedIndex].text;
                 } else if (esEditable) {
-                    valor = elemento.textContent.trim();
+                    valor = elemento.textContent;
                 } else {
-                    valor = elemento.value.trim();
+                    valor = elemento.value;
                 }
 
                 if (valor === "" || valor === "-- Seleccione --") {
@@ -755,14 +1182,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 const index = meta.dataset.index;
 
                 // Validar solo si cada campo está visible
-                validarCampo(`nombreMeta-${index}`, false, true);
                 validarCampo(`actividad-${index}`, true);
-                validarCampo(`metaNueva-${index}`, true);
-                validarCampo(`estadoMeta-${index}`, true);
-                validarCampo(`detalleMeta-${index}`, false, true);
-                validarCampo(`fechaInicio-${index}`);
-                validarCampo(`fechaFin-${index}`);
+                // validarCampo(`nombreMeta-${index}`, false, true);
+                validarCampo(`numerometas-${index}`);
                 validarCampo(`entidad-${index}`, false, true);
+                // validarCampo(`metaNueva-${index}`, true);
+                // validarCampo(`estadoMeta-${index}`, true);
+                // validarCampo(`detalleMeta-${index}`, false, true);
+                // validarCampo(`fechaInicio-${index}`);
+                // validarCampo(`fechaFin-${index}`);
                 // validarCampo(`variosConsultores-${index}`, true);
                 validarCampo(`participantes-${index}`);
                 validarCampo(`hombres-${index}`);
@@ -790,12 +1218,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         fechaFin: fechaFinGlobal,
                         mesReporte: mesReporteGlobal,
                         actividad: getSelectText(`actividad-${index}`),
-                        metaNueva: getSelectText(`metaNueva-${index}`),
-                        nombreMeta: getElementText(`nombreMeta-${index}`),
-                        estadoMeta: getSelectText(`estadoMeta-${index}`),
-                        detalleMeta: getElementText(`detalleMeta-${index}`),
-                        fechaInicio: getElementValue(`fechaInicio-${index}`),
-                        fechaFin: getElementValue(`fechaFin-${index}`),
+                        titulo: document.getElementById(`titulo-${index}`).value,
+                        // tipoRegistro: document.getElementById(`tiporegistro-${index}`).innerText,
+                        numerometas: getElementValue(`numerometas-${index}`) || 1,
+                        // metaNueva: getSelectText(`metaNueva-${index}`),
+                        // nombreMeta: getElementText(`nombreMeta-${index}`),
+                        // estadoMeta: getSelectText(`estadoMeta-${index}`),
+                        // detalleMeta: getElementText(`detalleMeta-${index}`),
+                        // fechaInicio: getElementValue(`fechaInicio-${index}`),
+                        // fechaFin: getElementValue(`fechaFin-${index}`),
                         entidad: getElementText(`entidad-${index}`),
                         // variosConsultores: getSelectText(`variosConsultores-${index}`),
                         participantes: getElementValue(`participantes-${index}`),
@@ -803,15 +1234,23 @@ document.addEventListener("DOMContentLoaded", function () {
                         mujeres: getElementValue(`mujeres-${index}`),
                         autoridades: getElementText(`autoridades-${index}`)
                     };
+                    console.log(metaData)
                     await addDoc(collection(db, "metas"), metaData);
                 }
             }
 
-            alert("✅ La información se registró satisfactoriamente.");
         } catch (error) {
             alert(`❌ Error: ${error.message}\nPor favor, no pierda su registro, tome nota del error e informe a Seguimiento y Evaluación.`);
             console.error("Error al enviar datos:", error);
+        } finally {
+            // Ocultar el pop-up de carga
+            const loaderPopup = document.getElementById("loaderPopup");
+            if (loaderPopup) {
+                loaderPopup.remove();
+            }
+            alert("✅ La información se registró satisfactoriamente.");
         }
+
     }
 
     document.addEventListener("click", function (event) {
@@ -883,10 +1322,15 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".multipleSelect-container").forEach(container => {
             const multipleSelectBoton = container.querySelector(".multipleSelect-boton");
             const multipleSelectLista = container.querySelector(".multipleSelect-opciones");
-            const multipleSelectSeleccionadas = container.querySelector("#entidad-1");
+
+            // Seleccionar todos los elementos cuyo ID comienza con "entidad-"
+            const multipleSelectSeleccionadas = container.querySelectorAll("[id^='entidad-']");
 
             if (!container.dataset.initialized) {
-                setupMultipleSelect(multipleSelectBoton, multipleSelectLista, multipleSelectSeleccionadas);
+                // Si hay varios elementos con ID que empieza por "entidad-", se aplican a todos
+                multipleSelectSeleccionadas.forEach(el => {
+                    setupMultipleSelect(multipleSelectBoton, multipleSelectLista, el);
+                });
                 container.dataset.initialized = "true";
             }
         });
@@ -904,172 +1348,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-//////////////// CONTENIDO2 /////////////////
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    function inicializarTablaPOA() {
-        if (!document.getElementById("tablaPOA")) {
-            return false;
-        }
-
-        window.tablaPOA_subtitulos = ["Resultado", "Producto"];
-        window.tablaPOA_columnasFijas = ["Actividad", "Indicador", "Unidad de medida", "Medio de verificación", "Logro Esperado"];
-        window.tablaPOA_meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"];
-        window.tablaPOA_datos = [...window.tablaPOA_columnasFijas, ...window.tablaPOA_meses.map(m => m + "_pl"), "Pl_total", ...window.tablaPOA_meses.map(m => m + "_ej"), "Ej_total"];
-
-        window.tablaPOA_leerExcel = function (url) {
-            fetch(url)
-                .then(response => response.arrayBuffer())
-                .then(buffer => {
-                    const libro = XLSX.read(buffer, { type: 'array' });
-                    const nombreHoja = libro.SheetNames[0];
-                    const hoja = libro.Sheets[nombreHoja];
-                    const POAdatos = XLSX.utils.sheet_to_json(hoja);
-                    window.tablaPOA_crearEncabezado();
-                    window.tablaPOA_crearTabla(POAdatos);
-                });
-        };
-
-        window.tablaPOA_crearEncabezado = function () {
-            const encabezado1 = document.getElementById("tablaPOA-encabezado1");
-            const encabezado2 = document.getElementById("tablaPOA-encabezado2");
-
-            if (!encabezado1 || !encabezado2) return;
-            encabezado1.innerHTML = "";
-            encabezado2.innerHTML = "";
-
-            window.tablaPOA_columnasFijas.forEach(dato => encabezado1.appendChild(crearTH(dato, { rowSpan: 2 })));
-
-            ["Planificado", "Ejecutado"].forEach(seccion => {
-                encabezado1.appendChild(crearTH(seccion, { colSpan: window.tablaPOA_meses.length + 1 }));
-                window.tablaPOA_meses.forEach(mes => encabezado2.appendChild(crearTH(mes)));
-                encabezado2.appendChild(crearTH("Total"));
-            });
-        };
-
-        window.crearTH = function (texto, atributos = {}) {
-            let th = document.createElement("th");
-            th.textContent = texto;
-            Object.assign(th, atributos);
-            return th;
-        };
-
-        window.tablaPOA_crearTabla = function (POAdatos) {
-            const tabla = document.getElementById("tablaPOA")?.getElementsByTagName('tbody')[0];
-            if (!tabla) return;
-
-            let ultimosSubtitulos = {};
-            POAdatos.forEach(fila => {
-                let clasesSubtitulos = [];
-                window.tablaPOA_subtitulos.forEach((sub, index) => {
-                    if (fila[sub] !== ultimosSubtitulos[sub]) {
-                        window.tablaPOA_agregarSubtitulo(tabla, fila[sub], sub, index + 1, clasesSubtitulos);
-                        ultimosSubtitulos[sub] = fila[sub];
-                    }
-                    clasesSubtitulos.push(fila[sub] || "");
-                });
-                window.tablaPOA_agregarFila(tabla, fila, clasesSubtitulos);
-            });
-        };
-
-        window.tablaPOA_escapeClassName = function (name) {
-            return name.replace(/\W/g, "_");
-        };
-
-        window.tablaPOA_agregarFila = function (tabla, fila, clasesSubtitulos) {
-            const nuevaFila = tabla.insertRow();
-            nuevaFila.classList.add("tablaPOA-normal");
-            nuevaFila.setAttribute("data-tipo", "dato");
-            nuevaFila.setAttribute("subtitulos-superiores", JSON.stringify(clasesSubtitulos.map(window.tablaPOA_escapeClassName)));
-
-            clasesSubtitulos.forEach(sub => {
-                if (sub) nuevaFila.classList.add(`tablaPOA-sub-${window.tablaPOA_escapeClassName(sub)}`);
-            });
-
-            window.tablaPOA_datos.forEach(dato => {
-                let celda = nuevaFila.insertCell();
-                let div = document.createElement("div");
-                div.classList.add("tablaPOA-scrollable");
-                div.textContent = fila[dato] || "";
-                celda.appendChild(div);
-                if (dato === "Pl_total" || dato === "Ej_total") {
-                    celda.classList.add("tablaPOA-total");
-                }
-            });
-        };
-
-
-        window.tablaPOA_agregarSubtitulo = function (tabla, subtitulo, claseSub, nivel, clasesSuperiores) {
-            if (!subtitulo) return;
-            const fila = tabla.insertRow();
-            fila.classList.add("tablaPOA-subtitulo", `tablaPOA-${claseSub}`);
-            fila.setAttribute("data-tipo", "subtitulo");
-            fila.setAttribute("subtitulo-nivel", nivel);
-            fila.setAttribute("subtitulo-nombre", window.tablaPOA_escapeClassName(subtitulo));
-            fila.setAttribute("subtitulos-superiores", JSON.stringify(clasesSuperiores.map(window.tablaPOA_escapeClassName)));
-            // Crear el nuevo atributo subtitulo-superiores-nombre
-            const subtituloNombreEscaped = window.tablaPOA_escapeClassName(subtitulo);
-            const subtitulosSuperioresNombres = clasesSuperiores.map(window.tablaPOA_escapeClassName);
-            const subtitulosSuperioresNombresConActual = [...subtitulosSuperioresNombres, subtituloNombreEscaped];
-            fila.setAttribute("filas-inferiores-subsup", JSON.stringify(subtitulosSuperioresNombresConActual));
-
-            let celda = fila.insertCell();
-            celda.textContent = subtitulo;
-            celda.colSpan = window.tablaPOA_datos.length;
-
-            let icono = document.createElement("span");
-            icono.classList.add("tablaPOA-triangulo");
-            icono.textContent = "▼";
-            celda.appendChild(icono);
-
-            fila.addEventListener("click", function () {
-                window.tablaPOA_alternarVisibilidad(fila.getAttribute("filas-inferiores-subsup"), icono);
-            });
-        };
-
-        window.tablaPOA_alternarVisibilidad = function (subsup, icono) {
-            subsup = JSON.parse(subsup);
-            let filas = document.querySelectorAll("[subtitulos-superiores]"); // Get all elements with the attribute
-            let matchingRows = [];
-
-            filas.forEach(fila => {
-                let attrValue = fila.getAttribute("subtitulos-superiores");
-                let cleanValue = attrValue.replace(/&quot;/g, '"').trim(); // Convert HTML entities to quotes
-                let parsedValue = JSON.parse(cleanValue); // Convert to an array
-                // Check if ALL elements in `subsup` exist in `parsedValue` (atribute)
-                if (Array.isArray(parsedValue) && subsup.every(value => parsedValue.includes(value))) {
-                    matchingRows.push(fila); // Add matching row to array
-                }
-            });
-
-            let shouldHide = icono.textContent === "▼"; // If currently visible (▼), we will hide all
-            matchingRows.forEach(fila => fila.classList.toggle("tablaPOA-oculto", shouldHide));
-            icono.textContent = shouldHide ? "▶" : "▼";
-        };
-
-        window.tablaPOA_leerExcel("POA 2025_bd.xlsx");
-        return true;
-    }
-
-    // Crear un observador para esperar a que #tablaPOA aparezca en el DOM
-    const observer2 = new MutationObserver(() => {
-        if (inicializarTablaPOA()) {
-            observer2.disconnect(); // Detener el observador una vez que la tabla esté lista
-        }
-    });
-
-    observer2.observe(document.body, { childList: true, subtree: true });
-
-    // Intentar ejecutar directamente si la tabla ya existe
-    inicializarTablaPOA();
-});
-
-
-//////////////////////////// CONTENIDO3 //////////////////////////////
+//////////////////////////// CONTENIDO2 //////////////////////////////
 window.actualizarTabla = actualizarTabla;
 
-function esperarMemoriaSubmissions() {
+function esperarMisEnvios() {
     const limiteTiempo = 60000; // 60 segundos
     let intervalo;
 
@@ -1079,9 +1361,9 @@ function esperarMemoriaSubmissions() {
         mostrarErrorCarga();
     }, limiteTiempo);
 
-    // Intervalo para verificar cada 500ms si ya existe memoriaSubmissions
+    // Intervalo para verificar cada 500ms si ya existe misEnvios
     intervalo = setInterval(() => {
-        if (localStorage.getItem("memoriaSubmissions")) {
+        if (localStorage.getItem("misEnvios")) {
             clearTimeout(timeout); // Detener el error programado
             clearInterval(intervalo); // Detener la espera
             actualizarTabla(); // Llamar a la función de actualización
@@ -1095,7 +1377,7 @@ const observer3 = new MutationObserver((mutationsList, observer) => {
             const table = document.getElementById("submissions-table");
             if (table) {
                 observer.disconnect(); // Deja de observar una vez que encuentra el elemento
-                esperarMemoriaSubmissions(); // Esperar hasta que haya datos en localStorage
+                esperarMisEnvios(); // Esperar hasta que haya datos en localStorage
                 break;
             }
         }
@@ -1105,9 +1387,9 @@ observer3.observe(document.body, { childList: true, subtree: true });
 
 async function actualizarTabla() {
     try {
-        let memoriaSubmissions = JSON.parse(localStorage.getItem("memoriaSubmissions"));
-        if (memoriaSubmissions) {
-            renderizarTabla(memoriaSubmissions);
+        let misEnvios = JSON.parse(localStorage.getItem("misEnvios"));
+        if (misEnvios) {
+            renderizarTabla(misEnvios);
         } else {
             mostrarErrorCarga();
         }
@@ -1143,18 +1425,21 @@ function renderizarTabla(datos) {
 
     const headers = [
         { key: "usuario", label: "Usuario" },
-        { key: "timestamp", label: "R-timestamp" },
-        { key: "fechaInicio", label: "R-inicio" },
-        { key: "fechaFin", label: "R-fin" },
-        { key: "mesReporte", label: "R-mes" },
+        { key: "timestamp", label: "R - timestamp" },
+        { key: "fechaInicio", label: "R - fecha inicio" },
+        { key: "fechaFin", label: "R - fecha fin" },
+        { key: "mesReporte", label: "R - mes" },
+        // { key: "tipoRegistro", label: "Tipo de Registro" },
+        { key: "numerometas", label: "Número de metas" },
         { key: "actividad", label: "Actividad POA" },
-        { key: "metaNueva", label: "Meta nueva" },
-        { key: "nombreMeta", label: "Título de la meta" },
-        { key: "estadoMeta", label: "Estado de la meta" },
-        { key: "detalleMeta", label: "Detalle de la meta" },
+        { key: "titulo", label: "Título" },
+        // { key: "metaNueva", label: "Meta nueva" },
+        // { key: "nombreMeta", label: "Título de la meta" },
+        // { key: "estadoMeta", label: "Estado de la meta" },
+        // { key: "detalleMeta", label: "Detalle de la meta" },
         { key: "entidad", label: "Entidad" },
-        { key: "fechaInicio", label: "Fecha inicio" },
-        { key: "fechaFin", label: "Fecha fin" },
+        // { key: "fechaInicio", label: "Fecha inicio" },
+        // { key: "fechaFin", label: "Fecha fin" },
         // { key: "variosConsultores", label: "Intervino más de un consultor" },
         { key: "participantes", label: "Número de participantes" },
         { key: "hombres", label: "Hombres" },
@@ -1186,206 +1471,952 @@ function renderizarTabla(datos) {
 
 
 ////// FILTROS
-document.addEventListener("DOMContentLoaded", function () {
-    let currentFilterMenu = null;
 
-    function waitForTable() {
-        const table = document.querySelector("#submissions-table");
-        if (!table) {
-            setTimeout(waitForTable, 500);
+document.addEventListener("DOMContentLoaded", () => {
+    const tableId = "submissions-table";
+    const activeFilters = {}; // clave: colIndex, valor: Set con valores seleccionados
+
+    const addFilters = (table) => {
+        // console.log("[addFilters] Ejecutando addFilters...");
+
+        const thead = table.querySelector("thead tr");
+        const tbody = table.querySelector("tbody");
+
+        if (!thead || !tbody) {
+            console.warn("[addFilters] Faltan <thead> o <tbody>");
+            return;
+        }
+
+        if (thead.parentNode.querySelector(".filter-row")) return;
+
+        const headers = Array.from(thead.children);
+        const filterRow = document.createElement("tr");
+        filterRow.className = "filter-row";
+
+        headers.forEach((th, colIndex) => {
+            const originalText = th.textContent;
+            th.textContent = ""; // Limpiar contenido
+
+            // Crear contenedor para el filtro
+            const wrapper = document.createElement("div");
+            wrapper.className = "filter-cell";
+            wrapper.style.position = "relative"; // Necesario para posicionar el desplegable
+
+            const labelSpan = document.createElement("span");
+            labelSpan.textContent = originalText;
+
+            // Crear botón de embudo para desplegar el filtro
+            const filterButton = document.createElement("button");
+            filterButton.className = "filter-button";
+            filterButton.addEventListener("click", (event) => {
+                event.stopPropagation(); // Evitar que el clic se propague al documento
+                checkboxContainer.style.display = checkboxContainer.style.display === "none" ? "block" : "none";
+            });
+            filterButton.style.backgroundColor = "transparent"; // color neutro por defecto
+
+            const checkboxContainer = document.createElement("div");
+            checkboxContainer.className = "checkbox-container";
+            checkboxContainer.style.display = "none"; // Inicialmente oculto
+            checkboxContainer.style.position = "fixed"; // Para que se muestre por encima de todo
+            checkboxContainer.style.backgroundColor = "white";
+            checkboxContainer.style.border = "1px solid #ccc";
+            checkboxContainer.style.zIndex = "1000"; // Asegurar que esté por encima de otros elementos
+            checkboxContainer.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+            // Establecer una anchura máxima para evitar que se salga de la pantalla
+            checkboxContainer.style.maxWidth = "calc(100vw - 20px)";
+            checkboxContainer.style.maxHeight = "calc(100vh - 20px)";
+            checkboxContainer.style.overflowY = "auto"; // Permitir scroll si es necesario
+            checkboxContainer.style.color = "black"; // Establecer el color del texto a negro
+            checkboxContainer.style.padding = "10px"; // Añadir un poco de espacio interno
+
+            const optionsSet = new Set();
+
+            // Recopilar valores únicos de las filas de la tabla
+            Array.from(tbody.rows).forEach(row => {
+                const cellValue = row.cells[colIndex]?.textContent?.trim();
+                if (cellValue !== undefined) optionsSet.add(cellValue);
+            });
+
+            const sortedOptions = [...optionsSet].sort();
+
+            // Opción "Seleccionar todo" al principio
+            const selectAllLabel = document.createElement("label");
+            selectAllLabel.style.display = "block"; // Cada opción en una nueva fila
+            const selectAllCheckbox = document.createElement("input");
+            selectAllCheckbox.type = "checkbox";
+            selectAllCheckbox.checked = true; // Por defecto está seleccionado
+            selectAllCheckbox.className = "select-all-checkbox";
+            selectAllLabel.appendChild(selectAllCheckbox);
+            selectAllLabel.appendChild(document.createTextNode(" Todos"));
+            selectAllLabel.style.fontWeight = "normal"; // Establece el peso de la fuente como normal
+            checkboxContainer.appendChild(selectAllLabel);
+
+            // Crear una casilla de verificación para cada valor único
+            sortedOptions.forEach(value => {
+                const label = document.createElement("label");
+                label.style.display = "block"; // Cada opción en una nueva fila
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.value = value;
+                checkbox.className = "filter-checkbox";
+                checkbox.checked = true; // Por defecto todas las opciones están seleccionadas
+
+                const checkboxLabel = document.createElement("span");
+                checkboxLabel.textContent = value;
+                checkboxLabel.style.marginLeft = "5px"; // Añadir un poco de espacio entre el checkbox y el texto
+                checkboxLabel.style.fontWeight = "normal"; // Quitar negrita
+                
+                label.appendChild(checkbox);
+                label.appendChild(checkboxLabel);
+                checkboxContainer.appendChild(label);
+            });
+
+            checkboxContainer.style.textAlign = "left"; // Alinea todos los elementos dentro del contenedor a la izquierda
+
+            // Función para aplicar los filtros
+            const applyFilters = () => {
+                // Actualizar el estado global del filtro de esta columna
+                const selectedValues = new Set(
+                    Array.from(checkboxContainer.querySelectorAll(".filter-checkbox:checked"))
+                        .map(checkbox => checkbox.value)
+                );
+                activeFilters[colIndex] = selectedValues;
+                // Estilizar botón si hay filtros activos
+                const totalCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox").length;
+                const selectedCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox:checked").length;
+
+                if (selectedCheckboxes < totalCheckboxes) {
+                    filterButton.style.backgroundColor = "rgba(255, 255, 255, 0.6)"; // amarillo claro (indicador de filtro activo)
+                } else {
+                    filterButton.style.backgroundColor = "transparent"; // sin filtro activo
+                }
+
+                // Filtrar las filas de la tabla considerando TODAS las columnas con filtros activos
+                Array.from(tbody.rows).forEach(row => {
+                    let show = true;
+            
+                    for (const [filterColIndex, selectedSet] of Object.entries(activeFilters)) {
+                        const cellValue = row.cells[filterColIndex]?.textContent?.trim();
+                        if (!selectedSet.has(cellValue)) {
+                            show = false;
+                            break;
+                        }
+                    }
+            
+                    row.style.display = show ? "" : "none";
+                });
+            };
+            
+
+            // Manejar el cambio en el checkbox "Seleccionar todo"
+            selectAllCheckbox.addEventListener("change", () => {
+                const allCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox");
+                const shouldCheckAll = selectAllCheckbox.checked;
+            
+                allCheckboxes.forEach(checkbox => {
+                    checkbox.checked = shouldCheckAll;
+                });
+            
+                applyFilters(); // Aplica el filtro después de marcar/desmarcar
+            });
+            
+            // Manejar el cambio en las casillas de verificación individuales
+            checkboxContainer.addEventListener("change", (event) => {
+                if (event.target.classList.contains("filter-checkbox")) {
+                    const checkedCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox:checked");
+                    const allCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox");
+
+                    // Evitar desmarcar la última casilla
+                    if (checkedCheckboxes.length === 0) {
+                        event.target.checked = true; // Re-marca la casilla que se intentó desmarcar
+                        return;
+                    }
+
+                    // Actualizar el estado del "Seleccionar todo"
+                    selectAllCheckbox.checked = checkedCheckboxes.length === allCheckboxes.length;
+                    applyFilters();
+                }
+            });
+
+            wrapper.appendChild(labelSpan);
+            wrapper.appendChild(filterButton);
+            wrapper.appendChild(checkboxContainer);
+            th.appendChild(wrapper);
+        });
+
+        // console.log("[addFilters] Filtros agregados.");
+
+        // Cerrar el desplegable al hacer clic fuera de él
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest(".filter-cell")) {
+                const allCheckboxContainers = document.querySelectorAll(".checkbox-container");
+        
+                allCheckboxContainers.forEach(container => {
+                    container.style.display = "none";
+        
+                    const colIndex = [...container.closest("th").parentElement.children].indexOf(container.closest("th"));
+                    const checkboxes = container.querySelectorAll(".filter-checkbox");
+                    const checked = container.querySelectorAll(".filter-checkbox:checked");
+        
+                    // Si todos los checkboxes están desmarcados, restaurar todos
+                    if (checked.length === 0) {
+                        checkboxes.forEach(cb => cb.checked = true);
+        
+                        // Actualizar estado global
+                        const restoredSet = new Set(Array.from(checkboxes).map(cb => cb.value));
+                        activeFilters[colIndex] = restoredSet;
+        
+                        // Marcar "Seleccionar todo"
+                        const selectAll = container.querySelector(".select-all-checkbox");
+                        if (selectAll) selectAll.checked = true;
+        
+                        // Reaplicar filtros cruzados
+                        applyFilters();
+                    }
+                });
+            }
+        });
+    };
+
+    const addFiltersSafely = (table) => {
+        const tryAdd = () => {
+            const thead = table.querySelector("thead tr");
+            const tbody = table.querySelector("tbody");
+
+            if (thead && tbody) {
+                addFilters(table);
+            } else {
+                setTimeout(tryAdd, 100);
+            }
+        };
+        tryAdd();
+    };
+
+    const observer = new MutationObserver(() => {
+        const table = document.getElementById(tableId);
+        if (table) {
+            observer.disconnect();
+            addFiltersSafely(table);
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+});
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const tableId = "submissions-table-ficha";
+    const activeFilters = {}; // clave: colIndex, valor: Set con valores seleccionados
+
+    const addFilters = (table) => {
+        // console.log("[addFilters] Ejecutando addFilters...");
+
+        const thead = table.querySelector("thead tr");
+        const tbody = table.querySelector("tbody");
+
+        if (!thead || !tbody) {
+            console.warn("[addFilters] Faltan <thead> o <tbody>");
+            return;
+        }
+
+        if (thead.parentNode.querySelector(".filter-row")) return;
+
+        const headers = Array.from(thead.children);
+        const filterRow = document.createElement("tr");
+        filterRow.className = "filter-row";
+
+        headers.forEach((th, colIndex) => {
+            const originalText = th.textContent;
+            th.textContent = ""; // Limpiar contenido
+
+            // Crear contenedor para el filtro
+            const wrapper = document.createElement("div");
+            wrapper.className = "filter-cell";
+            wrapper.style.position = "relative"; // Necesario para posicionar el desplegable
+
+            const labelSpan = document.createElement("span");
+            labelSpan.textContent = originalText;
+
+            // Crear botón de embudo para desplegar el filtro
+            const filterButton = document.createElement("button");
+            filterButton.className = "filter-button";
+            filterButton.addEventListener("click", (event) => {
+                event.stopPropagation(); // Evitar que el clic se propague al documento
+                checkboxContainer.style.display = checkboxContainer.style.display === "none" ? "block" : "none";
+            });
+            filterButton.style.backgroundColor = "transparent"; // color neutro por defecto
+
+            const checkboxContainer = document.createElement("div");
+            checkboxContainer.className = "checkbox-container";
+            checkboxContainer.style.display = "none"; // Inicialmente oculto
+            checkboxContainer.style.position = "fixed"; // Para que se muestre por encima de todo
+            checkboxContainer.style.backgroundColor = "white";
+            checkboxContainer.style.border = "1px solid #ccc";
+            checkboxContainer.style.zIndex = "1000"; // Asegurar que esté por encima de otros elementos
+            checkboxContainer.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+            // Establecer una anchura máxima para evitar que se salga de la pantalla
+            checkboxContainer.style.maxWidth = "calc(100vw - 20px)";
+            checkboxContainer.style.maxHeight = "calc(100vh - 20px)";
+            checkboxContainer.style.overflowY = "auto"; // Permitir scroll si es necesario
+            checkboxContainer.style.color = "black"; // Establecer el color del texto a negro
+            checkboxContainer.style.padding = "10px"; // Añadir un poco de espacio interno
+
+            const optionsSet = new Set();
+
+            // Recopilar valores únicos de las filas de la tabla
+            Array.from(tbody.rows).forEach(row => {
+                const cellValue = row.cells[colIndex]?.textContent?.trim();
+                if (cellValue !== undefined) optionsSet.add(cellValue);
+            });
+
+            const sortedOptions = [...optionsSet].sort();
+
+            // Opción "Seleccionar todo" al principio
+            const selectAllLabel = document.createElement("label");
+            selectAllLabel.style.display = "block"; // Cada opción en una nueva fila
+            const selectAllCheckbox = document.createElement("input");
+            selectAllCheckbox.type = "checkbox";
+            selectAllCheckbox.checked = true; // Por defecto está seleccionado
+            selectAllCheckbox.className = "select-all-checkbox";
+            selectAllLabel.appendChild(selectAllCheckbox);
+            selectAllLabel.appendChild(document.createTextNode(" Todos"));
+            selectAllLabel.style.fontWeight = "normal"; // Establece el peso de la fuente como normal
+            checkboxContainer.appendChild(selectAllLabel);
+
+            // Crear una casilla de verificación para cada valor único
+            sortedOptions.forEach(value => {
+                const label = document.createElement("label");
+                label.style.display = "block"; // Cada opción en una nueva fila
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.value = value;
+                checkbox.className = "filter-checkbox";
+                checkbox.checked = true; // Por defecto todas las opciones están seleccionadas
+
+                const checkboxLabel = document.createElement("span");
+                checkboxLabel.textContent = value;
+                checkboxLabel.style.marginLeft = "5px"; // Añadir un poco de espacio entre el checkbox y el texto
+                checkboxLabel.style.fontWeight = "normal"; // Quitar negrita
+                
+                label.appendChild(checkbox);
+                label.appendChild(checkboxLabel);
+                checkboxContainer.appendChild(label);
+            });
+
+            checkboxContainer.style.textAlign = "left"; // Alinea todos los elementos dentro del contenedor a la izquierda
+
+            // Función para aplicar los filtros
+            const applyFilters = () => {
+                // Actualizar el estado global del filtro de esta columna
+                const selectedValues = new Set(
+                    Array.from(checkboxContainer.querySelectorAll(".filter-checkbox:checked"))
+                        .map(checkbox => checkbox.value)
+                );
+                activeFilters[colIndex] = selectedValues;
+                // Estilizar botón si hay filtros activos
+                const totalCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox").length;
+                const selectedCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox:checked").length;
+
+                if (selectedCheckboxes < totalCheckboxes) {
+                    filterButton.style.backgroundColor = "rgba(255, 255, 255, 0.6)"; // amarillo claro (indicador de filtro activo)
+                } else {
+                    filterButton.style.backgroundColor = "transparent"; // sin filtro activo
+                }
+
+                // Filtrar las filas de la tabla considerando TODAS las columnas con filtros activos
+                Array.from(tbody.rows).forEach(row => {
+                    let show = true;
+            
+                    for (const [filterColIndex, selectedSet] of Object.entries(activeFilters)) {
+                        const cellValue = row.cells[filterColIndex]?.textContent?.trim();
+                        if (!selectedSet.has(cellValue)) {
+                            show = false;
+                            break;
+                        }
+                    }
+            
+                    row.style.display = show ? "" : "none";
+                });
+            };
+            
+
+            // Manejar el cambio en el checkbox "Seleccionar todo"
+            selectAllCheckbox.addEventListener("change", () => {
+                const allCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox");
+                const shouldCheckAll = selectAllCheckbox.checked;
+            
+                allCheckboxes.forEach(checkbox => {
+                    checkbox.checked = shouldCheckAll;
+                });
+            
+                applyFilters(); // Aplica el filtro después de marcar/desmarcar
+            });
+            
+            // Manejar el cambio en las casillas de verificación individuales
+            checkboxContainer.addEventListener("change", (event) => {
+                if (event.target.classList.contains("filter-checkbox")) {
+                    const checkedCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox:checked");
+                    const allCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox");
+
+                    // Evitar desmarcar la última casilla
+                    if (checkedCheckboxes.length === 0) {
+                        event.target.checked = true; // Re-marca la casilla que se intentó desmarcar
+                        return;
+                    }
+
+                    // Actualizar el estado del "Seleccionar todo"
+                    selectAllCheckbox.checked = checkedCheckboxes.length === allCheckboxes.length;
+                    applyFilters();
+                }
+            });
+
+            wrapper.appendChild(labelSpan);
+            wrapper.appendChild(filterButton);
+            wrapper.appendChild(checkboxContainer);
+            th.appendChild(wrapper);
+        });
+
+        // console.log("[addFilters] Filtros agregados.");
+
+        // Cerrar el desplegable al hacer clic fuera de él
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest(".filter-cell")) {
+                const allCheckboxContainers = document.querySelectorAll(".checkbox-container");
+        
+                allCheckboxContainers.forEach(container => {
+                    container.style.display = "none";
+        
+                    const colIndex = [...container.closest("th").parentElement.children].indexOf(container.closest("th"));
+                    const checkboxes = container.querySelectorAll(".filter-checkbox");
+                    const checked = container.querySelectorAll(".filter-checkbox:checked");
+        
+                    // Si todos los checkboxes están desmarcados, restaurar todos
+                    if (checked.length === 0) {
+                        checkboxes.forEach(cb => cb.checked = true);
+        
+                        // Actualizar estado global
+                        const restoredSet = new Set(Array.from(checkboxes).map(cb => cb.value));
+                        activeFilters[colIndex] = restoredSet;
+        
+                        // Marcar "Seleccionar todo"
+                        const selectAll = container.querySelector(".select-all-checkbox");
+                        if (selectAll) selectAll.checked = true;
+        
+                        // Reaplicar filtros cruzados
+                        applyFilters();
+                    }
+                });
+            }
+        });
+    };
+
+    const addFiltersSafely = (table) => {
+        const tryAdd = () => {
+            const thead = table.querySelector("thead tr");
+            const tbody = table.querySelector("tbody");
+
+            if (thead && tbody) {
+                addFilters(table);
+            } else {
+                setTimeout(tryAdd, 100);
+            }
+        };
+        tryAdd();
+    };
+
+    const observer = new MutationObserver(() => {
+        const table = document.getElementById(tableId);
+        if (table) {
+            observer.disconnect();
+            addFiltersSafely(table);
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+});
+
+//////////////// CONTENIDO3 y CONTENIDO4/////////////////
+
+
+// Funcion para cargar tablaPOA y mitablaPOA
+document.addEventListener("DOMContentLoaded", function () {
+    window.inicializarTablaPOA = inicializarTablaPOA;
+
+    function inicializarTablaPOA(tablaId, meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"]) {
+        const tablaElement = document.getElementById(tablaId);
+        if (!tablaElement) {
+            return false;
+        }
+
+        window[`tablaPOA_subtitulos_${tablaId}`] = ["Resultado", "Producto"];
+        window[`tablaPOA_columnasFijas_${tablaId}`] = ["Actividad", "Indicador", "Unidad de medida", "Medio de verificación", "Logro Esperado"];
+        window[`tablaPOA_meses_${tablaId}`] = meses;  // Aquí pasas los meses como argumento
+        window[`tablaPOA_datos_${tablaId}`] = [...window[`tablaPOA_columnasFijas_${tablaId}`], ...window[`tablaPOA_meses_${tablaId}`].map(m => m + "_pl"), "Pl_total", ...window[`tablaPOA_meses_${tablaId}`].map(m => m + "_ej"), "Ej_total"];
+
+        window[`tablaPOA_leerExcel_${tablaId}`] = function (url) {
+            fetch(url)
+                .then(response => response.arrayBuffer())
+                .then(buffer => {
+                    const libro = XLSX.read(buffer, { type: 'array' });
+                    const nombreHoja = libro.SheetNames[0];
+                    const hoja = libro.Sheets[nombreHoja];
+                    const POAdatos = XLSX.utils.sheet_to_json(hoja);
+                    window[`tablaPOA_crearEncabezado_${tablaId}`]();
+                    window[`tablaPOA_crearTabla_${tablaId}`](POAdatos);
+                });
+        };
+
+        window[`tablaPOA_crearEncabezado_${tablaId}`] = function () {
+            const encabezado1 = document.getElementById(`${tablaId}-encabezado1`);
+            const encabezado2 = document.getElementById(`${tablaId}-encabezado2`);
+
+            if (!encabezado1 || !encabezado2) return;
+            encabezado1.innerHTML = "";
+            encabezado2.innerHTML = "";
+
+            window[`tablaPOA_columnasFijas_${tablaId}`].forEach(dato => encabezado1.appendChild(crearTH(dato, { rowSpan: 2 })));
+
+            ["Planificado", "Ejecutado"].forEach(seccion => {
+                encabezado1.appendChild(crearTH(seccion, { colSpan: window[`tablaPOA_meses_${tablaId}`].length + 1 }));
+                window[`tablaPOA_meses_${tablaId}`].forEach(mes => encabezado2.appendChild(crearTH(mes)));
+                encabezado2.appendChild(crearTH("Total"));
+            });
+        };
+
+        window.crearTH = function (texto, atributos = {}) {
+            let th = document.createElement("th");
+            th.textContent = texto;
+            Object.assign(th, atributos);
+            return th;
+        };
+
+        window[`tablaPOA_crearTabla_${tablaId}`] = function (POAdatos) {
+            const tabla = document.getElementById(tablaId)?.getElementsByTagName('tbody')[0];
+            if (!tabla) return;
+
+            let ultimosSubtitulos = {};
+            POAdatos.forEach(fila => {
+                let clasesSubtitulos = [];
+                window[`tablaPOA_subtitulos_${tablaId}`].forEach((sub, index) => {
+                    if (fila[sub] !== ultimosSubtitulos[sub]) {
+                        window[`tablaPOA_agregarSubtitulo_${tablaId}`](tabla, fila[sub], sub, index + 1, clasesSubtitulos);
+                        ultimosSubtitulos[sub] = fila[sub];
+                    }
+                    clasesSubtitulos.push(fila[sub] || "");
+                });
+                window[`tablaPOA_agregarFila_${tablaId}`](tabla, fila, clasesSubtitulos);
+            });
+        };
+
+        window[`tablaPOA_escapeClassName_${tablaId}`] = function (name) {
+            return name.replace(/\W/g, "_");
+        };
+
+        window[`tablaPOA_agregarFila_${tablaId}`] = function (tabla, fila, clasesSubtitulos) {
+            const nuevaFila = tabla.insertRow();
+            nuevaFila.classList.add("tablaPOA-normal");
+            nuevaFila.setAttribute("data-tipo", "dato");
+            nuevaFila.setAttribute("subtitulos-superiores", JSON.stringify(clasesSubtitulos.map(window[`tablaPOA_escapeClassName_${tablaId}`])));
+
+            clasesSubtitulos.forEach(sub => {
+                if (sub) nuevaFila.classList.add(`tablaPOA-sub-${window[`tablaPOA_escapeClassName_${tablaId}`](sub)}`);
+            });
+
+            window[`tablaPOA_datos_${tablaId}`].forEach(dato => {
+                let celda = nuevaFila.insertCell();
+                let div = document.createElement("div");
+                div.classList.add("tablaPOA-scrollable");
+                div.textContent = fila[dato] || "";
+                celda.appendChild(div);
+                if (dato === "Pl_total" || dato === "Ej_total") {
+                    celda.classList.add("tablaPOA-total");
+                }
+            });
+        };
+
+        window[`tablaPOA_agregarSubtitulo_${tablaId}`] = function (tabla, subtitulo, claseSub, nivel, clasesSuperiores) {
+            if (!subtitulo) return;
+            const fila = tabla.insertRow();
+            fila.classList.add("tablaPOA-subtitulo", `tablaPOA-${claseSub}`);
+            fila.setAttribute("data-tipo", "subtitulo");
+            fila.setAttribute("subtitulo-nivel", nivel);
+            fila.setAttribute("subtitulo-nombre", window[`tablaPOA_escapeClassName_${tablaId}`](subtitulo));
+            fila.setAttribute("subtitulos-superiores", JSON.stringify(clasesSuperiores.map(window[`tablaPOA_escapeClassName_${tablaId}`])));
+
+            const subtituloNombreEscaped = window[`tablaPOA_escapeClassName_${tablaId}`](subtitulo);
+            const subtitulosSuperioresNombres = clasesSuperiores.map(window[`tablaPOA_escapeClassName_${tablaId}`]);
+            const subtitulosSuperioresNombresConActual = [...subtitulosSuperioresNombres, subtituloNombreEscaped];
+            fila.setAttribute("filas-inferiores-subsup", JSON.stringify(subtitulosSuperioresNombresConActual));
+
+            let celda = fila.insertCell();
+            celda.textContent = subtitulo;
+            celda.colSpan = window[`tablaPOA_datos_${tablaId}`].length;
+
+            let icono = document.createElement("span");
+            icono.classList.add("tablaPOA-triangulo");
+            icono.textContent = "▼";
+            celda.appendChild(icono);
+
+            fila.addEventListener("click", function () {
+                window[`tablaPOA_alternarVisibilidad_${tablaId}`](fila.getAttribute("filas-inferiores-subsup"), icono);
+            });
+        };
+
+        window[`tablaPOA_alternarVisibilidad_${tablaId}`] = function (subsup, icono) {
+            subsup = JSON.parse(subsup);
+            let filas = document.querySelectorAll(`#${tablaId} tbody [subtitulos-superiores]`);
+            let matchingRows = [];
+
+            filas.forEach(fila => {
+                let attrValue = fila.getAttribute("subtitulos-superiores");
+                let cleanValue = attrValue.replace(/&quot;/g, '"');
+                let parsedValue = JSON.parse(cleanValue);
+                if (Array.isArray(parsedValue) && subsup.every(value => parsedValue.includes(value))) {
+                    matchingRows.push(fila);
+                }
+            });
+
+            let shouldHide = icono.textContent === "▼";
+            matchingRows.forEach(fila => fila.classList.toggle("tablaPOA-oculto", shouldHide));
+            icono.textContent = shouldHide ? "▶" : "▼";
+        };
+
+        window[`tablaPOA_leerExcel_${tablaId}`]("POA 2025_bd.xlsx");        
+        return true;
+    }
+});
+
+
+// Cargar tablaPOA
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Crear un observador para esperar a que la tabla deseada aparezca en el DOM
+    const observer2 = new MutationObserver(() => {
+        if (inicializarTablaPOA("tablaPOA")) {
+            observer2.disconnect();
+        }
+    });
+    observer2.observe(document.body, { childList: true, subtree: true });
+    // Intentar ejecutar directamente si la tabla ya existe
+    inicializarTablaPOA("tablaPOA");
+
+});
+
+
+// Cargar mitablaPOA
+document.addEventListener("DOMContentLoaded", function () {
+    // console.log("DOM completamente cargado y parseado");
+
+    // Variable para controlar si los datos ya fueron procesados
+    let datosProcesados = false;
+
+    // Función para verificar si los datos del usuario están en el localStorage
+    function verificarYFiltrar() {
+        const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos")) || null;
+
+        if (usuarioDatos && !datosProcesados) {
+            // console.log("Datos de usuario encontrados:", usuarioDatos);
+
+            const criterioFiltro = usuarioDatos.Resultado || 'Criterio no definido';
+            // console.log("Criterio de filtro:", criterioFiltro);
+
+            // Crear un observador para esperar a que la tabla deseada aparezca en el DOM
+            const observer5 = new MutationObserver(() => {
+                const tabla = document.getElementById("mitablaPOA");
+                if (tabla) {
+                    // console.log("Tabla 'mitablaPOA' encontrada. Inicializando...");
+                    if (inicializarTablaPOA("mitablaPOA")) {
+                        // console.log("Tabla inicializada correctamente.");
+                        observer5.disconnect();
+                        // Luego de inicializar la tabla, podemos configurar el observador para las filas.
+                        crearObserverParaTabla(tabla);
+                        // Llamamos a la función de filtrado para asegurar que la tabla esté filtrada desde el inicio
+                        filtrarFilas(tabla, criterioFiltro);
+                    }
+                } else {
+                    // console.log("La tabla 'mitablaPOA' no se encontró aún.");
+                }
+            });
+
+            observer5.observe(document.body, { childList: true, subtree: true });
+
+            // Intentar ejecutar directamente si la tabla ya existe
+            const tablaExistente = document.getElementById("mitablaPOA");
+            if (tablaExistente) {
+                // console.log("La tabla 'mitablaPOA' ya estaba presente en el DOM.");
+                inicializarTablaPOA("mitablaPOA");
+                crearObserverParaTabla(tablaExistente);
+                filtrarFilas(tablaExistente, criterioFiltro);
+            } else {
+                // console.log("La tabla 'mitablaPOA' no está presente al inicio.");
+            }
+
+            // Marcar como procesado para evitar futuras comprobaciones
+            datosProcesados = true;
+
+            // Detener el intervalo una vez que se han procesado los datos
+            clearInterval(intervalo);
         } else {
-            restructureTableHeaders(table);
-            addFilterButtons(table);
-            observeTableChanges(table);
+            // console.log("Esperando a que los datos del usuario estén disponibles en localStorage...");
         }
     }
 
-    function restructureTableHeaders(table) {
-        const thead = table.querySelector("thead");
-        if (!thead) return
+    // Esperar a que el localStorage tenga los datos del usuario antes de continuar
+    const intervalo = setInterval(function () {
+        verificarYFiltrar();
+    }, 1000); // Comprobar cada segundo
 
-        thead.querySelectorAll("tr").forEach(row => {
-            row.querySelectorAll("th").forEach(th => {
-                if (!th.classList.contains("has-filter-btn")) {
-                    th.classList.add("has-filter-btn");
+    // Función para filtrar las filas de la tabla
+    function filtrarFilas(tabla, criterioFiltro) {
+        if (!tabla) {
+            // console.log("No se proporcionó una tabla para filtrar.");
+            return;
+        }
 
-                    const wrapper = document.createElement("div");
-                    wrapper.style.display = "flex";
-                    wrapper.style.justifyContent = "space-between";
-                    wrapper.style.alignItems = "center";
+        const filas = tabla.querySelectorAll("tr"); // Seleccionar todas las filas de la tabla
+        // console.log("Número de filas en la tabla:", filas.length);
 
-                    const textSpan = document.createElement("span");
-                    textSpan.innerHTML = th.innerHTML;
-
-                    const buttonWrapper = document.createElement("div");
-                    buttonWrapper.style.flexShrink = "0";
-
-                    th.innerHTML = "";
-                    wrapper.appendChild(textSpan);
-                    wrapper.appendChild(buttonWrapper);
-                    th.appendChild(wrapper);
+        // Verificar si la tabla tiene filas
+        if (filas.length > 0) {
+            // Filtrar filas donde el primer elemento de la fila (primera columna) empiece con usuarioDatos.Resultado
+            filas.forEach(fila => {
+                const primeraColumna = fila.querySelector("td");
+                if (primeraColumna) {
+                    const textoColumna = primeraColumna.textContent.trim();
+                    // console.log("Texto de la primera columna:", textoColumna);
+                    if (textoColumna.startsWith(criterioFiltro)) {
+                        // console.log("La fila coincide con el criterio. Mostrando fila.");
+                        fila.style.display = ""; // Mostrar la fila si coincide
+                    } else {
+                        // console.log("La fila NO coincide con el criterio. Ocultando fila.");
+                        fila.style.display = "none"; // Ocultar la fila si no coincide
+                    }
                 }
             });
-        });
+        } else {
+            // console.log("No hay filas en la tabla para filtrar.");
+        }
     }
 
-    function addFilterButtons(table) {
-        const thead = table.querySelector("thead");
-        if (!thead) return;
+    // Función para crear el observador de la tabla
+    function crearObserverParaTabla(tabla) {
+        // console.log("Creando un observador para la tabla...");
+        const observerTabla = new MutationObserver(() => {
+            // console.log("Cambio detectado en la tabla. Filtrando filas...");
+            const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos")) || {};
+            const criterioFiltro = usuarioDatos.Resultado || 'Criterio no definido';
+            filtrarFilas(tabla, criterioFiltro);
+        });
 
-        thead.querySelectorAll("th").forEach((th, colIndex) => {
-            const buttonWrapper = th.querySelector("div:last-child");
-            if (!buttonWrapper.querySelector(".filter-btn")) {
-                const btn = document.createElement("button");
-                btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18l-7 10v4l-4 2v-6z"/></svg>`;
-                btn.classList.add("filter-btn");
-                Object.assign(btn.style, {
-                    marginLeft: "5px",
-                    backgroundColor: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: "5px",
-                    borderRadius: "3px",
+        observerTabla.observe(tabla, { childList: true, subtree: true });
+        // console.log("Observador de la tabla creado.");
+    }
+});
+
+
+
+///// Cargar mitablaPOA, Filtros mitablaPOA
+
+function waitForButton() {
+    const dropdownBtn = document.getElementById('dropdownBtn');
+    if (dropdownBtn) {
+      initializeDropdown();
+    } else {
+      setTimeout(waitForButton, 1000);
+    }
+  }
+  
+  function initializeDropdown() {
+    const dropdownBtn = document.getElementById('dropdownBtn');
+    const selectAll = document.getElementById('selectAll');
+    const months = document.querySelectorAll('.month');
+    const dropdownContent = document.querySelector('.dropdownmeses-content');
+    const localStorageKey = 'selectedMonths';
+  
+    function getSelectedMonths() {
+      const selected = [];
+      months.forEach(m => {
+        if (m.checked) selected.push(m.dataset.month);
+      });
+      return selected;
+    }
+  
+    function updateStorageAndLog() {
+      const selected = getSelectedMonths();
+      if (selected.length > 0) {
+        localStorage.setItem(localStorageKey, JSON.stringify(selected));
+        console.log(JSON.parse(localStorage.getItem('selectedMonths')));
+      }
+    }
+  
+    function loadSelection() {
+      const saved = JSON.parse(localStorage.getItem(localStorageKey)) || [];
+      if (saved.length === 0) {
+        months.forEach(m => m.checked = true);
+      } else {
+        months.forEach(m => m.checked = saved.includes(m.dataset.month));
+      }
+      updateSelectAllState();
+    }
+  
+    function updateSelectAllState() {
+      const allSelected = getSelectedMonths().length === months.length;
+      selectAll.checked = allSelected;
+    }
+  
+    selectAll.addEventListener('change', () => {
+      const checked = selectAll.checked;
+      months.forEach(m => m.checked = checked);
+      updateSelectAllState();
+      updateStorageAndLog();
+    });
+  
+    months.forEach(m => {
+      m.addEventListener('change', () => {
+        updateSelectAllState();
+        updateStorageAndLog();
+      });
+    });
+  
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.dropdownmeses')) {
+        const selected = getSelectedMonths();
+        if (selected.length === 0) {
+          months.forEach(m => m.checked = true);
+          updateSelectAllState();
+        }
+        updateStorageAndLog();
+        dropdownContent.style.display = 'none';
+      }
+    });
+  
+    dropdownBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+    });
+  
+    loadSelection();
+    updateStorageAndLog();
+  }
+  
+  waitForButton();
+  
+/////////////// Cargar ejecutado 
+
+function waitForElement(selector, callback) {
+    // console.log(`Esperando elemento: ${selector}`);
+    const observer = new MutationObserver((mutations, obs) => {
+        const element = document.querySelector(selector);
+        if (element) {
+            // console.log(`Elemento encontrado: ${selector}`);
+            obs.disconnect();
+            callback(element);
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
+function waitForLocalStorageItem(key, callback) {
+    // console.log(`Esperando LocalStorage item: ${key}`);
+    const checkInterval = setInterval(() => {
+        const item = localStorage.getItem(key);
+        if (item) {
+            // console.log(`Item encontrado en LocalStorage: ${key}`);
+            clearInterval(checkInterval);
+            callback(JSON.parse(item));
+        }
+    }, 1000);
+}
+
+function createPopupTable(details) {
+    let popup = document.getElementById("popupTable");
+    if (!popup) {
+        popup = document.createElement("div");
+        popup.id = "popupTable";
+        popup.style.position = "fixed";
+        popup.style.top = "50%";
+        popup.style.left = "50%";
+        popup.style.transform = "translate(-50%, -50%)";
+        popup.style.backgroundColor = "white";
+        popup.style.border = "1px solid black";
+        popup.style.padding = "10px";
+        popup.style.boxShadow = "0px 0px 10px rgba(0,0,0,0.5)";
+        popup.style.zIndex = "1000";
+        document.body.appendChild(popup);
+    }
+    
+    const keys = Object.keys(details[0]).filter(key => details.some(d => d[key] && d[key] !== ""));
+    
+    popup.innerHTML = `<button onclick='document.getElementById("popupTable").style.display="none"' style='float:right;'>✖</button>` +
+        `<table border='1'><tr>${keys.map(key => `<th>${key}</th>`).join("")}</tr>` +
+        details.map(d => `<tr>${keys.map(key => `<td>${d[key]}</td>`).join("")}</tr>`).join("") + "</table>";
+    
+    popup.style.display = "block";
+}
+
+function fillTableWithEnvios(tablaId, localStorageKey) {
+    // console.log(`Esperando a que aparezcan filas en la tabla con ID: ${tablaId}`);
+    
+    waitForElement(`#${tablaId} tbody tr`, () => {
+        // console.log("✅ Filas de la tabla detectadas");
+
+        waitForLocalStorageItem(localStorageKey, (misEnvios) => {
+            // console.log("📦 Datos obtenidos de localStorage:", misEnvios);
+            
+            document.querySelectorAll(`#${tablaId} tbody tr`).forEach(row => {
+                const firstCellText = row.cells[0]?.innerText;
+                // console.log("🔍 Procesando fila con texto en primera celda:", firstCellText);
+                if (!firstCellText) return;
+
+                const monthIndexMap = {
+                    "Enero": 18,
+                    "Febrero": 19,
+                    "Marzo": 20,
+                    "Abril": 21,
+                    "Mayo": 22,
+                    "Junio": 23,
+                    "Julio": 24,
+                    "Agosto": 25,
+                    "Setiembre": 26,
+                    "Octubre": 27,
+                    "Noviembre": 28,
+                    "Diciembre": 29
+                };
+                
+                const monthDetails = {};
+                misEnvios.forEach(entry => {
+                    if (entry.actividad === firstCellText) {
+                        const monthIndex = monthIndexMap[entry.mesReporte];
+                        if (monthIndex !== undefined) {
+                            if (!monthDetails[monthIndex]) monthDetails[monthIndex] = [];
+                            monthDetails[monthIndex].push(entry);
+                            // console.log(`📅 Agregado envío a mes ${entry.mesReporte} (columna ${monthIndex}) para actividad "${entry.actividad}"`);
+                        }
+                    }
                 });
 
-                btn.onclick = (event) => {
-                    event.stopPropagation();
+                Object.keys(monthDetails).forEach(index => {
+                    if (row.cells[index]) {
+                        const total = monthDetails[index].reduce((sum, entry) => sum + (parseInt(entry.numerometas) || 0), 0);
+                        // console.log(`📊 Total metas en columna ${index} para actividad "${firstCellText}":`, total);
 
-                    if (currentFilterMenu) {
-                        currentFilterMenu.remove();
-                        currentFilterMenu = null;
-                    } else {
-                        showFilterMenu(colIndex, table, btn);
+                        row.cells[index].innerText = total;
+                        row.cells[index].style.cursor = "pointer";
+                        row.cells[index].addEventListener("click", () => {
+                            // console.log(`🖱️ Click en celda [${firstCellText}, columna ${index}]`);
+                            createPopupTable(monthDetails[index]);
+                        });
                     }
-                };
-                buttonWrapper.appendChild(btn);
-            }
-        });
-    }
-
-    function showFilterMenu(colIndex, table, button) {
-        if (currentFilterMenu) currentFilterMenu.remove();
-
-
-        const filterMenu = document.createElement("div");
-        filterMenu.classList.add("filter-menu");
-        filterMenu.dataset.colIndex = colIndex; // Guardamos el índice de la columna
-
-        Object.assign(filterMenu.style, {
-            position: "absolute",
-            background: "white",
-            border: "none",
-            padding: "10px",
-            zIndex: "1000",
-            top: `${button.getBoundingClientRect().bottom + window.scrollY}px`,
-            left: `${button.getBoundingClientRect().left}px`,
-            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-            borderRadius: "5px"
-        });
-
-        const uniqueValues = new Set();
-        table.querySelectorAll("tbody tr").forEach(row => {
-            const cell = row.cells[colIndex];
-            if (cell) uniqueValues.add(cell.textContent.trim());
-        });
-
-
-        const allCheckbox = document.createElement("input");
-        allCheckbox.type = "checkbox";
-        allCheckbox.checked = true;
-        allCheckbox.id = `select-all-${colIndex}`; // Aseguramos un ID único
-
-        allCheckbox.onchange = () => {
-            const checkboxes = filterMenu.querySelectorAll(`input[type='checkbox']:not(#select-all-${colIndex})`);
-            checkboxes.forEach(cb => cb.checked = allCheckbox.checked);
-            applyFilters(table);
-            updateFilterButtonState(button, checkboxes);
-        };
-
-        const allLabel = document.createElement("label");
-        allLabel.appendChild(allCheckbox);
-        allLabel.appendChild(document.createTextNode("Todos"));
-        filterMenu.appendChild(allLabel);
-        filterMenu.appendChild(document.createElement("br"));
-
-        uniqueValues.forEach(value => {
-            const label = document.createElement("label");
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.value = value;
-            checkbox.checked = true;
-
-            checkbox.onchange = () => {
-                applyFilters(table);
-                updateFilterButtonState(button, filterMenu.querySelectorAll(`input[type='checkbox']:not(#select-all-${colIndex})`));
-                allCheckbox.checked = [...filterMenu.querySelectorAll(`input[type='checkbox']:not(#select-all-${colIndex})`)].every(cb => cb.checked);
-            };
-
-            label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(value));
-            filterMenu.appendChild(label);
-            filterMenu.appendChild(document.createElement("br"));
-        });
-
-        document.body.appendChild(filterMenu);
-        currentFilterMenu = filterMenu;
-
-        filterMenu.addEventListener("click", (e) => e.stopPropagation());
-
-        setTimeout(() => {
-            document.addEventListener("click", function hideMenu(e) {
-                if (currentFilterMenu && !currentFilterMenu.contains(e.target)) {
-                    currentFilterMenu.remove();
-                    currentFilterMenu = null;
-                }
-            }, { once: true });
-        }, 0);
-    }
-
-    function applyFilters(table) {
-
-        const activeFilters = {};
-        document.querySelectorAll(".filter-menu").forEach(menu => {
-            const colIndex = menu.dataset.colIndex;
-            const checkedValues = Array.from(menu.querySelectorAll("input[type='checkbox']:checked:not(#select-all)"))
-                .map(cb => cb.value);
-
-            // Solo guardamos filtros activos
-            if (checkedValues.length > 0) {
-                activeFilters[colIndex] = new Set(checkedValues);
-            }
-        });
-
-        table.querySelectorAll("tbody tr").forEach(row => {
-            let show = true;
-
-            // Aplicar filtro por cada columna con filtros activos
-            Object.keys(activeFilters).forEach(colIndex => {
-                const cell = row.cells[colIndex];
-                if (cell) {
-                    const value = cell.textContent.trim();
-                    if (!activeFilters[colIndex].has(value)) {
-                        show = false;
-                    }
-                }
+                });
             });
-
-            row.style.display = show ? "" : "none";
         });
-    }
+    });
+}
 
-    function updateFilterButtonState(button, checkboxes) {
-        const allChecked = [...checkboxes].every(cb => cb.checked);
-        button.style.backgroundColor = allChecked ? "transparent" : "#ddd"; // Gris si hay filtros activos
-    }
 
-    function observeTableChanges(table) {
-        const observer = new MutationObserver(() => {
-            restructureTableHeaders(table);
-            addFilterButtons(table);
-        });
-        observer.observe(table, { childList: true, subtree: true });
-    }
-
-    waitForTable();
-});
+// Cargar ejecutado mitablaPOA
+fillTableWithEnvios('mitablaPOA', 'misEnvios');
+fillTableWithEnvios('tablaPOA', 'Envios');

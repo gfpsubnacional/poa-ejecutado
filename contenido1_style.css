@@ -6,7 +6,7 @@
     background: white;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
-
+ 
 #form-container {
     display: flex;
     flex-direction: row; /* Asegura que los elementos estén en una fila */
@@ -29,7 +29,7 @@ h2 {
     color: white;
     border: none;
     padding: 10px 15px;
-    margin-top: 10px;
+    margin-top: 70px;
     cursor: pointer;
     border-radius: 5px;
     transition: background 0.3s;
@@ -60,6 +60,59 @@ input[type="text"], input[type="password"], input[type="email"] {
 }
 
 
+/* Estilos para boton tipo registro */
+.boton-tiporegistro {
+    margin: 0 auto; /* Esto centrará horizontalmente */
+    display: flex;
+    justify-content: center;
+    margin-top: 0px;
+    height: 30px;
+    width: 270px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    position: relative;
+    cursor: pointer;
+}
+
+.selector-tiporegistro {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background-color: #1C4574;
+    transition: left 0.3s ease;
+    border-radius: 5px;
+}
+
+.opcion-tiporegistro-izq, .opcion-tiporegistro-der {
+    position: relative;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+}
+
+.opcion-tiporegistro-izq {
+    left: 0;
+    color: white;
+}
+
+.opcion-tiporegistro-der {
+    right: 0;
+    color: black;
+}
+
+.opcion-tiporegistro-seleccionada {
+    color: white !important;
+}
+
+.opcion-tiporegistro-no-seleccionada {
+    color: black;
+}
+
 /* Estilos para todas las tablas*/
 table {
 }
@@ -81,16 +134,54 @@ td {
 
 /* Estilo particular para tabla de formulario */
 
+#Formulario {
+    width: fit-content;
+}
+
+#metas-super-container {
+    width: auto;
+    justify-content: flex-start;
+    margin-left: 0;
+    margin-right: auto;
+    padding: 0;
+    width: fit-content;
+}
+
+#metas-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-left: 0;
+    margin-right: auto;
+    padding: 0;
+    width: fit-content;
+}
 
 .meta-container {
     border: 2px solid #1C4574;
     border-radius: 10px;
     padding: 10px;
-    margin: 50px auto -15px;
-    max-width: 620px;
+    margin: 20px 0;
+    width: 100%;
     position: relative;
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); /* Sombra */
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
 }
+
+.add-meta {
+    margin: -20px auto;  /* Centra el botón en su contenedor */
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 10;
+    background: #1C4574;
+    color: white;
+    width: fit-content;  /* Asegura que el ancho del botón se ajuste al contenido */
+    max-width: 400px;  /* Limita el ancho máximo del botón */
+    text-align: center;  /* Centra el texto dentro del botón */
+    display: block;  /* Asegura que el botón sea un bloque y se pueda centrar */
+}
+
+
 
 .meta-title {
     font-weight: bold;
@@ -169,17 +260,6 @@ td {
     border: none;
 }
 
-.add-meta {
-    position:relative;
-    margin: auto; /* Agrega espacio arriba y mantiene centrado */
-    display: block;
-    padding: 5px 10px;
-    font-size: 16px;
-    cursor: pointer;
-    z-index: 10; /* Asegura que esté encima */
-    background: #1C4574;
-    color: white;
-}
 
 
 
@@ -257,3 +337,13 @@ td {
     margin: 0; /* Evitar márgenes extra */
     width: auto;
 }
+
+
+
+
+/* Filtros */
+.checkbox-container label {
+    display: block;  /* Asegura que cada casilla de verificación esté en su propia línea */
+    margin-bottom: 5px;  /* Espacio entre las casillas */
+  }
+  

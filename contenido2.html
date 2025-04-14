@@ -1,24 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<title>Tabla con Expansión</title> 
-<link rel="stylesheet" type="text/css" href="contenido2_style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Envíos</title>
+    <link rel="stylesheet" href="contenido2_style.css">
 </head>
 <body>
-
-<div class="tablaPOA-contenedor">
-<table id="tablaPOA">
-  <thead>
-    <h2>POA 2025</h2>
-    <tr id="tablaPOA-encabezado1"></tr>
-    <tr id="tablaPOA-encabezado2"></tr>
-  </thead>
-  <tbody></tbody>
-</table>
-</div>
-
-<script type="module" src="script.js"></script>
-
+    <h2>Mis envíos 
+        <button id="download-btn-2" class="download-btn" style="float: right;">Descargar PDF</button>
+    </h2>
+    <div id="user-submissions">
+    <table id="submissions-table" class="table-misenvios"></table>                    
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.legacy.min.js"></script> <!-- ✅ SÍ -->
+    <script src="script.js"></script>
 </body>
 </html>

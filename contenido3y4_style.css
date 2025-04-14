@@ -1,0 +1,149 @@
+  .tablaPOA {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px; /* Reducido el tamaño de letra */
+    table-layout: fixed;
+  }
+
+  .tablaPOA th, .tablaPOA td {
+    border: 1px solid black;
+    padding: 4px;
+  }
+
+  .tablaPOA-scrollable {
+    max-height: 70px; /* Altura máxima antes de activar el scroll */
+    overflow-y: auto; /* Solo permite desplazamiento vertical */
+    overflow-x: hidden; /* Oculta la barra horizontal */
+    text-align: inherit; /* Mantiene la alineación original */
+    word-wrap: break-word; /* Asegura que el texto se ajuste */
+    white-space: normal; /* Permite saltos de línea */
+    padding: 0; /* Elimina el espacio interno */
+    margin: 0; /* Asegura que no haya márgenes */
+    scrollbar-width: thin; /* Funciona en Firefox */
+  }
+
+  .tablaPOA th {
+    background-color: #1C4574;
+    color: white;
+    text-align: center;
+  }
+
+  .tablaPOA-Resultado, .tablaPOA-Resultado td { background-color: rgb(255, 192, 0); }
+  .tablaPOA-Producto, .tablaPOA-Producto td { background-color: #ddd; }
+
+  /* Subtítulos alineados a la izquierda */
+  .tablaPOA-subtitulo td {
+    text-align: left !important;
+  }
+  /* Color de fondo para las columnas de "Total" solo en filas de datos */
+  .tablaPOA-total {
+    background-color: #e4e4ff;
+  }
+  .tablaPOA-normal td {
+    text-align: left;
+  }
+  .tablaPOA-oculto { display: none; }
+  .tablaPOA-subtitulo {
+    cursor: pointer;
+    position: relative;
+  }
+  .tablaPOA-triangulo {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+  }
+
+  .tablaPOA th:nth-child(1) { width: 250px; } /* Actividad */
+  .tablaPOA th:nth-child(2) { width: 100px; } /* Indicador */
+  .tablaPOA th:nth-child(3) { width: 70px; } /* Unidad de medida */
+  .tablaPOA th:nth-child(4) { width: 80px; } /* Medio de verificación */
+  .tablaPOA th:nth-child(5) { width: 180px; } /* Logro Esperado */  
+  .tablaPOA th:nth-child(n+6):nth-child(-n+17) { 
+    width: 500px; /*  Meses Planificado */
+  }
+  .tablaPOA th:nth-child(18) { 
+    width: 100px;   /* Total Planificado */
+  }
+  .tablaPOA th:nth-child(n+19):nth-child(-n+30) { 
+    width: 80px;   /* Meses Ejecutado */
+  }
+  .tablaPOA th:nth-child(31) { 
+    width: 100px;   /* Total Ejecutado */
+  }
+
+  .tablaPOA-contenedor {
+  width: 100%;
+  height: 100%; 
+  }
+
+  .tablaPOA thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+
+
+
+
+  /* BOTON DE DESCARGAR PDF */
+
+
+.download-btn {
+  padding: 10px 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+.download-btn:hover {
+  background-color: #45a049;
+}
+
+
+/* DROPDOWN MESES */
+
+.dropdownmeses {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdownmeses-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  width: 150px; /* 2 columnas de 160px cada una */
+  max-height: 50vh; /* altura máxima de la mitad de la pantalla */
+  overflow-y: auto;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 3;
+  border: 1px solid #ccc;
+}
+
+.dropdownmeses-content label {
+  padding: 8px 16px;
+  cursor: pointer;
+  display: block;
+  font-size: 10pt;
+}
+
+.dropdownmeses-content label:hover {
+  background-color: #ddd;
+}
+
+.dropdownmeses button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdownmeses button:hover {
+  background-color: #45a049;
+}
