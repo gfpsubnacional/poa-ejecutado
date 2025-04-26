@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sube tu archivo CSV</title>
-    <link rel="stylesheet" href="style.css">
+<title>Tabla con Expansión</title> 
+<link rel="stylesheet" type="text/css" href="contenido3y4_style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-    <div class="ayudacsv-container">
-        <h1 class="ayudacsv-title">Sube tu archivo CSV</h1>
 
-        <p class="ayudacsv-text">
-            Aquí debe subir un CSV con información descargada de SIGA. Si no sabe cómo obtener el CSV, atento:
-        </p>
+<div class="tablaPOA-contenedor">
+<h2>POA 2025</h2>
+<table id="tablaPOA" class="tablaPOA">
+  <thead>
+    <tr id="tablaPOA-encabezado1"></tr>
+    <tr id="tablaPOA-encabezado2"></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+</div>
 
-        <ul class="ayudacsv-list">
-            <li>...</li>
-        </ul>
-    </div>
+<script type="module" src="script.js"></script>
+
 </body>
 </html>

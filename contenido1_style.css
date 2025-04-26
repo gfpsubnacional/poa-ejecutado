@@ -1,0 +1,349 @@
+#login-container, #admin-container {
+    width: 350px;
+    margin: 30px auto;
+    border-radius: 10px;
+    padding: 50px;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+ 
+#form-container {
+    display: flex;
+    flex-direction: row; /* Asegura que los elementos estén en una fila */
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin: 0;
+    width: 100%; /* Que ocupe todo el ancho disponible */
+}
+
+
+h2 {
+    color: #1C4574;
+    text-align: left;
+    margin: 0
+}
+
+
+#submitButton {
+    background-color: #EA232B;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-top: 70px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+#submitButton:hover {
+    background-color: #F5811E;
+}
+
+
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#main-container {
+    display: flex;
+    flex-direction: row; /* Asegura que los elementos estén en una fila */
+    align-items: flex-start;
+    width: 100%;
+}
+
+.error {
+    color: red;
+}
+
+
+/* Estilos para boton tipo registro */
+.boton-tiporegistro {
+    margin: 0 auto; /* Esto centrará horizontalmente */
+    display: flex;
+    justify-content: center;
+    margin-top: 0px;
+    height: 30px;
+    width: 270px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    position: relative;
+    cursor: pointer;
+}
+
+.selector-tiporegistro {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    background-color: #1C4574;
+    transition: left 0.3s ease;
+    border-radius: 5px;
+}
+
+.opcion-tiporegistro-izq, .opcion-tiporegistro-der {
+    position: relative;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+}
+
+.opcion-tiporegistro-izq {
+    left: 0;
+    color: white;
+}
+
+.opcion-tiporegistro-der {
+    right: 0;
+    color: black;
+}
+
+.opcion-tiporegistro-seleccionada {
+    color: white !important;
+}
+
+.opcion-tiporegistro-no-seleccionada {
+    color: black;
+}
+
+/* Estilos para todas las tablas*/
+table {
+}
+
+th, td {
+    padding: 0px 2px; 
+    vertical-align: middle; /* Centrar verticalmente */
+}
+
+th {
+    background-color: #1C4574;
+    color: white;
+    text-align: center;
+}
+
+td {
+    text-align: left;
+}
+
+/* Estilo particular para tabla de formulario */
+
+#Formulario {
+    width: fit-content;
+}
+
+#metas-super-container {
+    width: auto;
+    justify-content: flex-start;
+    margin-left: 0;
+    margin-right: auto;
+    padding: 0;
+    width: fit-content;
+}
+
+#metas-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-left: 0;
+    margin-right: auto;
+    padding: 0;
+    width: fit-content;
+}
+
+.meta-container {
+    border: 2px solid #1C4574;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 20px 0;
+    width: 100%;
+    position: relative;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.add-meta {
+    margin: -20px auto;  /* Centra el botón en su contenedor */
+    padding: 5px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 10;
+    background: #1C4574;
+    color: white;
+    width: fit-content;  /* Asegura que el ancho del botón se ajuste al contenido */
+    max-width: 400px;  /* Limita el ancho máximo del botón */
+    text-align: center;  /* Centra el texto dentro del botón */
+    display: block;  /* Asegura que el botón sea un bloque y se pueda centrar */
+}
+
+
+
+.meta-title {
+    font-weight: bold;
+    color: #1C4574;
+    background: white;
+    padding: 0 10px;
+    position: absolute;
+    top: -12px;
+    left: 15px;
+}
+
+.minimize-meta, .delete-meta {
+    position: absolute;
+    top: -15px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 3px 7px;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+
+.minimize-meta {
+    right: 15px;
+    background: #1C4574;
+}
+
+.delete-meta {
+    right: -10px;
+    background: #cf0909;
+}
+
+.table-container {
+    max-width: 600px;
+}
+
+.table-formulario {
+    border-collapse: separate;
+    border-spacing: 8px;
+    width: 100%;
+}
+
+.table-formulario td {
+    vertical-align: top;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+}
+
+.table-formulario td:first-child {
+    width: 100px;
+    vertical-align: middle;
+}
+
+.table-formulario td:nth-child(2) {
+    width: 250px;
+    border: 2px solid #000;
+    border-radius: 10px;
+    padding: 8px;
+    vertical-align: middle;
+}
+
+.table-formulario select, .table-formulario input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: inherit;
+    font-family: inherit;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+#table-formulario-general tr:nth-child(3) td:nth-child(2) {
+    border: none;
+}
+
+
+
+
+
+
+/* Seleccion multiple para entidad */ 
+.multipleSelect-container {
+    position: relative;
+    width: 100%; /* Ocupa todo el ancho disponible */
+    box-sizing: border-box; /* Evita desbordamientos */
+    z-index: 11;
+}
+
+/* Estilo del botón para que se ajuste sin padding extra */
+.multipleSelect-boton {
+    width: 100%;
+    border: none;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* Menú desplegable sin afectar el diseño */
+.multipleSelect-opciones {
+    position: absolute;
+    width: 100%; 
+    background: white;
+    border: none;
+    list-style: none;
+    margin: 0;
+    overflow-y: auto;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    display: none; 
+}
+
+.multipleSelect-opciones li {
+    list-style: none; /* Elimina los estilos predeterminados de lista */
+    padding: 2px 5px; /* Ajusta el relleno si es necesario */
+    margin: 0; /* Elimina márgenes extra */
+}
+
+.multipleSelect-opciones li label {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Espacio entre checkbox y texto */
+    cursor: pointer;
+    padding: 2px 0;
+    width: 100%;
+}
+
+.multipleSelect-opciones label:hover {
+    background: #f0f0f0;
+}
+
+.multipleSelect-icon {
+    font-size: 12px;
+}
+
+.multipleSelect-container td,
+.multipleSelect-container input,
+.multipleSelect-container select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 20;
+}
+
+.multipleSelect-opciones input[type="checkbox"] {
+    padding: 0;
+    margin: 0; /* Evitar márgenes extra */
+    width: auto;
+}
+
+
+
+
+/* Filtros */
+.checkbox-container label {
+    display: block;  /* Asegura que cada casilla de verificación esté en su propia línea */
+    margin-bottom: 5px;  /* Espacio entre las casillas */
+  }
+  
