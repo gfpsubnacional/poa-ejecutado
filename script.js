@@ -119,6 +119,20 @@ let datosPOA = [];
 let varios = [];
 
 
+function trimStringsInArray(array) {
+    return array.map(row => {
+        const trimmedRow = {};
+        for (const key in row) {
+            if (typeof row[key] === 'string') {
+                trimmedRow[key] = row[key].trim();
+            } else {
+                trimmedRow[key] = row[key];
+            }
+        }
+        return trimmedRow;
+    });
+}
+
 function login() {
     usuarioActual = document.getElementById('username').value;
     const password = document.getElementById('password').value;
@@ -144,10 +158,12 @@ function login() {
             console.log("Datos de consultor en LS:", JSON.parse(localStorage.getItem("usuarioDatos")));
 
             datosPOA  = XLSX.utils.sheet_to_json(workbook.Sheets['POA2025_ej']); // Guardamos los datos globalmente
+            datosPOA = trimStringsInArray(datosPOA);            
             localStorage.setItem("POADatos", JSON.stringify(datosPOA));
             console.log("Datos POA en LS:", JSON.parse(localStorage.getItem("POADatos")));
 
             varios  = XLSX.utils.sheet_to_json(workbook.Sheets['varios']); // Guardamos los datos globalmente
+            varios = trimStringsInArray(varios);            
             localStorage.setItem("varios", JSON.stringify(varios));
             console.log("Datos varios en LS:", JSON.parse(localStorage.getItem("varios")));
 
@@ -165,7 +181,8 @@ function mostrarMenu(userData) {
     let buttons = "";
 
     const adminButtons = ["Contenido 6", "Contenido 7", "Contenido 8", "Contenido 9"];
-    const userButtons = ["Registro POA", "Mis envíos","POA 2025", "Mi POA 2025","Llenar Ficha (residente)","Ver Fichas (itinerante)"];
+    const userButtons = ["Registro POA", "Mis envíos","Mi POA 2025", "POA 2025", "Manual de uso"];
+    // const userButtons = ["Registro POA", "Mis envíos","POA 2025", "Mi POA 2025","Llenar Ficha (residente)","Ver Fichas (itinerante)"];
 
     if (userData.Tipo === 'admin') {
         buttons = adminButtons.map((name, i) =>
@@ -666,18 +683,23 @@ function actualizarTitulos() {
 
     if (textoSeleccionado.includes(".P1.") || textoSeleccionado.includes(".P6.")) {
         // Buscar en POADatos
+      numerometas.closest('tr').style.display = '';
       titulo.setAttribute("readonly", true);
       const poaItem = datosPOA.find(item => item.Actividad === textoSeleccionado);
       if (poaItem) {
         titulo.value = poaItem.Actividad_name;
+        titulo.closest('tr').style.display = 'none';
         // console.log(`Actualizado #${id} con nombre:`, poaItem.Actividad_name);
       } else {
         titulo.value = "";
+        titulo.closest('tr').style.display = 'none';
         console.warn(`No se encontró Actividad "${textoSeleccionado}" en POADatos`);
       }
     } else if (textoSeleccionado.includes("Seleccione")) {
+        numerometas.closest('tr').style.display = 'none';
         titulo.value = "";
         titulo.setAttribute("readonly", true);
+        titulo.closest('tr').style.display = 'none';
         if (numerometas) {
             numerometas.value = "";
             numerometas.readonly = true;
@@ -686,8 +708,10 @@ function actualizarTitulos() {
         // console.log(`El texto contiene "Seleccione", borrando el contenido en #${id} y estableciendo como no editable`);
         return;
     } else {
-      titulo.value = "";
+      numerometas.closest('tr').style.display = 'none';
+    //   titulo.value = "";
       titulo.removeAttribute("readonly");
+      titulo.closest('tr').style.display = '';
       numerometas.value = 1;
       numerometas.readonly = true;
       numerometas.style.pointerEvents = 'none';
@@ -747,9 +771,9 @@ setInterval(observarCambiosEnSelects, 1000);
 //             // const nombreMeta = document.getElementById(`nnombreMeta-${idNumero}`);
 //             const filaNumeroMetas = document.getElementById(`numerometas-${idNumero}`)?.closest('tr');
 //             const tipoRegistro = document.getElementById(`tiporegistro-${idNumero}`);
-            
+
 //             let seleccionIndividual = true;
-    
+
 //             function cambiarEstado(esIndividual) {
 //                 if (esIndividual) {
 //                     indicadorTipoRegistro.style.left = '0';
@@ -757,7 +781,7 @@ setInterval(observarCambiosEnSelects, 1000);
 //                     opcionIndividual.classList.remove('opcion-tiporegistro-no-seleccionada');
 //                     opcionMultiple.classList.add('opcion-tiporegistro-no-seleccionada');
 //                     opcionMultiple.classList.remove('opcion-tiporegistro-seleccionada');
-                    
+
 //                     // if (nombreMeta) nombreMeta.textContent = "Nombre de meta:";
 //                     if (filaNumeroMetas) filaNumeroMetas.style.display = 'none';
 //                     if (tipoRegistro) tipoRegistro.textContent = "Individual";
@@ -767,14 +791,14 @@ setInterval(observarCambiosEnSelects, 1000);
 //                     opcionIndividual.classList.add('opcion-tiporegistro-no-seleccionada');
 //                     opcionMultiple.classList.remove('opcion-tiporegistro-no-seleccionada');
 //                     opcionMultiple.classList.add('opcion-tiporegistro-seleccionada');
-                    
+
 //                     // if (nombreMeta) nombreMeta.textContent = "Nombre de bloque de metas:";
 //                     if (filaNumeroMetas) filaNumeroMetas.style.display = 'table-row';
 //                     if (tipoRegistro) tipoRegistro.textContent = "Multiple";
 //                 }
 //                 seleccionIndividual = esIndividual;
 //             }
-    
+
 //             selectorTipoRegistro.addEventListener('click', () => {
 //                 cambiarEstado(!seleccionIndividual);
 //             });
@@ -785,9 +809,9 @@ setInterval(observarCambiosEnSelects, 1000);
 //             elementosConfigurados.add(selectorTipoRegistro.id);
 //         });
 //     }
-    
+
 //     setupTodosLosSelectores();
-    
+
 //     const observer = new MutationObserver(function(mutations) {
 //         let nuevosElementos = false;
 //         mutations.forEach(mutation => {
@@ -905,7 +929,36 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    let totalCargas = 2;
+    function agregarOpcionesAmbito1() {
+        const ambito = document.getElementById("ambitoopciones-1");
+        if (ambito) {
+            ambito.innerHTML = ""; // Limpiar opciones anteriores
+            ambito.style.maxHeight = "200px"; // Altura máxima para scroll
+            ambito.style.overflowY = "auto"; // Habilitar scroll vertical
+
+            let datosVarios = JSON.parse(localStorage.getItem("varios"));
+            let opcionesGrupo = datosVarios?.find(grupo => grupo.nombre === "ambitos");
+            if (opcionesGrupo) {
+                Object.keys(opcionesGrupo).forEach(key => {
+                    if (key.startsWith("opcion")) {
+                        const li = document.createElement("li");
+                        const label = document.createElement("label");
+                        const input = document.createElement("input");
+
+                        input.type = "checkbox";
+                        input.value = opcionesGrupo[key];
+                        label.appendChild(input);
+                        label.appendChild(document.createTextNode(` ${opcionesGrupo[key]}`));
+
+                        li.appendChild(label);
+                        ambito.appendChild(li);
+                    }
+                });
+            }
+        }
+    }
+
+    let totalCargas = 3;
     let cargasCompletadas = 0;
 
     function verificarCargaCompleta() {
@@ -917,14 +970,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // esperarElementoYAplicar("estadoMeta-1", select => cargarOpciones(select, "estado"), verificarCargaCompleta);
     esperarElementoYAplicar("entidadopciones-1", agregarOpcionesEntidad1, verificarCargaCompleta);
-    esperarElementoYAplicar("variosConsultores-1", select => cargarOpciones(select, "masdeunconsultor"), verificarCargaCompleta);
+    esperarElementoYAplicar("ambitoopciones-1", agregarOpcionesAmbito1, verificarCargaCompleta);
+    // esperarElementoYAplicar("variosConsultores-1", select => cargarOpciones(select, "masdeunconsultor"), verificarCargaCompleta);
     // esperarElementoYAplicar("metaNueva-1", select => cargarOpciones(select, "sino"), verificarCargaCompleta);
-    esperarElementoYAplicar("estadoMeta-1", select => cargarOpciones(select, "etapa"), verificarCargaCompleta);
+    // esperarElementoYAplicar("estadoMeta-1", select => cargarOpciones(select, "etapa"), verificarCargaCompleta);
     esperarElementoYAplicar("actividad-1", filtrarActividades, verificarCargaCompleta);
 
+    /*
     function activarScriptFecha() {
-        const fechaInicioInput = document.getElementById("fecha-inicio");
-        const fechaFinInput = document.getElementById("fecha-fin");
+        // const fechaInicioInput = document.getElementById("fecha-inicio");
+        // const fechaFinInput = document.getElementById("fecha-fin");
         const mesReporteInput = document.getElementById("mes-reporte");
 
         function actualizarMes() {
@@ -985,13 +1040,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     observer4.observe(document.body, { childList: true, subtree: true });
-
+    */
 
     function toggleRows(selectElement) {
         const metaContainer = selectElement.closest(".meta-container");
         if (!metaContainer) return;
-
-        const filasExtras = metaContainer.querySelectorAll("table tr:nth-last-child(-n+4)");
+        const filasExtras = metaContainer.querySelectorAll("table tr:nth-last-child(n+2):nth-last-child(-n+5)");
+        // const filasExtras = metaContainer.querySelectorAll("table tr:nth-last-child(-n+4)");
         const shouldShow = selectElement.value.includes(".P2.");
 
         filasExtras.forEach(row => {
@@ -1024,21 +1079,21 @@ document.addEventListener("DOMContentLoaded", function () {
             // Actualizar el título de la meta
             meta.querySelector(".meta-title").textContent = `Registro ${index + 1}`;
             meta.dataset.index = index + 1;
-    
+
             // Actualizar el ID del contenedor .meta-container (si sigue el formato esperado)
             const metaIdPartes = meta.id.split("-");
             if (metaIdPartes.length > 1 && !isNaN(metaIdPartes.pop())) {
                 meta.id = `${metaIdPartes.join("-")}-${index + 1}`;
             }
-    
+
             // Actualizar los IDs de los elementos dentro del meta-container
             meta.querySelectorAll("[id]").forEach(input => {
                 const partes = input.id.split("-");
                 if (partes.length < 2) return; // Ignorar elementos con IDs no esperados
-    
+
                 const idActual = partes.pop(); // Último segmento del ID
                 const baseId = partes.join("-"); // Resto del ID sin el número
-                
+
                 // Solo actualizar si el ID termina en un número diferente al nuevo índice
                 if (!isNaN(idActual) && parseInt(idActual) !== index + 1) {
                     input.id = `${baseId}-${index + 1}`;
@@ -1046,7 +1101,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-    
+
     function minimizarMeta(event) {
         const metaContainer = event.target.closest(".meta-container");
         const tableContainer = metaContainer.querySelector(".table-container");
@@ -1098,10 +1153,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     async function enviarDatos() {
-        if (!confirm("¿Está seguro de enviar este reporte?")) {
-            return; // El usuario canceló → detener ejecución
-        }
-
         try {
             // Mostrar pop-up de carga
             const loader = document.createElement("div");
@@ -1125,17 +1176,17 @@ document.addEventListener("DOMContentLoaded", function () {
             const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos")) || {};
             const user = usuarioDatos["Usuario"];
             const fechaHora = new Date().toLocaleDateString('es-PE') + " " + new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false });
-            const fechaInicioGlobal = getElementValue("fecha-inicio");
-            const fechaFinGlobal = getElementValue("fecha-fin");
+            // const fechaInicioGlobal = getElementValue("fecha-inicio");
+            // const fechaFinGlobal = getElementValue("fecha-fin");
             const mesReporteGlobal = getElementValue("mes-reporte");
             const metas = document.querySelectorAll(".meta-container");
 
             // Restablecer los bordes de la segunda columna antes de validar
             document.querySelectorAll(".table-formulario td:nth-child(2)").forEach(td => {
-                if (!td.querySelector("#mes-reporte")) {
+                // if (!td.querySelector("#mes-reporte")) {
                     td.style.border = "2px solid black";
                     td.style.borderRadius = "10px";
-                }
+                // }
             });
 
             function esElementoVisible(elemento) {
@@ -1174,8 +1225,10 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             // Validar campos generales
-            validarCampo("fecha-inicio");
-            validarCampo("fecha-fin");
+
+            // validarCampo("fecha-inicio");
+            // validarCampo("fecha-fin");
+            validarCampo("mes-reporte");
 
             // Validar cada meta visible
             for (const meta of metas) {
@@ -1185,10 +1238,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 validarCampo(`actividad-${index}`, true);
                 // validarCampo(`nombreMeta-${index}`, false, true);
                 validarCampo(`numerometas-${index}`);
+                validarCampo(`ambito-${index}`, false, true);
                 validarCampo(`entidad-${index}`, false, true);
                 // validarCampo(`metaNueva-${index}`, true);
                 // validarCampo(`estadoMeta-${index}`, true);
-                // validarCampo(`detalleMeta-${index}`, false, true);
+                validarCampo(`detalleMeta-${index}`, false, true);
                 // validarCampo(`fechaInicio-${index}`);
                 // validarCampo(`fechaFin-${index}`);
                 // validarCampo(`variosConsultores-${index}`, true);
@@ -1207,15 +1261,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
+            if (!confirm("¿Está seguro de enviar este reporte?")) {
+                return; // El usuario canceló → detener ejecución
+            }
+    
             // Envío de datos si la validación pasa
             for (const meta of metas) {
-                if (window.getComputedStyle(meta).display !== "none") { // Solo enviar si está visible
+                if (window.getComputedStyle(meta)) { 
                     const index = meta.dataset.index;
                     const metaData = {
                         usuario: user,
                         timestamp: fechaHora,
-                        fechaInicio: fechaInicioGlobal,
-                        fechaFin: fechaFinGlobal,
+                        // fechaInicio: fechaInicioGlobal,
+                        // fechaFin: fechaFinGlobal,
                         mesReporte: mesReporteGlobal,
                         actividad: getSelectText(`actividad-${index}`),
                         titulo: document.getElementById(`titulo-${index}`).value,
@@ -1224,10 +1282,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         // metaNueva: getSelectText(`metaNueva-${index}`),
                         // nombreMeta: getElementText(`nombreMeta-${index}`),
                         // estadoMeta: getSelectText(`estadoMeta-${index}`),
-                        // detalleMeta: getElementText(`detalleMeta-${index}`),
                         // fechaInicio: getElementValue(`fechaInicio-${index}`),
                         // fechaFin: getElementValue(`fechaFin-${index}`),
+                        ambito: getElementText(`ambito-${index}`),
                         entidad: getElementText(`entidad-${index}`),
+                        detalleMeta: getElementText(`detalleMeta-${index}`),
                         // variosConsultores: getSelectText(`variosConsultores-${index}`),
                         participantes: getElementValue(`participantes-${index}`),
                         hombres: getElementValue(`hombres-${index}`),
@@ -1239,6 +1298,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
 
+            alert("✅ La información se registró satisfactoriamente.");
+            
         } catch (error) {
             alert(`❌ Error: ${error.message}\nPor favor, no pierda su registro, tome nota del error e informe a Seguimiento y Evaluación.`);
             console.error("Error al enviar datos:", error);
@@ -1248,7 +1309,6 @@ document.addEventListener("DOMContentLoaded", function () {
             if (loaderPopup) {
                 loaderPopup.remove();
             }
-            alert("✅ La información se registró satisfactoriamente.");
         }
 
     }
@@ -1271,10 +1331,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
     function setupMultipleSelect(multipleSelectBoton, multipleSelectLista, multipleSelectSeleccionadas) {
         if (!multipleSelectBoton || !multipleSelectLista || !multipleSelectSeleccionadas) return;
@@ -1296,18 +1352,18 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        function updateMultipleSelect() {
+        function updateMultipleSelect(seleccionadasElement) { // Recibe el elemento de visualización
             const multipleSelectCheckboxes = multipleSelectLista.querySelectorAll("input[type=checkbox]");
             let seleccionados = Array.from(multipleSelectCheckboxes)
                 .filter(cb => cb.checked)
                 .map(cb => cb.value)
                 .join(", ");
-            multipleSelectSeleccionadas.innerText = seleccionados || "-- Seleccione --";
+            seleccionadasElement.innerText = seleccionados || "-- Seleccione --"; // Actualiza el elemento correcto
         }
 
         multipleSelectLista.addEventListener("change", (event) => {
             if (event.target.matches("input[type=checkbox]")) {
-                updateMultipleSelect();
+                updateMultipleSelect(multipleSelectSeleccionadas); // Pasa el elemento correcto
             }
         });
 
@@ -1322,15 +1378,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".multipleSelect-container").forEach(container => {
             const multipleSelectBoton = container.querySelector(".multipleSelect-boton");
             const multipleSelectLista = container.querySelector(".multipleSelect-opciones");
+            const multipleSelectSeleccionadas = container.querySelector("[id^='entidad-'], [id^='ambito']"); // Ahora esperamos UN elemento dentro del contenedor
 
-            // Seleccionar todos los elementos cuyo ID comienza con "entidad-"
-            const multipleSelectSeleccionadas = container.querySelectorAll("[id^='entidad-']");
-
-            if (!container.dataset.initialized) {
-                // Si hay varios elementos con ID que empieza por "entidad-", se aplican a todos
-                multipleSelectSeleccionadas.forEach(el => {
-                    setupMultipleSelect(multipleSelectBoton, multipleSelectLista, el);
-                });
+            if (multipleSelectBoton && multipleSelectLista && multipleSelectSeleccionadas && !container.dataset.initialized) {
+                setupMultipleSelect(multipleSelectBoton, multipleSelectLista, multipleSelectSeleccionadas);
                 container.dataset.initialized = "true";
             }
         });
@@ -1344,8 +1395,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     observer.observe(document.body, { childList: true, subtree: true });
 });
-
-
 
 
 //////////////////////////// CONTENIDO2 //////////////////////////////
@@ -1426,8 +1475,8 @@ function renderizarTabla(datos) {
     const headers = [
         { key: "usuario", label: "Usuario" },
         { key: "timestamp", label: "R - timestamp" },
-        { key: "fechaInicio", label: "R - fecha inicio" },
-        { key: "fechaFin", label: "R - fecha fin" },
+        // { key: "fechaInicio", label: "R - fecha inicio" },
+        // { key: "fechaFin", label: "R - fecha fin" },
         { key: "mesReporte", label: "R - mes" },
         // { key: "tipoRegistro", label: "Tipo de Registro" },
         { key: "numerometas", label: "Número de metas" },
@@ -1436,8 +1485,9 @@ function renderizarTabla(datos) {
         // { key: "metaNueva", label: "Meta nueva" },
         // { key: "nombreMeta", label: "Título de la meta" },
         // { key: "estadoMeta", label: "Estado de la meta" },
-        // { key: "detalleMeta", label: "Detalle de la meta" },
+        { key: "ambito", label: "Ambito" },
         { key: "entidad", label: "Entidad" },
+        { key: "detalleMeta", label: "Observaciones" },
         // { key: "fechaInicio", label: "Fecha inicio" },
         // { key: "fechaFin", label: "Fecha fin" },
         // { key: "variosConsultores", label: "Intervino más de un consultor" },
@@ -1448,7 +1498,7 @@ function renderizarTabla(datos) {
     ];
 
     const columnasLlenas = headers.filter(({ key }) =>
-        datos.some(row => row[key] !== "" && row[key] !== null)
+        datos.some(row => row[key] !== "" && row[key] !== null && row[key] !== "-" && row[key] !== undefined)
     );
 
     let html = "<thead><tr>";
@@ -1565,7 +1615,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 checkboxLabel.textContent = value;
                 checkboxLabel.style.marginLeft = "5px"; // Añadir un poco de espacio entre el checkbox y el texto
                 checkboxLabel.style.fontWeight = "normal"; // Quitar negrita
-                
+
                 label.appendChild(checkbox);
                 label.appendChild(checkboxLabel);
                 checkboxContainer.appendChild(label);
@@ -1594,7 +1644,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Filtrar las filas de la tabla considerando TODAS las columnas con filtros activos
                 Array.from(tbody.rows).forEach(row => {
                     let show = true;
-            
+
                     for (const [filterColIndex, selectedSet] of Object.entries(activeFilters)) {
                         const cellValue = row.cells[filterColIndex]?.textContent?.trim();
                         if (!selectedSet.has(cellValue)) {
@@ -1602,24 +1652,24 @@ document.addEventListener("DOMContentLoaded", () => {
                             break;
                         }
                     }
-            
+
                     row.style.display = show ? "" : "none";
                 });
             };
-            
+
 
             // Manejar el cambio en el checkbox "Seleccionar todo"
             selectAllCheckbox.addEventListener("change", () => {
                 const allCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox");
                 const shouldCheckAll = selectAllCheckbox.checked;
-            
+
                 allCheckboxes.forEach(checkbox => {
                     checkbox.checked = shouldCheckAll;
                 });
-            
+
                 applyFilters(); // Aplica el filtro después de marcar/desmarcar
             });
-            
+
             // Manejar el cambio en las casillas de verificación individuales
             checkboxContainer.addEventListener("change", (event) => {
                 if (event.target.classList.contains("filter-checkbox")) {
@@ -1650,26 +1700,26 @@ document.addEventListener("DOMContentLoaded", () => {
         document.addEventListener("click", (event) => {
             if (!event.target.closest(".filter-cell")) {
                 const allCheckboxContainers = document.querySelectorAll(".checkbox-container");
-        
+
                 allCheckboxContainers.forEach(container => {
                     container.style.display = "none";
-        
+
                     const colIndex = [...container.closest("th").parentElement.children].indexOf(container.closest("th"));
                     const checkboxes = container.querySelectorAll(".filter-checkbox");
                     const checked = container.querySelectorAll(".filter-checkbox:checked");
-        
+
                     // Si todos los checkboxes están desmarcados, restaurar todos
                     if (checked.length === 0) {
                         checkboxes.forEach(cb => cb.checked = true);
-        
+
                         // Actualizar estado global
                         const restoredSet = new Set(Array.from(checkboxes).map(cb => cb.value));
                         activeFilters[colIndex] = restoredSet;
-        
+
                         // Marcar "Seleccionar todo"
                         const selectAll = container.querySelector(".select-all-checkbox");
                         if (selectAll) selectAll.checked = true;
-        
+
                         // Reaplicar filtros cruzados
                         applyFilters();
                     }
@@ -1800,7 +1850,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 checkboxLabel.textContent = value;
                 checkboxLabel.style.marginLeft = "5px"; // Añadir un poco de espacio entre el checkbox y el texto
                 checkboxLabel.style.fontWeight = "normal"; // Quitar negrita
-                
+
                 label.appendChild(checkbox);
                 label.appendChild(checkboxLabel);
                 checkboxContainer.appendChild(label);
@@ -1829,7 +1879,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Filtrar las filas de la tabla considerando TODAS las columnas con filtros activos
                 Array.from(tbody.rows).forEach(row => {
                     let show = true;
-            
+
                     for (const [filterColIndex, selectedSet] of Object.entries(activeFilters)) {
                         const cellValue = row.cells[filterColIndex]?.textContent?.trim();
                         if (!selectedSet.has(cellValue)) {
@@ -1837,24 +1887,24 @@ document.addEventListener("DOMContentLoaded", () => {
                             break;
                         }
                     }
-            
+
                     row.style.display = show ? "" : "none";
                 });
             };
-            
+
 
             // Manejar el cambio en el checkbox "Seleccionar todo"
             selectAllCheckbox.addEventListener("change", () => {
                 const allCheckboxes = checkboxContainer.querySelectorAll(".filter-checkbox");
                 const shouldCheckAll = selectAllCheckbox.checked;
-            
+
                 allCheckboxes.forEach(checkbox => {
                     checkbox.checked = shouldCheckAll;
                 });
-            
+
                 applyFilters(); // Aplica el filtro después de marcar/desmarcar
             });
-            
+
             // Manejar el cambio en las casillas de verificación individuales
             checkboxContainer.addEventListener("change", (event) => {
                 if (event.target.classList.contains("filter-checkbox")) {
@@ -1885,26 +1935,26 @@ document.addEventListener("DOMContentLoaded", () => {
         document.addEventListener("click", (event) => {
             if (!event.target.closest(".filter-cell")) {
                 const allCheckboxContainers = document.querySelectorAll(".checkbox-container");
-        
+
                 allCheckboxContainers.forEach(container => {
                     container.style.display = "none";
-        
+
                     const colIndex = [...container.closest("th").parentElement.children].indexOf(container.closest("th"));
                     const checkboxes = container.querySelectorAll(".filter-checkbox");
                     const checked = container.querySelectorAll(".filter-checkbox:checked");
-        
+
                     // Si todos los checkboxes están desmarcados, restaurar todos
                     if (checked.length === 0) {
                         checkboxes.forEach(cb => cb.checked = true);
-        
+
                         // Actualizar estado global
                         const restoredSet = new Set(Array.from(checkboxes).map(cb => cb.value));
                         activeFilters[colIndex] = restoredSet;
-        
+
                         // Marcar "Seleccionar todo"
                         const selectAll = container.querySelector(".select-all-checkbox");
                         if (selectAll) selectAll.checked = true;
-        
+
                         // Reaplicar filtros cruzados
                         applyFilters();
                     }
@@ -2084,7 +2134,7 @@ document.addEventListener("DOMContentLoaded", function () {
             icono.textContent = shouldHide ? "▶" : "▼";
         };
 
-        window[`tablaPOA_leerExcel_${tablaId}`]("POA 2025_bd.xlsx");        
+        window[`tablaPOA_leerExcel_${tablaId}`]("POA 2025_bd.xlsx");
         return true;
     }
 });
@@ -2228,14 +2278,14 @@ function waitForButton() {
       setTimeout(waitForButton, 1000);
     }
   }
-  
+
   function initializeDropdown() {
     const dropdownBtn = document.getElementById('dropdownBtn');
     const selectAll = document.getElementById('selectAll');
     const months = document.querySelectorAll('.month');
     const dropdownContent = document.querySelector('.dropdownmeses-content');
     const localStorageKey = 'selectedMonths';
-  
+
     function getSelectedMonths() {
       const selected = [];
       months.forEach(m => {
@@ -2243,7 +2293,7 @@ function waitForButton() {
       });
       return selected;
     }
-  
+
     function updateStorageAndLog() {
       const selected = getSelectedMonths();
       if (selected.length > 0) {
@@ -2251,7 +2301,7 @@ function waitForButton() {
         console.log(JSON.parse(localStorage.getItem('selectedMonths')));
       }
     }
-  
+
     function loadSelection() {
       const saved = JSON.parse(localStorage.getItem(localStorageKey)) || [];
       if (saved.length === 0) {
@@ -2261,26 +2311,26 @@ function waitForButton() {
       }
       updateSelectAllState();
     }
-  
+
     function updateSelectAllState() {
       const allSelected = getSelectedMonths().length === months.length;
       selectAll.checked = allSelected;
     }
-  
+
     selectAll.addEventListener('change', () => {
       const checked = selectAll.checked;
       months.forEach(m => m.checked = checked);
       updateSelectAllState();
       updateStorageAndLog();
     });
-  
+
     months.forEach(m => {
       m.addEventListener('change', () => {
         updateSelectAllState();
         updateStorageAndLog();
       });
     });
-  
+
     document.addEventListener('click', (e) => {
       if (!e.target.closest('.dropdownmeses')) {
         const selected = getSelectedMonths();
@@ -2292,19 +2342,19 @@ function waitForButton() {
         dropdownContent.style.display = 'none';
       }
     });
-  
+
     dropdownBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
     });
-  
+
     loadSelection();
     updateStorageAndLog();
   }
-  
+
   waitForButton();
-  
-/////////////// Cargar ejecutado 
+
+/////////////// Cargar ejecutado
 
 function waitForElement(selector, callback) {
     // console.log(`Esperando elemento: ${selector}`);
@@ -2347,25 +2397,78 @@ function createPopupTable(details) {
         popup.style.zIndex = "1000";
         document.body.appendChild(popup);
     }
-    
+
     const keys = Object.keys(details[0]).filter(key => details.some(d => d[key] && d[key] !== ""));
-    
+
     popup.innerHTML = `<button onclick='document.getElementById("popupTable").style.display="none"' style='float:right;'>✖</button>` +
         `<table border='1'><tr>${keys.map(key => `<th>${key}</th>`).join("")}</tr>` +
         details.map(d => `<tr>${keys.map(key => `<td>${d[key]}</td>`).join("")}</tr>`).join("") + "</table>";
-    
+
     popup.style.display = "block";
+}
+
+
+
+function calcularSumasTablaPOA() {
+    console.log("Ejecutando calcularSumasTablaPOA");
+    const tablas = document.querySelectorAll('#tablaPOA, #mitablaPOA');
+
+    tablas.forEach(tabla => {
+        const elementosTotal = tabla.querySelectorAll('.tablaPOA-total');
+
+        elementosTotal.forEach(celdaTotal => {
+            console.log("Encontrado elemento total:", celdaTotal);
+            const fila = celdaTotal.parentNode;
+            let suma = 0;
+            let columnaActual = celdaTotal.cellIndex - 1;
+            let contadorCeldas = 0;
+
+            while (columnaActual >= 0) {
+                const celdaIzquierda = fila.cells[columnaActual];
+
+                if (celdaIzquierda && !celdaIzquierda.classList.contains('tablaPOA-total')) {
+                    const textoCelda = celdaIzquierda.textContent.trim();
+                    const esNumerico = /^[0-9.]+$/.test(textoCelda);
+
+                    if (!textoCelda || esNumerico) {
+                        if (textoCelda) {
+                            const valor = parseFloat(textoCelda);
+                            if (!isNaN(valor)) {
+                                console.log(`  Celda [${columnaActual}]: "${textoCelda}" - Sumando ${valor}`);
+                                suma += valor;
+                            }
+                        } else {
+                            console.log(`  Celda [${columnaActual}]: "${textoCelda}" - Celda vacía, continuando`);
+                        }
+                        contadorCeldas++;
+                        columnaActual--;
+                        // Aquí puedes añadir una condición para limitar el número de celdas a considerar (las 'n' primeras)
+                        // Por ejemplo: if (contadorCeldas >= n) break;
+                    } else {
+                        console.log(`  Celda [${columnaActual}]: "${textoCelda}" - Contiene texto no numérico, deteniendo suma`);
+                        break;
+                    }
+                } else {
+                    console.log("  Encontrada celda total o límite de fila, deteniendo suma");
+                    break;
+                }
+            }
+            console.log(`  Suma calculada: ${suma}`);
+            celdaTotal.textContent = Math.floor(suma);
+        });
+    });
+    console.log("Función calcularSumasTablaPOA finalizada.");
 }
 
 function fillTableWithEnvios(tablaId, localStorageKey) {
     // console.log(`Esperando a que aparezcan filas en la tabla con ID: ${tablaId}`);
-    
+
     waitForElement(`#${tablaId} tbody tr`, () => {
         // console.log("✅ Filas de la tabla detectadas");
 
         waitForLocalStorageItem(localStorageKey, (misEnvios) => {
             // console.log("📦 Datos obtenidos de localStorage:", misEnvios);
-            
+
             document.querySelectorAll(`#${tablaId} tbody tr`).forEach(row => {
                 const firstCellText = row.cells[0]?.innerText;
                 // console.log("🔍 Procesando fila con texto en primera celda:", firstCellText);
@@ -2385,7 +2488,7 @@ function fillTableWithEnvios(tablaId, localStorageKey) {
                     "Noviembre": 28,
                     "Diciembre": 29
                 };
-                
+
                 const monthDetails = {};
                 misEnvios.forEach(entry => {
                     if (entry.actividad === firstCellText) {
@@ -2412,11 +2515,26 @@ function fillTableWithEnvios(tablaId, localStorageKey) {
                     }
                 });
             });
+
+            // Llamar a la función para calcular las sumas después de que la tabla se haya llenado
+            calcularSumasTablaPOA();
         });
     });
 }
 
 
+
+
 // Cargar ejecutado mitablaPOA
 fillTableWithEnvios('mitablaPOA', 'misEnvios');
 fillTableWithEnvios('tablaPOA', 'Envios');
+
+// MANUAL 
+
+document.addEventListener('DOMContentLoaded', function () {
+    window.manualShowSection = function(id) {
+        document.querySelectorAll('.manual-section').forEach(sec => sec.classList.remove('manual-active'));
+        const target = document.getElementById(id);
+        target.classList.add('manual-active');
+        }
+})

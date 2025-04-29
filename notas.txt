@@ -1,30 +1,11 @@
 ver avance por región / por consultor 
-P1 y P6 sin nombre / envío multiple  
-otros P, con nombre / sin posibilidad de envío multiple  
-
-Quitar fecha inicio - fecha fin 
 porcentajes en poa  y en mi poa 
+
 manual (guía)
-
-AMBITO : 
-Nacional 
-Todas las regiones
-Todas las provincias
-Región 1
-Región 2 
-Provincia 1
-…
-
-
-ENTIDAD: 
-"Entidades nacionales"
-GOREs
-Munis
-
-OBSERVACIONES:
-… libre  
 
 
 horas / link en capacitaciones (P2) (para después) 
 
 
+observaciones al final (siempre) 
+mi poa antes de poa 

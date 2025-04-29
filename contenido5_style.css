@@ -1,0 +1,62 @@
+
+
+
+.manual-header {
+    background: #005a8d;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+  }
+  .manual-nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    background: #e8eff5;
+    padding: 0.5rem;
+  }
+  .manual-nav button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #0056b3;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .manual-nav button:hover {
+    background: #007bff;
+  }
+  .manual-section {
+    display: none;
+    padding: 2rem;
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    margin-top: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  .manual-active {
+    display: block;
+  }
+  .manual-section img {
+    max-width: 100%;
+    margin: 1rem 0;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  }
+  .manual-section ul {
+    margin-left: 1.5rem;
+  }
+  .faq-item {
+    margin-bottom: 1.5em;
+  }
+
+  .manual-section img {
+    display: block;
+    margin: 20px auto;
+    max-width: 600px;
+    max-height: 400px;
+    height: auto;
+    width: auto;
+  }

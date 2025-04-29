@@ -5,10 +5,11 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Segoe UI", sans-serif;
     display: flex;
     height: 100vh;
 }
+
 
 h2 {
     color: #1C4574;

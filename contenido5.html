@@ -1,127 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Ficha Consultor (residentes)</title>
-    <!-- Enlaces a estilos -->
-    <link rel="stylesheet" type="text/css" href="contenido1_style.css">
-    <!-- Librerias online -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manual de Uso - Plataforma POA Ejecutado</title>
+  <link rel="stylesheet" type="text/css" href="contenido5_style.css">
 </head>
 <body>
-    <!-- Formulario -->
-    <h2>Ficha Consultor (residentes)</h2>
-    <form id="Formulario">
-        <div class="table-container">
-            <table id="table-formulario-general" class="table-formulario">
-                <tr>
-                    <td>Fecha de inicio de reporte:</td>
-                    <td><input type="date" id="fecha-inicio" min="2025-01-01" max="2025-12-31"></td>
-                </tr>
-                <tr>
-                    <td>Fecha de fin de reporte:</td>
-                    <td><input type="date" id="fecha-fin" min="2025-01-01" max="2025-12-31"></td>
-                </tr>
-                <tr>
-                    <td>Mes del reporte:</td>
-                    <td><input id="mes-reporte" readonly></td>
-                </tr>
-            </table>
-        </div>
-        
-        <div id="metas-super-container" >
-            <div id="metas-container">
-                <div class="meta-container" id="meta-1" data-index="1">
-                    <div class="meta-title">Registro 1</div>
-                    <button type="button" class="minimize-meta">−</button>
-                    <button type="button" class="delete-meta">x</button>
-            
-                    <div class="table-container">
-                        <table class="table-formulario">
-                            <tr>
-                                <td>Actividad POA:</td>
-                                <td>
-                                    <select id="actividad-1">
-                                        <option hidden>-- Seleccione --</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Título:</td>
-                                <td><input id="titulo-1" readonly></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Entidad(es):
-                                </td>
-                                <td>
-                                    <div class="multipleSelect-container">
-                                        <div class="multipleSelect-boton">
-                                            <span id="entidad-1">-- Seleccione --</span>
-                                            <span class="multipleSelect-icon">▼</span>
-                                        </div>
-                                        <ul id="entidadopciones-1" class="multipleSelect-opciones">                                        
-                                        </ul>
-                                    </div>
-                                </td>
 
-                            </tr>
-                            <tr>
-                                <td>Estado de la ejecución:</td>
-                                <td>
-                                    <select id="estadoMeta-1">
-                                        <option hidden>-- Seleccione --</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Detalle de la ejecución:</td>
-                                <td id="detalleMeta-1" contenteditable="true"></td>
-                            </tr>
-                            <tr>
-                                <td>Fecha inicio:</td>
-                                <td><input type="date" id="fechaInicio-1" min="2025-01-01" max="2025-12-31"></td>
-                            </tr>
-                            <tr>
-                                <td>Fecha fin:</td>
-                                <td><input type="date" id="fechaFin-1" min="2025-01-01" max="2025-12-31"></td>
-                            </tr>
+<div class="manual-header">
+  <h1>Manual de Uso</h1>
+  <p>Plataforma de Registro de POA Ejecutado</p>
+  <p><em>GFP Subnacional</em></p>
+</div>
 
-                            <tr>
-                                <td>Intervino más de un consultor:</td>
-                                <td>
-                                    <select id="variosConsultores-1">
-                                        <option hidden>-- Seleccione --</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Número de participantes:</td>
-                                <td><input type="number" id="participantes-1" min="0"></td>
-                            </tr>
-                            <tr>
-                                <td>Hombres:</td>
-                                <td><input type="number" id="hombres-1" min="0"></td>
-                            </tr>
-                            <tr>
-                                <td>Mujeres:</td>
-                                <td><input type="number" id="mujeres-1" min="0"></td>
-                            </tr>
-                            <tr>
-                                <td>Autoridades presentes:</td>
-                                <td id="autoridades-1" contenteditable="true"></td>
-                            </tr>
-                        </table>
+<div class="manual-nav">
+  <button onclick="manualShowSection('manual-intro')">Introducción</button>
+  <button onclick="manualShowSection('manual-ingreso')">Ingreso</button>
+  <button onclick="manualShowSection('manual-registro')">Registro POA</button>
+  <button onclick="manualShowSection('manual-envios')">Mis Envíos</button>
+  <button onclick="manualShowSection('manual-mipoa')">Mi POA 2025</button>
+  <button onclick="manualShowSection('manual-poa')">POA 2025</button>
+  <button onclick="manualShowSection('manual-faq')">Preguntas Frecuentes</button>
+</div>
 
+<section id="manual-intro" class="manual-section manual-active">
+  <h2>Introducción</h2>
+  <p>Bienvenido(a) a la Plataforma de Registro de POA Ejecutado. Esta herramienta permite registrar el cumplimiento de metas del POA, hacer seguimiento y mantener un historial detallado.</p>
+  <p>Este manual explica paso a paso cómo utilizar cada sección de la plataforma.</p>
+</section>
 
-                    </div>
-                </div>
-            </div>
-            <button type="button" class="add-meta">+</button>
-        </div>
-        <button type="button" id="submitButton">Enviar</button>
-    </form>
+<section id="manual-ingreso" class="manual-section">
+  <h2>Ingreso a la Plataforma</h2>
+  <p>Ingrese utilizando su usuario y contraseña asignados.</p>
+  <img src="Manual/Capturas de pantalla/1.png" alt="Ingreso a la plataforma">
+  <img src="Manual/Capturas de pantalla/2.png" alt="Ingreso a la plataforma">
+</section>
 
-    <!-- Script principal -->
-    <script type="module" src="script.js"></script>
+<section id="manual-registro" class="manual-section">
+  <h2>Registro POA</h2>
+  <p>Permite registrar las metas ejecutadas mensualmente.</p>
+  <ul>
+    <li>Cada envío corresponde a un solo mes.</li>
+    <li>Si registra varios meses, hágalo en envíos separados.</li>
+  </ul>
+  <p><strong>Ejemplo:</strong> Para la actividad R3.P1.2.1 (Acompañamiento), complete los campos según el mes, actividad, metas ejecutadas, ámbito y observaciones.</p>
+  <img src="Manual/Capturas de pantalla/3.png" alt="Formulario de registro">
+  <p>Si no hay observaciones, ingrese un guion ("-").</p>
+  <img src="Manual/Capturas de pantalla/4.png" alt="Observaciones">
+  <p>El sistema validará que todos los campos obligatorios estén completos.</p>
+  <img src="Manual/Capturas de pantalla/5.png" alt="Campos obligatorios">
+  <p>Algunas actividades requieren campos dinámicos (por ejemplo, participantes).</p>
+  <img src="Manual/Capturas de pantalla/6.png" alt="Agregar meta">
+  <p>Presione <strong>Enviar</strong> al finalizar.</p>
+  <img src="Manual/Capturas de pantalla/7.png" alt="Confirmación de envío">
+  <img src="Manual/Capturas de pantalla/8.png" alt="Mensaje de confirmación">
+</section>
+
+<section id="manual-envios" class="manual-section">
+  <h2>Mis Envíos</h2>
+  <p>Consulte sus registros anteriores.</p>
+  <img src="Manual/Capturas de pantalla/9.png" alt="Lista de envíos">
+  <ul>
+    <li>Filtre por mes, actividad, etc.</li>
+    <img src="Manual/Capturas de pantalla/10.png" alt="Filtros">
+    <li>Descargue en PDF.</li>
+    <img src="Manual/Capturas de pantalla/11.png" alt="Descargar PDF">
+    <img src="Manual/Capturas de pantalla/12.png" alt="PDF generado">
+  </ul>
+</section>
+
+<section id="manual-mipoa" class="manual-section">
+  <h2>Mi POA 2025</h2>
+  <p>Visualice el avance de sus metas personales.</p>
+  <img src="Manual/Capturas de pantalla/13.png" alt="Mi POA 2025">
+  <ul>
+    <li>Comparación entre metas planificadas y ejecutadas.</li>
+    <li>Puede hacer clic para ver detalles.</li>
+  </ul>
+  <img src="Manual/Capturas de pantalla/14.png" alt="Detalle por actividad">
+  <img src="Manual/Capturas de pantalla/15.png" alt="Detalle por mes">
+</section>
+
+<section id="manual-poa" class="manual-section">
+  <h2>POA 2025</h2>
+  <p>Muestra el progreso general del Programa.</p>
+  <ul>
+    <li>Incluye envíos de todos los usuarios.</li>
+    <li>Visualiza el avance acumulado.</li>
+  </ul>
+  <img src="Manual/Capturas de pantalla/16.png" alt="POA total">
+</section>
+
+<section id="manual-faq" class="manual-section">
+  <h2>Preguntas Frecuentes</h2>
+  
+    <div class="faq-item">
+    </div>
+
+  <div class="faq-item">
+    <h4>1. ¿Qué ocurre si ingreso metas de diferentes meses en un mismo envío?</h4>
+    <p>Cada envío debe ser únicamente para un mes específico. Si mezcla meses, el sistema podría rechazar el envío o registrarlo incorrectamente.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>2. ¿Qué pasa si no tengo observaciones para una meta?</h4>
+    <p>Puede completar el campo con un guion ("-") para no dejarlo vacío.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>3. ¿Qué significa que los campos son "dinámicos"?</h4>
+    <p>Dependiendo de la actividad seleccionada, el formulario mostrará campos adicionales relevantes. Por ejemplo, actividades de capacitación pedirán información sobre participantes.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>4. ¿Puedo editar un envío ya realizado?</h4>
+    <p>No es posible. Si desea subsanar algún envío, contactarse con Seguimiento y Evaluación.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>5. ¿Qué hago si olvidé enviar un mes anterior?</h4>
+    <p>Es posible enviar de manera diferida, comunicándose con Seguimiento y Evaluación.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>6. ¿Puedo registrar varias metas en un solo envío?</h4>
+    <p>Sí, siempre que todas correspondan al mismo mes.</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>7. ¿Cómo sé que mi envío fue exitoso?</h4>
+    <p>Debe esperar el mensaje "Enviando..." seguido de una confirmación de "envío satisfactorio". Además, verificará que aparece</p>
+  </div>
+
+  <div class="faq-item">
+    <h4>8. ¿Qué diferencia hay entre "Mi POA 2025" y "POA 2025"?</h4>
+    <ul>
+      <li><strong>Mi POA 2025:</strong> muestra únicamente sus propios registros.</li>
+      <li><strong>POA 2025:</strong> muestra el avance acumulado de todos los usuarios del programa.</li>
+    </ul>
+  </div>
+
+<script type="module" src="script.js"></script>
+
 </body>
 </html>
