@@ -861,31 +861,40 @@ function inicializarEventosMetas() {
 
 document.addEventListener("DOMContentLoaded", function () {
     function esperarElementoYAplicar(id, callback, onComplete) {
+        const elemento = document.getElementById(id);
+
+        if (elemento) {
+            callback(elemento);
+            if (onComplete) onComplete();
+            return;
+        }
+
         const observer = new MutationObserver(() => {
-            const elemento = document.getElementById(id);
-            if (elemento) {
+            const el = document.getElementById(id);
+            if (el) {
                 observer.disconnect();
-                callback(elemento);
+                callback(el);
                 if (onComplete) onComplete();
             }
         });
+
         observer.observe(document.body, { childList: true, subtree: true });
     }
 
-    function cargarOpciones(select, nombre) {
-        let datosVarios = JSON.parse(localStorage.getItem("varios"));
-        let opcionesGrupo = datosVarios?.find(grupo => grupo.nombre === nombre);
-        if (opcionesGrupo) {
-            Object.keys(opcionesGrupo).forEach(key => {
-                if (key.startsWith("opcion")) {
-                    let option = document.createElement("option");
-                    option.value = opcionesGrupo[key];
-                    option.textContent = opcionesGrupo[key];
-                    select.appendChild(option);
-                }
-            });
-        }
-    }
+    // function cargarOpciones(select, nombre) {
+    //     let datosVarios = JSON.parse(localStorage.getItem("varios"));
+    //     let opcionesGrupo = datosVarios?.find(grupo => grupo.nombre === nombre);
+    //     if (opcionesGrupo) {
+    //         Object.keys(opcionesGrupo).forEach(key => {
+    //             if (key.startsWith("opcion")) {
+    //                 let option = document.createElement("option");
+    //                 option.value = opcionesGrupo[key];
+    //                 option.textContent = opcionesGrupo[key];
+    //                 select.appendChild(option);
+    //             }
+    //         });
+    //     }
+    // }
 
     function filtrarActividades(actividadesDropdown) {
         const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos")) || {};
@@ -963,23 +972,27 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+function inicializarCargaDeOpciones() {
     let totalCargas = 3;
     let cargasCompletadas = 0;
-
     function verificarCargaCompleta() {
         cargasCompletadas++;
         if (cargasCompletadas === totalCargas) {
-            inicializarEventosMetas(); // Se inicializa después de cargar los selects
+            inicializarEventosMetas();
         }
     }
 
-    // esperarElementoYAplicar("estadoMeta-1", select => cargarOpciones(select, "estado"), verificarCargaCompleta);
     esperarElementoYAplicar("entidadopciones-1", agregarOpcionesEntidad1, verificarCargaCompleta);
     esperarElementoYAplicar("ambitoopciones-1", agregarOpcionesAmbito1, verificarCargaCompleta);
+    esperarElementoYAplicar("actividad-1", filtrarActividades, verificarCargaCompleta);
     // esperarElementoYAplicar("variosConsultores-1", select => cargarOpciones(select, "masdeunconsultor"), verificarCargaCompleta);
     // esperarElementoYAplicar("metaNueva-1", select => cargarOpciones(select, "sino"), verificarCargaCompleta);
     // esperarElementoYAplicar("estadoMeta-1", select => cargarOpciones(select, "etapa"), verificarCargaCompleta);
-    esperarElementoYAplicar("actividad-1", filtrarActividades, verificarCargaCompleta);
+    // esperarElementoYAplicar("estadoMeta-1", select => cargarOpciones(select, "estado"), verificarCargaCompleta);
+}
+
+inicializarCargaDeOpciones()
+
 
     /*
     function activarScriptFecha() {
@@ -1326,7 +1339,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const respuesta = await fetch("contenido1.html");
                     const html = await respuesta.text();
                     div.innerHTML = html;
-                    inicializarEventosMetas();
+                    inicializarCargaDeOpciones()
                 } catch (error) {
                     console.error("Error al cargar el contenido:", error);
                 }
@@ -2503,14 +2516,14 @@ function createPopupTable(details) {
 
 
 function calcularSumasTablaPOA() {
-    console.log("Ejecutando calcularSumasTablaPOA");
+    // console.log("Ejecutando calcularSumasTablaPOA");
     const tablas = document.querySelectorAll('#tablaPOA, #mitablaPOA');
 
     tablas.forEach(tabla => {
         const elementosTotal = tabla.querySelectorAll('.tablaPOA-total');
 
         elementosTotal.forEach(celdaTotal => {
-            console.log("Encontrado elemento total:", celdaTotal);
+            // console.log("Encontrado elemento total:", celdaTotal);
             const fila = celdaTotal.parentNode;
             let suma = 0;
             let columnaActual = celdaTotal.cellIndex - 1;
@@ -2527,30 +2540,30 @@ function calcularSumasTablaPOA() {
                         if (textoCelda) {
                             const valor = parseFloat(textoCelda);
                             if (!isNaN(valor)) {
-                                console.log(`  Celda [${columnaActual}]: "${textoCelda}" - Sumando ${valor}`);
+                                // console.log(`  Celda [${columnaActual}]: "${textoCelda}" - Sumando ${valor}`);
                                 suma += valor;
                             }
                         } else {
-                            console.log(`  Celda [${columnaActual}]: "${textoCelda}" - Celda vacía, continuando`);
+                            // console.log(`  Celda [${columnaActual}]: "${textoCelda}" - Celda vacía, continuando`);
                         }
                         contadorCeldas++;
                         columnaActual--;
                         // Aquí puedes añadir una condición para limitar el número de celdas a considerar (las 'n' primeras)
                         // Por ejemplo: if (contadorCeldas >= n) break;
                     } else {
-                        console.log(`  Celda [${columnaActual}]: "${textoCelda}" - Contiene texto no numérico, deteniendo suma`);
+                        // console.log(`  Celda [${columnaActual}]: "${textoCelda}" - Contiene texto no numérico, deteniendo suma`);
                         break;
                     }
                 } else {
-                    console.log("  Encontrada celda total o límite de fila, deteniendo suma");
+                    // console.log("  Encontrada celda total o límite de fila, deteniendo suma");
                     break;
                 }
             }
-            console.log(`  Suma calculada: ${suma}`);
+            // console.log(`  Suma calculada: ${suma}`);
             celdaTotal.textContent = Math.floor(suma);
         });
     });
-    console.log("Función calcularSumasTablaPOA finalizada.");
+    // console.log("Función calcularSumasTablaPOA finalizada.");
 }
 
 function fillTableWithEnvios(tablaId, localStorageKey) {
