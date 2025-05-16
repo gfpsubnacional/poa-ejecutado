@@ -890,7 +890,12 @@ document.addEventListener("DOMContentLoaded", function () {
     function filtrarActividades(actividadesDropdown) {
         const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos")) || {};
         const POADatos = JSON.parse(localStorage.getItem("POADatos")) || [];
-        const actividadesFiltradas = POADatos.filter(item => item.Actividad_cod.startsWith(usuarioDatos.Resultado));
+        const criteriosResultados = usuarioDatos.Resultado.split(',').map(c => c.trim());
+        const actividadesFiltradas = POADatos.filter(item =>
+        criteriosResultados.some(criterio => item.Actividad_cod.startsWith(criterio))
+        );
+
+        // const actividadesFiltradas = POADatos.filter(item => item.Actividad_cod.startsWith(usuarioDatos.Resultado));
 
         actividadesFiltradas.forEach(actividad => {
             const option = document.createElement("option");
@@ -2170,7 +2175,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (usuarioDatos && !datosProcesados) {
             // console.log("Datos de usuario encontrados:", usuarioDatos);
 
-            const criterioFiltro = usuarioDatos.Resultado || 'Criterio no definido';
+            const criterioFiltro = (usuarioDatos.Resultado || 'Criterio no definido')
+            .split(',')
+            .map(c => c.trim());
+
+            // const criterioFiltro = usuarioDatos.Resultado || 'Criterio no definido';
             // console.log("Criterio de filtro:", criterioFiltro);
 
             // Crear un observador para esperar a que la tabla deseada aparezca en el DOM
@@ -2237,13 +2246,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (primeraColumna) {
                     const textoColumna = primeraColumna.textContent.trim();
                     // console.log("Texto de la primera columna:", textoColumna);
-                    if (textoColumna.startsWith(criterioFiltro)) {
-                        // console.log("La fila coincide con el criterio. Mostrando fila.");
-                        fila.style.display = ""; // Mostrar la fila si coincide
+                    if (criterioFiltro.some(criterio => textoColumna.startsWith(criterio))) {
+                        fila.style.display = "";
                     } else {
-                        // console.log("La fila NO coincide con el criterio. Ocultando fila.");
-                        fila.style.display = "none"; // Ocultar la fila si no coincide
+                        fila.style.display = "none";
                     }
+
+                    // if (textoColumna.startsWith(criterioFiltro)) {
+                    //     // console.log("La fila coincide con el criterio. Mostrando fila.");
+                    //     fila.style.display = ""; // Mostrar la fila si coincide
+                    // } else {
+                    //     // console.log("La fila NO coincide con el criterio. Ocultando fila.");
+                    //     fila.style.display = "none"; // Ocultar la fila si no coincide
+                    // }
                 }
             });
         } else {
@@ -2256,8 +2271,13 @@ document.addEventListener("DOMContentLoaded", function () {
         // console.log("Creando un observador para la tabla...");
         const observerTabla = new MutationObserver(() => {
             // console.log("Cambio detectado en la tabla. Filtrando filas...");
+            
             const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos")) || {};
-            const criterioFiltro = usuarioDatos.Resultado || 'Criterio no definido';
+
+            const criterioFiltro = (usuarioDatos.Resultado || 'Criterio no definido')
+            .split(',')
+            .map(c => c.trim());
+
             filtrarFilas(tabla, criterioFiltro);
         });
 
@@ -2265,6 +2285,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // console.log("Observador de la tabla creado.");
     }
 });
+
+
 
 
 
