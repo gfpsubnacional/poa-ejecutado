@@ -8,7 +8,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-    <h2>Registro</h2>
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+        <h2 style="margin: 0; margin-right: 30px;">Registro</h2>
+        
+        <!-- Botón Borrar todo -->
+        <button id="borrarTodo" style="padding: 6px 12px; background-color: #b02a2ad2; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">
+            ❌ Borrar todo
+        </button>
+        
+        <!-- Botón Guardar Excel -->
+        <button id="guardarExcel" style="padding: 6px 12px; background-color: #217346d5; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <img src="https://img.icons8.com/color/24/000000/microsoft-excel-2019--v1.png" alt="Excel" style="width: 20px; height: 20px;">
+            Guardar Excel
+        </button>
+    </div>
+
     <!-- Formulario -->
     <form id="Formulario">
         <div class="table-container">

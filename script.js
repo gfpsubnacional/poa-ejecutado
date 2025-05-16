@@ -1247,7 +1247,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 validarCampo(`entidad-${index}`, false, true);
                 // validarCampo(`metaNueva-${index}`, true);
                 // validarCampo(`estadoMeta-${index}`, true);
-                validarCampo(`detalleMeta-${index}`, false, true);
                 // validarCampo(`fechaInicio-${index}`);
                 // validarCampo(`fechaFin-${index}`);
                 // validarCampo(`variosConsultores-${index}`, true);
@@ -1255,6 +1254,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 validarCampo(`hombres-${index}`);
                 validarCampo(`mujeres-${index}`);
                 validarCampo(`autoridades-${index}`, false, true);
+                validarCampo(`detalleMeta-${index}`, false, true);
             }
 
             // Si hay errores, marcar en rojo y mostrar mensaje emergente
@@ -1291,12 +1291,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         // fechaFin: getElementValue(`fechaFin-${index}`),
                         ambito: getElementText(`ambito-${index}`),
                         entidad: getElementText(`entidad-${index}`),
-                        detalleMeta: getElementText(`detalleMeta-${index}`),
                         // variosConsultores: getSelectText(`variosConsultores-${index}`),
                         participantes: getElementValue(`participantes-${index}`),
                         hombres: getElementValue(`hombres-${index}`),
                         mujeres: getElementValue(`mujeres-${index}`),
-                        autoridades: getElementText(`autoridades-${index}`)
+                        autoridades: getElementText(`autoridades-${index}`),
+                        detalleMeta: getElementText(`detalleMeta-${index}`)
                     };
                     console.log(metaData)
                     await addDoc(collection(db, "metas"), metaData);
@@ -1306,7 +1306,7 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("✅ La información se registró satisfactoriamente.");
             
         } catch (error) {
-            alert(`❌ Error: ${error.message}\nPor favor, no pierda su registro, tome nota del error e informe a Seguimiento y Evaluación.`);
+            alert(`❌ Error: ${error.message}\nPor favor, descargue su registro como Excel e informe a Seguimiento y Evaluación.`);
             console.error("Error al enviar datos:", error);
         } finally {
             // Ocultar el pop-up de carga
@@ -1318,6 +1318,70 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+    async function borrarTodo() {
+        if (confirm("¿Está seguro de borrar todos los campos del formulario?")) {
+            const div = document.querySelector(".dynamic-content:not(.hidden)");
+            if (div) {
+                try {
+                    const respuesta = await fetch("contenido1.html");
+                    const html = await respuesta.text();
+                    div.innerHTML = html;
+                    inicializarEventosMetas();
+                } catch (error) {
+                    console.error("Error al cargar el contenido:", error);
+                }
+            }
+        }
+    }
+
+    async function guardarExcel() {
+        try {
+            const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos")) || {};
+            const user = usuarioDatos["Usuario"];
+            const fechaHora = new Date().toISOString(); // formato técnico
+            const mesReporteGlobal = getElementValue("mes-reporte");
+            const metas = document.querySelectorAll(".meta-container");
+
+            const datosExcel = [];
+
+            for (const meta of metas) {
+                if (window.getComputedStyle(meta).display !== "none") {
+                    const index = meta.dataset.index;
+                    const metaData = {
+                        usuario: user,
+                        timestamp: fechaHora,
+                        mesReporte: mesReporteGlobal,
+                        actividad: getSelectText(`actividad-${index}`),
+                        titulo: document.getElementById(`titulo-${index}`).value,
+                        numerometas: getElementValue(`numerometas-${index}`) || 1,
+                        ambito: getElementText(`ambito-${index}`),
+                        entidad: getElementText(`entidad-${index}`),
+                        participantes: getElementValue(`participantes-${index}`),
+                        hombres: getElementValue(`hombres-${index}`),
+                        mujeres: getElementValue(`mujeres-${index}`),
+                        autoridades: getElementText(`autoridades-${index}`),
+                        detalleMeta: getElementText(`detalleMeta-${index}`)
+                    };
+                    datosExcel.push(metaData);
+                }
+            }
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(datosExcel);
+            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+
+            const nombreArchivo = `reporte_${new Date().toISOString().slice(0,10)}.xlsx`;
+            XLSX.writeFile(wb, nombreArchivo);
+
+            alert("✅ Datos guardados en un archivo Excel.");
+        } catch (error) {
+            alert(`❌ Error al guardar Excel: ${error.message}`);
+            console.error("Error al guardar Excel:", error);
+        }
+    }
+
+
+
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("minimize-meta")) {
             minimizarMeta(event);
@@ -1328,6 +1392,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (event.target.id === "submitButton") {
             enviarDatos();
         }
+        if (event.target.id === "borrarTodo") {
+            borrarTodo();
+        }
+        if (event.target.id === "guardarExcel") {
+            guardarExcel();
+        }
+
     });
 
 
@@ -1492,14 +1563,14 @@ function renderizarTabla(datos) {
         // { key: "estadoMeta", label: "Estado de la meta" },
         { key: "ambito", label: "Ambito" },
         { key: "entidad", label: "Entidad" },
-        { key: "detalleMeta", label: "Observaciones" },
         // { key: "fechaInicio", label: "Fecha inicio" },
         // { key: "fechaFin", label: "Fecha fin" },
         // { key: "variosConsultores", label: "Intervino más de un consultor" },
         { key: "participantes", label: "Número de participantes" },
         { key: "hombres", label: "Hombres" },
         { key: "mujeres", label: "Mujeres" },
-        { key: "autoridades", label: "Autoridades presentes" }
+        { key: "autoridades", label: "Autoridades presentes" },
+        { key: "detalleMeta", label: "Observaciones" }
     ];
 
     const columnasLlenas = headers.filter(({ key }) =>
