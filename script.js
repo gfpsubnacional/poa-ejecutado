@@ -1694,7 +1694,15 @@ function inicializarBotonFiltroEjecutadosPOA() {
         const filas = tabla.querySelectorAll("tbody tr");
         const todasLasFilas = tabla.querySelectorAll("tr");
 
-        filas.forEach((fila, index) => {
+        filas.forEach((fila) => {
+            const esSubtituloResultado = fila.classList.contains("tablaPOA-subtitulo") && fila.classList.contains("tablaPOA-Resultado");
+
+            if (esSubtituloResultado) {
+                fila.style.display = "table-row"; // Siempre visible
+                fila.querySelectorAll("td").forEach(celda => celda.style.display = "table-cell");
+                return; // Salta el resto del filtro
+            }
+
             const celda = fila.querySelector('td[data-month="total"][data-type="ejecutado"]');
             if (!celda) {
                 fila.style.display = "none";
@@ -1716,16 +1724,14 @@ function inicializarBotonFiltroEjecutadosPOA() {
                 cumple = true;
             } else if (ratio1 > 100 && planned) {
                 cumple = true;
-            } else {
-                cumple = false;
             }
-            
-            fila.style.display = filtroActivo ? (cumple ? "" : "none") : "";
+
+            fila.style.display = filtroActivo && !cumple ? "none" : "table-row";
 
             fila.querySelectorAll("td").forEach((celda, i) => {
                 const esTotal = celda.dataset?.month === "total";
                 const esAcum = celda.dataset?.month === "acum";
-                celda.style.display = (!filtroActivo || i < 5 || esTotal || esAcum) ? "" : "none";
+                celda.style.display = (!filtroActivo || i < 5 || esTotal || esAcum) ? "table-cell" : "none";
             });
         });
 
@@ -1737,20 +1743,6 @@ function inicializarBotonFiltroEjecutadosPOA() {
                 th.style.display = (!filtroActivo || estaEnEncabezado1 || esTotal || esAcum) ? "" : "none";
             });
         });
-
-        // Cambiar colspan del th con texto "Planificado" a 2 y ajustar el ancho
-        // si !filtroActivo: 
-        // .tablaPOA th:nth-child(n+6) { 
-        //     width: 100px; /*  Meses Planificado */
-        // }
-        // .tablaPOA th:nth-child(n+7) { 
-        //     width: 50px; /*  Meses Planificado */
-        // }
-
-        // si filtroActivo:
-        // .tablaPOA th:nth-child(n+6):nth-child(-n+7) { 
-        //     width: 500px; /*  Meses Planificado */
-        // }
 
         // Eliminar el style anterior si ya existe
         const estiloPrevio = document.getElementById("tablaPOA-style-planificado");
@@ -1788,6 +1780,12 @@ function inicializarBotonFiltroEjecutadosPOA() {
 
         // Insertar el nuevo <style> en el <head>
         document.head.appendChild(style);
+
+        // Cambiar colspan de los subtítulos de resultado
+        document.querySelectorAll("tr.tablaPOA-subtitulo.tablaPOA-Resultado td").forEach(td => {
+            td.colSpan = filtroActivo ? 8 : 32;
+        });
+
 
 
     };
