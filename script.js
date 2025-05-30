@@ -2821,14 +2821,7 @@ function tablasPOAApplyCellProperties(tableId, localStorageKey) {
 
         // Reconstruir html de la celda con tooltip
         if (tooltipText !== '') {
-
-            const rect = cell.getBoundingClientRect();
-            const espacioDerecha = window.innerWidth - rect.right;
-            if (espacioDerecha < 500) {
-                cell.classList.add('tooltip-right');
-            } else {
-                cell.classList.remove('tooltip-right');
-            }
+            cell.classList.add('tooltip-right');
 
             cell.innerHTML = `
                 <div class="tablasPOA-tooltip-container">
