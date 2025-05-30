@@ -24,7 +24,7 @@ h2 {
 }
 
 
-#submitButton {
+#submitButtonRegistro {
     background-color: #EA232B;
     color: white;
     border: none;
@@ -35,7 +35,7 @@ h2 {
     transition: background 0.3s;
 }
 
-#submitButton:hover {
+#submitButtonRegistro:hover {
     background-color: #F5811E;
 }
 
@@ -348,3 +348,43 @@ td {
   }
   
 
+
+
+
+/* Botones excel y borrar todo  */
+        .boton-borrar-registro,
+        .boton-excel-registro {
+            padding: 6px 12px;
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .boton-borrar-registro {
+            background-color: #b02a2ad2;
+        }
+
+        .boton-borrar-registro:hover {
+            background-color: #8e1f1fd2;
+            transform: scale(1.05);
+        }
+
+        .boton-excel-registro {
+            background-color: #c8ffe1d5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .boton-excel-registro:hover {
+            background-color: #a8f6d0d5;
+            transform: scale(1.05);
+        }
+
+        .boton-excel-registro img {
+            width: 20px;
+            height: 20px;
+        }

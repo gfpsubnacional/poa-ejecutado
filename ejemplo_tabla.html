@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificación y Ejecución de Actividades POA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .tablasPOA-container {
+            max-width: 100%;
+            overflow-x: auto; /* Permite scroll horizontal si la tabla es muy ancha */
+        }
+
+        .tablasPOA-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tablasPOA-table th, .tablasPOA-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            white-space: nowrap; /* Evita que el texto se rompa en varias líneas */
+        }
+
+        .tablasPOA-table th {
+            background-color: #00008B; /* Azul oscuro para encabezados */
+            color: white; /* Texto blanco para contrastar */
+            font-weight: bold;
+        }
+        /* Asegurar que los encabezados de los meses también sean azul oscuro */
+        th.tablasPOA-month-header {
+            background-color: #00008B;
+            color: white;
+        }
+
+
+        /* Estilos específicos para la sección de meses */
+        .tablasPOA-month-cell {
+            text-align: center;
+        }
+
+        .tablasPOA-executed-cell {
+            cursor: pointer !important;
+            position: relative; /* Necesario para posicionar el tooltip */
+        }
+
+        .tablasPOA-executed-cell:hover .tablasPOA-tooltip-container {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .tablasPOA-executed-cell .tablasPOA-tooltip-container {
+            visibility: hidden;
+            width: auto; /* Ancho automático según contenido */
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 10px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 100%; /* Posiciona el tooltip por encima de la celda */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            display: flex; /* Para alinear el texto y los círculos */
+            align-items: center;
+            gap: 8px; /* Espacio entre el texto y los círculos */
+            min-width: 120px; /* Asegurar que no sea demasiado pequeño */
+            box-sizing: border-box;
+            flex-wrap: nowrap; /* Evitar que el contenido del tooltip se envuelva */
+            justify-content: center; /* Centrar contenido horizontalmente */
+        }
+
+        /* Flecha del tooltip */
+        .tablasPOA-executed-cell .tablasPOA-tooltip-container::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+        }
+
+
+        /* Estilos para el SVG del círculo concéntrico (tooltip) */
+        .tablasPOA-percentage-circle-svg-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0; /* Evitar que los círculos se encojan */
+        }
+        .tablasPOA-percentage-circle-svg {
+            /* width y height se definirán en la función de JS para tooltip vs modal */
+        }
+        .tablasPOA-circle-bg {
+            stroke: rgba(255, 255, 255, 0.3); /* Fondo del círculo más sutil */
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .tablasPOA-circle-progress {
+            /* stroke color is set by JS */
+            stroke-width: 2;
+            fill: none;
+            transition: stroke-dasharray 0.3s linear;
+        }
+
+        /* Modal para la tabla emergente */
+        .tablasPOA-modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1001; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px; /* Padding around the content */
+            box-sizing: border-box;
+        }
+
+        .tablasPOA-modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 90%; /* Could be responsive */
+            max-width: 800px; /* Max width for readability */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative; /* Esencial para el botón de cierre */
+            display: flex; /* Para que el contenido interno se apile correctamente */
+            flex-direction: column;
+        }
+
+        /* Contenedor desplazable dentro del modal */
+        .tablasPOA-modal-scrollable-content {
+            max-height: calc(90vh - 150px); /* Ajusta este valor si el header es más grande/pequeño */
+            overflow-y: auto; /* Aquí está el scroll ahora */
+            margin-top: 15px; /* Espacio entre el header y la tabla */
+            padding-right: 5px; /* Para evitar que el scrollbar tape el contenido */
+        }
+
+        .tablasPOA-close-button {
+            color: white; /* Texto blanco para el botón de cerrar */
+            background-color: #8B0000; /* Rojo oscuro para el botón de cerrar */
+            border-radius: 50%; /* Hacerlo circular */
+            width: 30px; /* Ancho del botón */
+            height: 30px; /* Alto del botón */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1; /* Centrar el X verticalmente */
+            font-size: 20px; /* Tamaño de la X */
+            font-weight: bold;
+            position: absolute; /* Relative to modal-content */
+            top: -10px; /* Mueve el botón ligeramente fuera de la esquina superior */
+            right: -10px; /* Mueve el botón ligeramente fuera de la esquina derecha */
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.2s ease;
+        }
+
+        .tablasPOA-close-button:hover,
+        .tablasPOA-close-button:focus {
+            background-color: #CC0000; /* Un rojo un poco más claro al pasar el ratón */
+            text-decoration: none;
+        }
+
+        /* Ajustes para el encabezado del modal */
+        .tablasPOA-modal-header-info {
+            display: flex;
+            flex-direction: column; /* Apilar elementos verticalmente */
+            align-items: flex-start; /* Alinear al inicio por defecto (izquierda) */
+            margin-bottom: 0; /* No necesitamos margin-bottom aquí, el scrollable-content tiene margin-top */
+        }
+
+        .tablasPOA-modal-header-info #tablasPOAModalPercentageDisplay {
+            width: 100%; /* Ocupa todo el ancho */
+            display: flex;
+            justify-content: center; /* Centrar el contenido horizontalmente */
+            align-items: center; /* Centrar el contenido verticalmente */
+            gap: 8px; /* Espacio entre el texto y los círculos */
+            margin-bottom: 10px; /* Espacio debajo del porcentaje */
+        }
+
+        .tablasPOA-modal-header-info p {
+            margin: 0;
+            font-size: 1.1em;
+            /* Si quieres centrar estas líneas también, añade align-self: center; aquí */
+            /* align-self: center; */
+        }
+
+        /* Estilos específicos para círculos en el modal */
+        .tablasPOA-modal-header-info .tablasPOA-circle-bg {
+            stroke: #ccc; /* Fondo de círculo gris claro en modal */
+            stroke-width: 6; /* Más grueso */
+        }
+        .tablasPOA-modal-header-info .tablasPOA-circle-progress {
+            /* stroke color is set by JS */
+            stroke-width: 6; /* Más grueso */
+        }
+        .tablasPOA-modal-header-info .tablasPOA-percentage-circle-svg {
+            /* width y height ya están en la función de JS para modal */
+        }
+
+
+        .tablasPOA-modal-content .tablasPOA-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tablasPOA-modal-content .tablasPOA-table th, .tablasPOA-modal-content .tablasPOA-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .tablasPOA-modal-content .tablasPOA-table th {
+            background-color: #00008B; /* Azul oscuro para encabezados del modal */
+            color: white;
+        }
+
+        /* Estilo para los totales anuales */
+        .tablasPOA-total-cell {
+            font-weight: bold;
+            background-color: #f9f9f9;
+            position: relative;
+            cursor: default; /* No clickable */
+            text-align: center; /* <--- AÑADIDO PARA CENTRAR LOS NÚMEROS */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tablasPOA-container">
+        <table id="tablaPOA" class="tablasPOA-table">
+            <thead>
+                <tr>
+                    <th rowspan="2">Actividad</th>
+                    <th rowspan="2">Indicador</th>
+                    <th rowspan="2">Unidad de medida</th>
+                    <th rowspan="2">Logro Esperado</th>
+                    <th colspan="13" class="tablasPOA-month-header">Planificado</th>
+                    <th colspan="12" class="tablasPOA-month-header">Ejecutado</th>
+                    <th rowspan="2">Total Ejecutado</th>
+                </tr>
+                <tr id="tablasPOA-month-headers">
+                </tr>
+            </thead>
+            <tbody id="tablasPOA-table-body">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const tablasPOAMONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+        const tablasPOATABLE_BODY = document.getElementById('tablasPOA-table-body');
+        const tablasPOAMONTH_HEADERS = document.getElementById('tablasPOA-month-headers');
+
+        let tablasPOAData = []; // This will hold the main table data, including planned and aggregated executed details
+        let tablasPOAEnviosData = []; // This will hold the raw 'Envios' data from localStorage
+
+        // --- Parte 1: Llenar los datos de la tabla (sin rastro de tooltips ni modals) ---
+
+        /**
+         * Genera datos aleatorios para la tabla principal y los envíos para localStorage.
+         * Esta función es puramente para la creación de datos de ejemplo.
+         * @param {number} rows - Número de filas de actividades a generar.
+         * @returns {Array<Object>} Datos de actividades planificadas.
+         */
+        function tablasPOAGenerateRandomData(rows = 10) {
+            const indicators = ["Indicador 1", "Indicador 2", "Indicador 3", "Indicador 4", "Indicador 5"];
+            const units = ["Unidad A", "Unidad B", "Unidad C", "Unidad D", "Unidad E"];
+            const expectedLogs = [
+                "Logro Esperado 1", "Logro Esperado 2", "Logro Esperado 3", "Logro Esperado 4", "Logro Esperado 5"
+            ];
+            const users = ["Usuario 1", "Usuario 2", "Usuario 3", "Usuario 4", "Usuario 5"];
+            const ambits = ["Ámbito 1", "Ámbito 2", "Ámbito 3", "Ámbito 4", "Ámbito 5"];
+            const entities = ["Entidad A", "Entidad B", "Entidad C", "Entidad D", "Entidad E"];
+            const detailMetas = [
+                "Meta 1 completada", "Meta 2 en progreso", "Meta 3 con retraso", "Meta 4 superada", "Meta 5 ajustada"
+            ];
+            const titles = ["Título A", "Título B", "Título C", "Título D", "Título E"];
+            const yesNo = ["si", "no"];
+
+            let tempData = [];
+            let enviosData = []; // Data for localStorage
+
+            for (let i = 0; i < rows; i++) {
+                const rNum = Math.floor(Math.random() * 5) + 1; // R1-R5
+                const pNum = Math.floor(Math.random() * 5) + 1; // P1-P5
+                const activitySuffix = Math.floor(Math.random() * 5) + 1; // .1-.5
+                const activityName = `Actividad R${rNum}.P${pNum}.${activitySuffix}`;
+
+                let row = {
+                    id: `tablasPOA-row-${i}`,
+                    activity: activityName,
+                    indicator: indicators[Math.floor(Math.random() * indicators.length)],
+                    unit: units[Math.floor(Math.random() * units.length)],
+                    expectedLog: expectedLogs[Math.floor(Math.random() * expectedLogs.length)],
+                    planned: {},
+                };
+
+                tablasPOAMONTHS.forEach(month => {
+                    const plannedValue = Math.floor(Math.random() * 10);
+                    row.planned[month] = plannedValue > 0 ? plannedValue : '';
+
+                    const numberOfEnvios = Math.floor(Math.random() * (plannedValue + 3));
+
+                    for (let k = 0; k < numberOfEnvios; k++) {
+                        const formattedMonth = month.charAt(0).toUpperCase() + month.slice(1);
+                        enviosData.push({
+                            hombres: String(Math.floor(Math.random() * 50)),
+                            actividad: activityName,
+                            autoridades: yesNo[Math.floor(Math.random() * yesNo.length)],
+                            mesReporte: formattedMonth,
+                            mujeres: String(Math.floor(Math.random() * 50)),
+                            participantes: String(Math.floor(Math.random() * 100)),
+                            timestamp: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                            usuario: users[Math.floor(Math.random() * users.length)],
+                            ambito: ambits[Math.floor(Math.random() * ambits.length)],
+                            numerometas: String(Math.floor(Math.random() * 3) + 1),
+                            detalleMeta: detailMetas[Math.floor(Math.random() * detailMetas.length)],
+                            titulo: titles[Math.floor(Math.random() * titles.length)],
+                            entidad: entities[Math.floor(Math.random() * entities.length)]
+                        });
+                    }
+                });
+                tempData.push(row);
+            }
+            localStorage.setItem('Envios', JSON.stringify(enviosData));
+            console.log("Generated and stored Envios in localStorage:", enviosData);
+            return tempData;
+        }
+
+        /**
+         * Renderiza los encabezados de la tabla principal (meses, totales).
+         */
+        function tablasPOARenderTableHeaders() {
+            tablasPOAMONTH_HEADERS.innerHTML = '';
+            tablasPOAMONTHS.forEach(month => {
+                tablasPOAMONTH_HEADERS.innerHTML += `<th class="tablasPOA-month-cell">${month}</th>`;
+            });
+            tablasPOAMONTH_HEADERS.innerHTML += `<th class="tablasPOA-month-cell">Total Planificado</th>`;
+
+            tablasPOAMONTHS.forEach(month => {
+                tablasPOAMONTH_HEADERS.innerHTML += `<th class="tablasPOA-month-cell">${month}</th>`;
+            });
+        }
+
+        /**
+         * Llena el cuerpo de la tabla con los datos planificados y ejecutados.
+         * Solo añade los datos y atributos necesarios para la interacción posterior.
+         */
+        function tablasPOAFillTableData() {
+            tablasPOATABLE_BODY.innerHTML = '';
+
+            tablasPOAData.forEach(rowData => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${rowData.activity}</td>
+                    <td>${rowData.indicator}</td>
+                    <td>${rowData.unit}</td>
+                    <td>${rowData.expectedLog}</td>
+                `;
+
+                let totalPlannedRow = 0;
+
+                // Celdas Planificadas
+                tablasPOAMONTHS.forEach(month => {
+                    const plannedVal = parseFloat(rowData.planned[month]) || 0;
+                    totalPlannedRow += plannedVal;
+                    const cell = document.createElement('td');
+                    cell.className = 'tablasPOA-month-cell'; // Keep this for styling
+                    cell.textContent = rowData.planned[month];
+                    cell.dataset.month = month;
+                    cell.dataset.type = 'planificado';
+                    cell.dataset.activityName = rowData.activity; // Keep activity name for calculation
+                    row.appendChild(cell);
+                });
+
+                const totalPlannedCell = document.createElement('td');
+                totalPlannedCell.className = 'tablasPOA-total-cell'; // Keep this for styling
+                totalPlannedCell.textContent = totalPlannedRow;
+                totalPlannedCell.dataset.month = 'total';
+                totalPlannedCell.dataset.type = 'planificado';
+                totalPlannedCell.dataset.activityName = rowData.activity; // Keep activity name for calculation
+                row.appendChild(totalPlannedCell);
+
+                // Celdas Ejecutadas
+                tablasPOAMONTHS.forEach(month => {
+                    // Populate the cell's text content.
+                    const formattedMonthForEnvios = month.charAt(0).toUpperCase() + month.slice(1);
+                    const monthlyExecutedDetails = tablasPOAEnviosData.filter(envio =>
+                        envio.actividad === rowData.activity &&
+                        envio.mesReporte.toLowerCase() === formattedMonthForEnvios.toLowerCase()
+                    );
+                    let executedVal = 0;
+                    if (monthlyExecutedDetails.length > 0) {
+                        executedVal = monthlyExecutedDetails.reduce((sum, detail) => sum + parseInt(detail.numerometas || 0), 0);
+                    }
+
+                    const executedCell = document.createElement('td');
+                    executedCell.classList.add('tablasPOA-month-cell'); // General cell styling
+                    executedCell.classList.add('tablasPOA-executed-cell'); // Specific executed cell styling for click/hover
+                    executedCell.textContent = executedVal; // Only the value
+                    executedCell.dataset.month = month;
+                    executedCell.dataset.type = 'ejecutado';
+                    executedCell.dataset.activityName = rowData.activity; // Essential for lookup in applyCellProperties
+                    row.appendChild(executedCell);
+                });
+
+                // Celda Total Ejecutado
+                const totalExecutedCell = document.createElement('td');
+                totalExecutedCell.classList.add('tablasPOA-total-cell'); // General total cell styling
+                totalExecutedCell.classList.add('tablasPOA-executed-cell'); // Specific executed cell styling for click/hover
+                // The actual total executed value will be dynamically calculated in applyCellProperties
+                // for accurate percentage calculation. For now, leave it empty or an initial 0.
+                totalExecutedCell.textContent = ''; // Will be updated in applyCellProperties
+                totalExecutedCell.dataset.month = 'total';
+                totalExecutedCell.dataset.type = 'ejecutado';
+                totalExecutedCell.dataset.activityName = rowData.activity; // Essential for lookup in applyCellProperties
+                row.appendChild(totalExecutedCell);
+
+                tablasPOATABLE_BODY.appendChild(row);
+            });
+        }
+
+        // --- Parte 2: Dar propiedades a celdas (hover, círculos, modal) ---
+
+        /**
+         * Genera un color degradado suave de rojo a amarillo a verde.
+         * @param {number} percentage
+         * @returns {string} Color RGB (en formato suave)
+         */
+        function tablasPOAGetPercentageColor(percentage) {
+            if (percentage <= 0) {
+                return 'rgb(255, 120, 150)';
+            }
+            const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
+            let r, g, b;
+            if (clampedPercentage <= 50) {
+                const ratio = clampedPercentage / 50;
+                r = Math.floor(255);
+                g = Math.floor(120 * (1 - ratio) + 255 * ratio);
+                b = Math.floor(120 * (1 - ratio) + 120 * ratio); // Adjust blue component slightly for yellow
+            } else {
+                const ratio = (clampedPercentage - 50) / 50;
+                r = Math.floor(255 * (1 - ratio) + 150 * ratio); // From yellow (255,255,120) to green (150,255,150)
+                g = Math.floor(255);
+                b = Math.floor(120 * (1 - ratio) + 150 * ratio);
+            }
+            if (percentage > 100) {
+                return 'rgb(150, 255, 150)'; // A distinct green for over 100%
+            }
+            return `rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`;
+        }
+
+        /**
+         * Genera el SVG con círculos concéntricos para representar el porcentaje.
+         * @param {number} percentage - El porcentaje total.
+         * @param {string} mode - 'tooltip' o 'modal' para ajustar el tamaño.
+         * @param {string} fillColor - El color de relleno para el progreso.
+         * @returns {string} HTML string con el SVG.
+         */
+        function tablasPOAGetConcentricCirclesSVG(percentage, mode = 'tooltip', fillColor = '#fff') {
+            let viewBoxSize, baseRadius, strokeWidth, gap;
+
+            if (mode === 'tooltip') {
+                viewBoxSize = 30;
+                baseRadius = 12;
+                strokeWidth = 2;
+                gap = 3;
+            } else { // 'modal'
+                viewBoxSize = 60;
+                baseRadius = 25;
+                strokeWidth = 6;
+                gap = 5;
+            }
+
+            const centerX = viewBoxSize / 2;
+            const centerY = viewBoxSize / 2;
+            let svgElements = '';
+            let currentPercentage = percentage;
+            let radius = baseRadius;
+            let circleIndex = 0;
+
+
+            while (currentPercentage > 0 && radius > (strokeWidth / 2)) {
+                let progressInThisCircle = Math.min(currentPercentage, 100);
+                const circumference = 2 * Math.PI * radius;
+                const strokeDashoffset = circumference * (1 - (progressInThisCircle / 100));
+
+                svgElements += `
+                    <circle class="tablasPOA-circle-bg" cx="${centerX}" cy="${centerY}" r="${radius}" stroke-width="${strokeWidth}"></circle>
+                    <circle class="tablasPOA-circle-progress" cx="${centerX}" cy="${centerY}" r="${radius}" stroke-width="${strokeWidth}"
+                            stroke-dasharray="${circumference}" stroke-dashoffset="${strokeDashoffset}"
+                            transform="rotate(-90 ${centerX} ${centerY})" style="stroke:${fillColor};"></circle>
+                `;
+
+                currentPercentage -= 100;
+                radius -= (strokeWidth + gap);
+                circleIndex++;
+
+                if (circleIndex >= 2 && currentPercentage > 0) {
+                    svgElements += `<text x="${centerX}" y="${centerY + (mode === 'tooltip' ? 4 : 6)}" font-family="Arial" font-size="${mode === 'tooltip' ? 10 : 16}" fill="${mode === 'tooltip' ? 'white' : '#333'}" text-anchor="middle">+</text>`;
+                    break;
+                }
+            }
+
+            return `
+                <div class="tablasPOA-percentage-circle-svg-wrapper">
+                    <svg class="tablasPOA-percentage-circle-svg" width="${viewBoxSize}" height="${viewBoxSize}" viewBox="0 0 ${viewBoxSize} ${viewBoxSize}">
+                        ${svgElements}
+                    </svg>
+                </div>
+            `;
+        }
+
+        function tablasPOASetActivityNameAttributes(tableId) {
+            const table = document.getElementById(tableId);
+            if (!table) {
+                console.error(`No se encontró la tabla con ID '${tableId}'.`);
+                return;
+            }
+
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const firstCell = row.querySelector('td:first-child .tablaPOA-scrollable');
+                if (!firstCell) return;
+
+                const activityName = firstCell.textContent.trim();
+                const cells = row.querySelectorAll('td');
+
+                cells.forEach(cell => {
+                    cell.setAttribute('data-activity-name', activityName);
+                });
+            });
+        }
+
+
+        /**
+         * Aplica los estilos y funcionalidades de interacción (hover, click) a las celdas de ejecución.
+         * @param {string} tableId - El ID de la tabla principal.
+         * @param {string} localStorageKey - La clave usada para obtener los datos de 'Envios' de localStorage.
+         */
+        function tablasPOAApplyCellProperties(tableId, localStorageKey) {
+            const mainTable = document.getElementById(tableId);
+            if (!mainTable) {
+                console.error(`Table with ID '${tableId}' not found.`);
+                return;
+            }
+            const executedCells = mainTable.querySelectorAll('.tablasPOA-executed-cell');
+
+            // Retrieve Envios data from localStorage
+            let currentEnviosData = [];
+            const storedEnvios = localStorage.getItem(localStorageKey);
+            if (storedEnvios) {
+                try {
+                    currentEnviosData = JSON.parse(storedEnvios);
+                } catch (e) {
+                    console.error(`Error parsing ${localStorageKey} from localStorage:`, e);
+                }
+            }
+
+            executedCells.forEach(cell => {
+                const activityName = cell.dataset.activityName;
+                const monthName = cell.dataset.month; // "ene", "feb", o "total"
+                const type = cell.dataset.type; // "ejecutado"
+
+                // Find the corresponding planned value from tablasPOAData
+                const rowData = tablasPOAData.find(data => data.activity === activityName);
+                if (!rowData) {
+                    console.warn(`No row data found for activity: ${activityName}`);
+                    return;
+                }
+
+                let plannedVal;
+                let executedVal = 0;
+                let details;
+
+                if (monthName === 'total') {
+                    // Calculate total planned for the row
+                    plannedVal = Object.values(rowData.planned).reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+                    // Filter all executed details for this activity across all months
+                    details = currentEnviosData.filter(envio =>
+                        envio.actividad === activityName
+                    );
+                    executedVal = details.reduce((sum, detail) => sum + parseInt(detail.numerometas || 0), 0);
+                    cell.textContent = executedVal; // Update the total executed cell's text content
+                } else {
+                    plannedVal = parseFloat(rowData.planned[monthName]) || 0;
+                    const formattedMonthForEnvios = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                    details = currentEnviosData.filter(envio =>
+                        envio.actividad === activityName &&
+                        envio.mesReporte.toLowerCase() === formattedMonthForEnvios.toLowerCase()
+                    );
+                    executedVal = details.reduce((sum, detail) => sum + parseInt(detail.numerometas || 0), 0);
+                    cell.textContent = executedVal; // Update the monthly executed cell's text content
+                }
+                
+                // Set the detailed data attributes here for modal to use
+                cell.dataset.plannedValue = plannedVal;
+                cell.dataset.executedValue = executedVal;
+                cell.dataset.details = JSON.stringify(details);
+
+                let percentage = 0;
+                let cellColor = '';
+                let tooltipText = '';
+                let circlesSVG = '';
+                let showCirclesInTooltip = false;
+
+                if (plannedVal === 0 && executedVal === 0) {
+                    cellColor = ''; // No specific color, or a neutral one
+                    tooltipText = "0% (0/0)";
+                } else if (plannedVal === 0) {
+                    percentage = (executedVal > 0) ? 1000 : 0; // Arbitrarily high for over-execution when planned is 0
+                    cellColor = tablasPOAGetPercentageColor(percentage);
+                    tooltipText = `Ejecutado: ${executedVal} (Planificado: 0)`;
+                    showCirclesInTooltip = false; // Don't show circles for planned 0 scenario, can be adjusted
+                } else {
+                    percentage = (executedVal / plannedVal) * 100;
+                    cellColor = tablasPOAGetPercentageColor(percentage);
+                    tooltipText = `${percentage.toFixed(1)}% (${executedVal}/${plannedVal})`;
+                    showCirclesInTooltip = true;
+                }
+
+                // Apply the background color to the cell
+                cell.style.backgroundColor = cellColor;
+
+                // Generate and add the content of the tooltip
+                if (showCirclesInTooltip) {
+                    circlesSVG = tablasPOAGetConcentricCirclesSVG(percentage, 'tooltip', '#fff');
+                }
+                
+                // Clear existing content except the text node if it's there
+                // This is important because the cell.textContent was set earlier in fillTableData
+                // We need to re-add it or make sure it's preserved.
+                // A safer way is to just clear and reconstruct the cell's innerHTML
+                cell.innerHTML = `
+                    <div class="tablasPOA-tooltip-container">
+                        <span>${tooltipText}</span>
+                        ${circlesSVG}
+                    </div>
+                    ${executedVal} `;
+                // To ensure text is not overwritten by tooltip, we insert the tooltip before text,
+                // or have the text explicitly in innerHTML like above.
+                // For direct text content, the tooltip container needs to be absolute.
+
+                // Add listener for the modal if there's data to show
+                if (executedVal > 0 || details.length > 0) {
+                    cell.style.cursor = 'pointer'; // Ensure cursor is pointer if clickable
+                    cell.addEventListener('click', tablasPOAHandleExecutedCellClick);
+                } else {
+                    cell.style.cursor = 'default';
+                    // Remove existing click listener if any
+                    cell.removeEventListener('click', tablasPOAHandleExecutedCellClick);
+                }
+            });
+        }
+
+        /**
+         * Maneja el click en una celda ejecutada para abrir el modal de detalles.
+         * @param {Event} event - El evento de click.
+         */
+        function tablasPOAHandleExecutedCellClick(event) {
+            const currentCell = event.currentTarget;
+            const activityName = currentCell.dataset.activityName;
+            const monthName = currentCell.dataset.month;
+            const plannedVal = parseFloat(currentCell.dataset.plannedValue) || 0;
+            const executedVal = parseFloat(currentCell.dataset.executedValue) || 0;
+            const cellColor = currentCell.style.backgroundColor; // Get the already applied color
+            const details = JSON.parse(currentCell.dataset.details || '[]');
+
+            const tablasPOADETAIL_MODAL = document.createElement('div');
+            tablasPOADETAIL_MODAL.id = 'tablasPOADetailModal';
+            tablasPOADETAIL_MODAL.className = 'tablasPOA-modal';
+            tablasPOADETAIL_MODAL.style.display = 'flex';
+
+            tablasPOADETAIL_MODAL.innerHTML = `
+                <div class="tablasPOA-modal-content">
+                    <span class="tablasPOA-close-button" id="tablasPOACloseModalBtn">&times;</span>
+                    <h3>Detalle de Ejecución</h3>
+                    <div class="tablasPOA-modal-header-info">
+                        <div id="tablasPOAModalPercentageDisplay">
+                        </div>
+                        <p>Actividad: <strong id="tablasPOAModalActivityName"></strong></p>
+                        <p>Mes del Reporte: <strong id="tablasPOAModalMonthReport"></strong></p>
+                    </div>
+
+                    <div class="tablasPOA-modal-scrollable-content">
+                        <table id="tablasPOADetailTable" class="tablasPOA-table">
+                            <thead>
+                                <tr>
+                                    <th>Número de Metas</th>
+                                    <th>Usuario</th>
+                                    <th>Ámbito</th>
+                                    <th>Entidad</th>
+                                    <th>Detalle de la Meta</th>
+                                    <th>Hombres</th>
+                                    <th>Mujeres</th>
+                                    <th>Participantes</th>
+                                    <th>Timestamp</th>
+                                    <th>Autoridades</th>
+                                    <th>Título</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(tablasPOADETAIL_MODAL);
+
+            const tablasPOAMODAL_ACTIVITY_NAME = tablasPOADETAIL_MODAL.querySelector('#tablasPOAModalActivityName');
+            const tablasPOAMODAL_MONTH_REPORT = tablasPOADETAIL_MODAL.querySelector('#tablasPOAModalMonthReport');
+            const tablasPOAMODAL_PERCENTAGE_DISPLAY = tablasPOADETAIL_MODAL.querySelector('#tablasPOAModalPercentageDisplay');
+            const tablasPOADETAIL_TABLE_BODY = tablasPOADETAIL_MODAL.querySelector('#tablasPOADetailTable tbody');
+            const tablasPOACLOSE_MODAL_BTN = tablasPOADETAIL_MODAL.querySelector('#tablasPOACloseModalBtn');
+
+
+            tablasPOAMODAL_ACTIVITY_NAME.textContent = activityName;
+            tablasPOAMODAL_MONTH_REPORT.textContent = monthName === 'total' ? 'Total Anual' : (monthName.charAt(0).toUpperCase() + monthName.slice(1));
+
+            let percentage = 0;
+            let percentageText = '';
+            let circlesSVG = '';
+
+            if (plannedVal === 0 && executedVal === 0) {
+                percentageText = "0% (0/0)";
+                circlesSVG = '';
+            } else if (plannedVal === 0) {
+                percentage = (executedVal > 0) ? 1000 : 0;
+                percentageText = `Ejecutado: ${executedVal} (Planificado: 0)`;
+                circlesSVG = '';
+            } else {
+                percentage = (executedVal / plannedVal) * 100;
+                percentageText = `${percentage.toFixed(1)}% (${executedVal}/${plannedVal})`;
+                circlesSVG = tablasPOAGetConcentricCirclesSVG(percentage, 'modal', cellColor);
+            }
+
+            tablasPOAMODAL_PERCENTAGE_DISPLAY.innerHTML = `
+                <span>${percentageText}</span>
+                ${circlesSVG}
+            `;
+
+            tablasPOADETAIL_TABLE_BODY.innerHTML = '';
+
+            if (details.length > 0) {
+                details.forEach(detail => {
+                    const detailRow = document.createElement('tr');
+                    detailRow.innerHTML = `
+                        <td>${detail.numerometas || ''}</td>
+                        <td>${detail.usuario || ''}</td>
+                        <td>${detail.ambito || ''}</td>
+                        <td>${detail.entidad || ''}</td>
+                        <td>${detail.detalleMeta || ''}</td>
+                        <td>${detail.hombres || ''}</td>
+                        <td>${detail.mujeres || ''}</td>
+                        <td>${detail.participantes || ''}</td>
+                        <td>${detail.timestamp || ''}</td>
+                        <td>${detail.autoridades || ''}</td>
+                        <td>${detail.titulo || ''}</td>
+                    `;
+                    tablasPOADETAIL_TABLE_BODY.appendChild(detailRow);
+                });
+            } else {
+                const noDataRow = document.createElement('tr');
+                noDataRow.innerHTML = `<td colspan="11">No hay detalles de ejecución para este período.</td>`;
+                tablasPOADETAIL_TABLE_BODY.appendChild(noDataRow);
+            }
+
+            tablasPOACLOSE_MODAL_BTN.addEventListener('click', () => {
+                tablasPOADETAIL_MODAL.remove();
+            });
+
+            tablasPOADETAIL_MODAL.addEventListener('click', (event) => {
+                if (event.target === tablasPOADETAIL_MODAL) {
+                    tablasPOADETAIL_MODAL.remove();
+                }
+            });
+        }
+
+        // --- Inicialización ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Paso 1: Generar y cargar los datos
+            tablasPOAData = tablasPOAGenerateRandomData(10);
+            // tablasPOAEnviosData is populated by generateRandomData, so no need to parse here again if it's the primary source.
+            // If Envios can come from other sources, you'd load it here.
+            // For now, we'll assume generateRandomData handles it, and applyCellProperties fetches directly from localStorage.
+
+            // Paso 2: Renderizar los encabezados de la tabla
+            tablasPOARenderTableHeaders();
+
+            // Paso 3: Llenar la tabla con los datos y atributos básicos
+            tablasPOAFillTableData();
+
+            // Paso 4: Aplicar propiedades interactivas a las celdas
+            // Pass the table ID and localStorage key as arguments
+            tablasPOAApplyCellProperties('tablaPOA', 'Envios');
+        });
+    </script>
+</body>
+</html>
