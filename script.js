@@ -2160,6 +2160,7 @@ const crearEncabezado = () => {
         });
     };
 
+    
     const alternarVisibilidad = (subsup, icono) => {
         subsup = JSON.parse(subsup);
         const filas = document.querySelectorAll(`#${tablaId} tbody [subtitulos-superiores]`);
