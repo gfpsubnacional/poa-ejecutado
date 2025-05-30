@@ -1823,6 +1823,7 @@ function inicializarBotonFiltroEjecutadosPOA() {
                 filtroActivo = !filtroActivo;
                 boton.dataset.activo = filtroActivo ? "true" : "false";
                 aplicarFiltro();
+                asignarClickASubtitulos(document.getElementById("tablaPOA")); 
             });
         }
 
@@ -2154,31 +2155,8 @@ const crearEncabezado = () => {
         icono.classList.add("tablaPOA-triangulo");
         icono.textContent = "▼";
         celda.appendChild(icono);
-
-        fila.addEventListener("click", () => {
-            alternarVisibilidad(fila.getAttribute("filas-inferiores-subsup"), icono);
-        });
     };
 
-    
-    const alternarVisibilidad = (subsup, icono) => {
-        subsup = JSON.parse(subsup);
-        const filas = document.querySelectorAll(`#${tablaId} tbody [subtitulos-superiores]`);
-        const matchingRows = [];
-
-        filas.forEach(fila => {
-            let attrValue = fila.getAttribute("subtitulos-superiores");
-            let cleanValue = attrValue.replace(/&quot;/g, '"');
-            let parsedValue = JSON.parse(cleanValue);
-            if (Array.isArray(parsedValue) && subsup.every(value => parsedValue.includes(value))) {
-                matchingRows.push(fila);
-            }
-        });
-
-        const shouldHide = icono.textContent === "▼";
-        matchingRows.forEach(fila => fila.classList.toggle("tablaPOA-oculto", shouldHide));
-        icono.textContent = shouldHide ? "▶" : "▼";
-    };
 
     const crearTabla = (POAdatos) => {
         const tbody = tablaElement.getElementsByTagName('tbody')[0];
@@ -2201,6 +2179,8 @@ const crearEncabezado = () => {
             agregarFila(tbody, fila, clasesSubtitulos);
         });
         recalcularTodasLasSumasPOA();
+        asignarClickASubtitulos(tablaElement);
+
     };
 
     const leerExcel = (url) => {
@@ -2227,6 +2207,93 @@ const crearEncabezado = () => {
     leerExcel("POA 2025_bd.xlsx");
     return true;
 }
+
+
+function alternarVisibilidad(subsup, icono, tablaId) {
+    subsup = JSON.parse(subsup);
+    const filas = document.querySelectorAll(`#${tablaId} tbody [subtitulos-superiores]`);
+    const matchingRows = [];
+
+    filas.forEach(fila => {
+        let attrValue = fila.getAttribute("subtitulos-superiores");
+        let cleanValue = attrValue.replace(/&quot;/g, '"');
+        let parsedValue = JSON.parse(cleanValue);
+        if (Array.isArray(parsedValue) && subsup.every(value => parsedValue.includes(value))) {
+            matchingRows.push(fila);
+        }
+    });
+
+    const shouldHide = icono.textContent === "▼";
+    matchingRows.forEach(fila => fila.classList.toggle("tablaPOA-oculto", shouldHide));
+    icono.textContent = shouldHide ? "▶" : "▼";
+}
+
+
+function asignarClickASubtitulos(tabla) {
+    const filasSubtitulo = tabla.querySelectorAll("tr.tablaPOA-subtitulo");
+
+    filasSubtitulo.forEach(fila => {
+        if (!fila.dataset.clickAsignado) {
+            let icono = fila.querySelector(".tablaPOA-triangulo");
+
+            // Crear ícono si no existe
+            if (!icono) {
+                icono = document.createElement("span");
+                icono.classList.add("tablaPOA-triangulo");
+                icono.textContent = "▼";
+                const primerTd = fila.querySelector("td");
+                if (primerTd) primerTd.appendChild(icono);
+            }
+
+            fila.addEventListener("click", () => {
+                const subsup = fila.getAttribute("filas-inferiores-subsup");
+                if (subsup && icono) {
+                    alternarVisibilidad(subsup, icono, tabla.id); // Pasa el id como referencia
+                }
+            });
+
+            fila.dataset.clickAsignado = "true";
+        }
+    });
+}
+
+
+function observarSubtitulosPOA(tablaId) {
+    const esperarYObservar = () => {
+        const tabla = document.getElementById(tablaId);
+        if (!tabla || !tabla.querySelector("tbody")) return;
+
+        asignarClickASubtitulos(tabla);
+
+        const observer = new MutationObserver(() => {
+            asignarClickASubtitulos(tabla);
+        });
+
+        observer.observe(tabla.querySelector("tbody"), {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ["class", "style"]
+        });
+    };
+
+    const domObserver = new MutationObserver(() => {
+        if (document.getElementById(tablaId)) {
+            domObserver.disconnect();
+            esperarYObservar();
+        }
+    });
+
+    domObserver.observe(document.body, { childList: true, subtree: true });
+    esperarYObservar();
+}
+
+// Llamadas
+observarSubtitulosPOA("tablaPOA");
+observarSubtitulosPOA("mitablaPOA");
+
+
+
 
 /**
  * Filtra las filas de una tabla basándose en un criterio de búsqueda.

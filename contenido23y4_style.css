@@ -61,8 +61,11 @@
   .tablaPOA-normal td {
     text-align: left;
   }
-  .tablaPOA-oculto { display: none; }
-  .tablaPOA-subtitulo {
+.tablaPOA-oculto {
+  display: none !important;
+}
+
+.tablaPOA-subtitulo {
     cursor: pointer;
     position: relative;
   }
