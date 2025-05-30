@@ -1785,9 +1785,6 @@ function inicializarBotonFiltroEjecutadosPOA() {
         document.querySelectorAll("tr.tablaPOA-subtitulo.tablaPOA-Resultado td").forEach(td => {
             td.colSpan = filtroActivo ? 8 : 32;
         });
-
-
-
     };
 
     const observer = new MutationObserver(() => {
