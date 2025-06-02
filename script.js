@@ -1794,7 +1794,7 @@ function inicializarBotonFiltroEjecutadosPOA() {
         const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos"));
 
         if (usuarioDatos.Tipo !== "admin") {
-            console.log(`${usuarioDatos.Tipo}`)
+            // console.log(`${usuarioDatos.Tipo}`)
             return 
         }
 
@@ -2534,6 +2534,8 @@ function tablasPOASetActivityNameAttributes(tableId) {
  * @param {string} localStorageKey - La clave usada para obtener los datos de 'Envios' de localStorage.
  */
 function tablasPOAApplyCellProperties(tableId, localStorageKey) {
+    const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos"));
+
     tablasPOASetActivityNameAttributes(tableId);
 
     const mainTable = document.getElementById(tableId);
@@ -2646,6 +2648,10 @@ function tablasPOAApplyCellProperties(tableId, localStorageKey) {
             showCirclesInTooltip = true;
         }
 
+
+        if (usuarioDatos.Tipo !== "admin") {
+            cellColor = '';
+        }
 
         // Apply the background color to the cell
         cell.style.backgroundColor = cellColor;
