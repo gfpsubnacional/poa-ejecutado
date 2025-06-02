@@ -1,9 +1,11 @@
 - Cambiar libremente el año. 
 
+- Emergente también en total 					OK
+- filtro atípicos (-70, +150) sin vista de meses, solo totales. OK
+- nuevo circulo sobre planificado anual. 			OK 
+- Actualizar luz 						OK 
+
+- filtro por región / ámbito de toda la tabla.
 - ver avance por región / por consultor 
 - grafico por región / ámbito adentro del emergente 
-- Emergente también en total 
-- filtro por región / ámbito de toda la tabla.
-- filtro atípicos (-70, +150) sin vista de meses, solo totales
-- nuevo circulo sobre planificado anual
-- Actualizar luz OK 
+

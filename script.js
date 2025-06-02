@@ -1720,7 +1720,7 @@ function inicializarBotonFiltroEjecutadosPOA() {
 
             if (!acum && !executed) {
                 cumple = false;
-            } else if (ratio2 < 70 && acum) {
+            } else if (ratio2 < 65 && acum) {
                 cumple = true;
             } else if (ratio1 > 100 && planned) {
                 cumple = true;
@@ -2422,36 +2422,24 @@ const SEMAFORO_EXTRA    = 'rgb(105, 173, 255)'; // > 100%
  * @returns {string} Color RGB (en formato suave)
  */
 function tablasPOAGetPercentageColor(percentage, usarAzulExtra = false) {
-    if (percentage <= 0) {
+    if (percentage < 65) {
         return SEMAFORO_ROJO;
+    }
+
+    if (percentage >= 65 && percentage < 90) {
+        return SEMAFORO_AMARILLO;
+    }
+
+    if (percentage >= 90 && percentage <= 100) {
+        return SEMAFORO_VERDE;
     }
 
     if (percentage > 100) {
         return usarAzulExtra ? SEMAFORO_EXTRA : SEMAFORO_VERDE;
     }
 
-    // Extraer valores RGB desde los strings
-    const parseRGB = (rgbStr) => rgbStr.match(/\d+/g).map(Number);
-
-    const rojo     = parseRGB(SEMAFORO_ROJO);
-    const amarillo = parseRGB(SEMAFORO_AMARILLO);
-    const verde    = parseRGB(SEMAFORO_VERDE);
-
-    let r, g, b;
-
-    if (percentage <= 50) {
-        const ratio = percentage / 50;
-        r = rojo[0];
-        g = Math.floor(rojo[1] * (1 - ratio) + amarillo[1] * ratio);
-        b = Math.floor(rojo[2] * (1 - ratio) + amarillo[2] * ratio);
-    } else {
-        const ratio = (percentage - 50) / 50;
-        r = Math.floor(amarillo[0] * (1 - ratio) + verde[0] * ratio);
-        g = Math.floor(amarillo[1] * (1 - ratio) + verde[1] * ratio);
-        b = Math.floor(amarillo[2] * (1 - ratio) + verde[2] * ratio);
-    }
-
-    return `rgb(${r}, ${g}, ${b})`;
+    // Por si acaso no cae en ningún rango (aunque no debería)
+    return SEMAFORO_ROJO;
 }
 
 
@@ -2664,7 +2652,7 @@ function tablasPOAApplyCellProperties(tableId, localStorageKey) {
 
         // Generate and add the content of the tooltip
         if (showCirclesInTooltip) {
-            circlesSVG = tablasPOAGetConcentricCirclesSVG(percentage, 'tooltip', '#fff');
+            circlesSVG = tablasPOAGetConcentricCirclesSVG(percentage, 'tooltip');
         }
 
         // Reconstruir html de la celda con tooltip
@@ -2748,7 +2736,7 @@ function tablasPOAApplyCellProperties(tableId, localStorageKey) {
 
         // Generate and add the content of the tooltip
         if (showCirclesInTooltip) {
-            circlesSVG = tablasPOAGetConcentricCirclesSVG(percentage, 'tooltip', '#fff');
+            circlesSVG = tablasPOAGetConcentricCirclesSVG(percentage, 'tooltip');
         }
 
         // Reconstruir html de la celda con tooltip
@@ -2812,6 +2800,7 @@ function tablasPOAApplyCellProperties(tableId, localStorageKey) {
         cell.dataset.details = JSON.stringify(details);
 
         let percentage = 0;
+        let percentagesobreanual = 0;
         let cellColor = '';
         let cellColorTotal = '';
         let tooltipText = '';
@@ -2862,12 +2851,12 @@ function tablasPOAApplyCellProperties(tableId, localStorageKey) {
 
         if (plannedVal > 0 && executedVal>0) {
             // Color del circulo sobre planificado anual 
-            percentage = (executedVal / plannedVal) * 100;
+            percentagesobreanual = (executedVal / plannedVal) * 100;
 
-            if (percentage > 100) {
+            if (percentagesobreanual > 100) {
                 cellColorTotal = SEMAFORO_EXTRA; // color celeste para sobre-ejecución
             } else {
-                cellColorTotal = tablasPOAGetPercentageColor(percentage);
+                cellColorTotal = tablasPOAGetPercentageColor(percentagesobreanual);
             }
         }
 
@@ -2878,7 +2867,7 @@ function tablasPOAApplyCellProperties(tableId, localStorageKey) {
 
         // Generate and add the content of the tooltip
         if (showCirclesInTooltip) {
-            circlesSVG = tablasPOAGetConcentricCirclesSVG(percentage, 'tooltip', '#fff');
+            circlesSVG = tablasPOAGetConcentricCirclesSVG(percentage, 'tooltip');
             // console.log("SVG generado para", activityName, percentage, "es:", circlesSVG);
         }
 
