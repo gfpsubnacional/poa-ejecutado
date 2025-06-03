@@ -1,3 +1,90 @@
+.leg-infografia {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  gap: 10px;
+  margin-left: 20px;
+  background: #f8f9fa;
+  padding: 6px 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.08);
+}
+
+.leg-explicacion {
+  font-weight: 500;
+  color: #555;
+  margin-right: 10px;
+  white-space: nowrap;
+  position: relative;
+}
+
+.leg-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  border: 1px solid #ccc;
+  border-left: 10px solid; /* ← Aquí aumentamos el grosor */
+  border-radius: 6px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  font-weight: 500;
+  font-size: 12px;
+  position: relative;
+}
+
+.leg-rojo     { border-color: rgb(255, 100, 120); }
+.leg-amarillo { border-color: rgb(255, 240, 100); }
+.leg-verde    { border-color: rgb(140, 243, 138); }
+.leg-extra    { border-color: rgb(105, 173, 255); }
+
+/* Tooltip */
+.leg-tooltip-container {
+  position: relative;
+  display: inline-block;
+  cursor: default;
+}
+
+.leg-tooltip {
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  font-size: 11px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 10;
+  width: max-content;
+  max-width: 220px;
+  text-align: left;
+}
+
+.leg-tooltip::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
+}
+
+.leg-tooltip-container:hover .leg-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+  
+  
   .tablaPOA {
     border-collapse: collapse;
     width: 100%;

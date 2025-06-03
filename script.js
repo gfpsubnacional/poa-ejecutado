@@ -2407,12 +2407,52 @@ function fillTableWithEnvios(tablaId, localStorageKey, callback) {
     intervalId = setInterval(checkTableAndFill, 1000);
 }
 
+// Tooltips a leyenda
+
+const legTooltips = {
+    "leg-explicacion": "Corresponde a lo planificado hasta la fecha (abril).",
+    "leg-rojo": "Respecto al planificado acumulado.",
+    "leg-amarillo": "Respecto al planificado acumulado.",
+    "leg-verde": "Respecto al planificado acumulado.",
+    "leg-extra": "Respecto al planificado total anual."
+  };
+
+  const appliedElements = new WeakSet();
+
+  function applyTooltips() {
+    Object.entries(legTooltips).forEach(([className, tooltipText]) => {
+      document.querySelectorAll(`.${className}`).forEach(el => {
+        if (!appliedElements.has(el)) {
+          const wrapper = document.createElement("span");
+          wrapper.className = "leg-tooltip-container";
+          el.parentNode.insertBefore(wrapper, el);
+          wrapper.appendChild(el);
+
+          const tooltip = document.createElement("div");
+          tooltip.className = "leg-tooltip";
+          tooltip.innerText = tooltipText;
+          wrapper.appendChild(tooltip);
+
+          appliedElements.add(el);
+        }
+      });
+    });
+  }
+
+  const observer100 = new MutationObserver(applyTooltips);
+
+  observer100.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  document.addEventListener("DOMContentLoaded", applyTooltips);
 
 // --- Parte 2: Dar propiedades a celdas (hover, círculos, modal) ---
 
-const SEMAFORO_ROJO     = 'rgb(255, 100, 120)'; // <= 0%
-const SEMAFORO_AMARILLO = 'rgb(255, 240, 100)'; // 50%
-const SEMAFORO_VERDE    = 'rgb(140, 243, 138)'; // 100%
+const SEMAFORO_ROJO     = 'rgb(255, 100, 120)'; // < 65%
+const SEMAFORO_AMARILLO = 'rgb(255, 240, 100)'; // 65-90%
+const SEMAFORO_VERDE    = 'rgb(140, 243, 138)'; // 90-100%
 const SEMAFORO_EXTRA    = 'rgb(105, 173, 255)'; // > 100%
 
 
