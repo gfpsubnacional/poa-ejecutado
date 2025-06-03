@@ -1300,6 +1300,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 //////////////////////////// CONTENIDO2 //////////////////////////////
+// Función que activa la exportación cuando el botón aparece
+function activarDescargaExcelCuandoAparezca() {
+  const observer = new MutationObserver((mutationsList, observer) => {
+    const boton = document.getElementById("guardarExcelEnvios");
+    if (boton) {
+      observer.disconnect(); // Deja de observar
+
+      boton.addEventListener("click", function () {
+        const tabla = document.getElementById("submissions-table");
+        if (!tabla) {
+          alert("No se encontró la tabla de envíos.");
+          return;
+        }
+
+        // Extraer encabezados personalizados
+        const headers = Array.from(tabla.querySelectorAll("thead th")).map(th => {
+          const firstDiv = th.querySelector("div");
+          const span = firstDiv?.querySelector("span");
+          return span?.textContent.trim() || ""; // Solo toma el texto del primer span dentro del primer div
+        });
+
+        // Extraer los datos del cuerpo
+        const rows = Array.from(tabla.querySelectorAll("tbody tr")).map(tr =>
+          Array.from(tr.querySelectorAll("td")).map(td => td.textContent.trim())
+        );
+
+        // Crear una matriz completa para exportar
+        const datos = [headers, ...rows];
+
+        // Usar SheetJS para generar Excel
+        const worksheet = XLSX.utils.aoa_to_sheet(datos);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Datos");
+        XLSX.writeFile(workbook, "envios.xlsx");
+      });
+    }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
+activarDescargaExcelCuandoAparezca();
+
+
 window.actualizarTabla = actualizarTabla;
 
 function esperarMisEnvios() {
@@ -2411,9 +2455,9 @@ function fillTableWithEnvios(tablaId, localStorageKey, callback) {
 
 const legTooltips = {
     "leg-explicacion": "Corresponde a lo planificado hasta la fecha (abril).",
-    "leg-rojo": "Respecto al planificado acumulado.",
-    "leg-amarillo": "Respecto al planificado acumulado.",
-    "leg-verde": "Respecto al planificado acumulado.",
+    "leg-rojo": "Respecto al planificado a la fecha.",
+    "leg-amarillo": "Respecto al planificado a la fecha.",
+    "leg-verde": "Respecto al planificado a la fecha.",
     "leg-extra": "Respecto al planificado total anual."
   };
 

@@ -7,9 +7,12 @@
     <link rel="stylesheet" href="contenido23y4_style.css">
 </head>
 <body>
-    <h2>Mis envíos 
-        <!-- <button id="download-btn-2" class="download-btn" style="float: right;">Descargar PDF</button> -->
-    </h2>
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+        <h2>Mis envíos</h2>
+        <button id="guardarExcelEnvios" class="boton-excel-registro" title="Descargar vista actual en Excel">
+            <img src="https://img.icons8.com/color/24/000000/microsoft-excel-2019--v1.png" alt="Excel">
+        </button>
+    </div>
     
     <div class="table-misenvios-contenedor">
         <div id="user-submissions">
@@ -18,6 +21,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.legacy.min.js"></script> <!-- ✅ SÍ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
