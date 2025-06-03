@@ -348,119 +348,135 @@ async function cargarEnviosYMisEnvios() {
 }
 
 
-///// Descargar PDF
+
+// PDF 
+
+
+function waitForJsPDFandInit(callback) {
+    const checkInterval = 100;
+    const intervalId = setInterval(() => {
+        if (window.jspdf?.jsPDF) {
+            clearInterval(intervalId);
+            callback(window.jspdf.jsPDF);
+        }
+    }, checkInterval);
+}
 
 function waitForElementsAndInit(callback) {
-    const checkInterval = 100; // milisegundos
-
+    const checkInterval = 100;
     const intervalId = setInterval(() => {
-        const content = document.getElementById('content');
-
-        if (content) {
+        const table = document.getElementById('submissions-table');
+        if (table && table.rows.length > 0) {
             clearInterval(intervalId);
-            callback(content); // Pasar solo el contenido, ya que el evento se delegará
+            callback(table);
         }
     }, checkInterval);
 }
 
 function generateRandomCode() {
-    // Genera un código aleatorio de 6 números
     return Math.floor(100000 + Math.random() * 900000);
 }
 
-function setupDownloadPDF(content) {
-    document.addEventListener('click', function (event) {
-        if (event.target && event.target.classList.contains('download-btn')) {
-            // Obtener los datos del usuario desde localStorage
-            const usuario = JSON.parse(localStorage.getItem("usuarioDatos"));
-            const usuarioNombre = usuario ? usuario.Usuario : "Usuario desconocido"; // Fallback en caso de que no exista
+function setupDownloadPDF(jsPDFClass, tableElement) {
+    const observer = new MutationObserver(() => {
+        document.querySelectorAll('.boton-pdf:not([data-listener-attached])').forEach(button => {
+            button.setAttribute('data-listener-attached', 'true');
+            button.addEventListener('click', () => {
+                const doc = new jsPDFClass({ orientation: "landscape", unit: "pt", format: "a4" });
 
-            // Generar el código aleatorio
-            const codigoAleatorio = generateRandomCode();
+                if (typeof doc.autoTable !== "function") {
+                    console.error("❌ autoTable no está disponible.");
+                    return;
+                }
 
-            // Obtener la fecha y hora actual
-            const now = new Date();
-            const fechaDescarga = now.toLocaleDateString();
-            const horaDescarga = now.toLocaleTimeString();
+                const thead = tableElement.querySelector('thead');
+                const head = [
+                    [...thead.querySelectorAll('th')].map(th =>
+                        (th.querySelector('span') || th).textContent
+                    )
+                ];
 
-            const opt = {
-                margin: [40, 10, 20, 10], // Margenes: [top, right, bottom, left] en puntos (pt)
-                filename: 'contenido.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'pt', format: 'a4', orientation: 'landscape' },
-                html2canvas: {
-                    useCORS: true,
-                    allowTaint: false,
-                    logging: false,
-                    letterRendering: true
-                },
-                width: 800,
-                maxWidth: 700,
-                pagebreak: { mode: 'avoid-all', before: '.page-break' }
-            };
+                const tbody = tableElement.querySelector('tbody');
+                const visibleRows = [...tbody.querySelectorAll('tr')].filter(
+                    tr => window.getComputedStyle(tr).display !== 'none'
+                );
 
-            // Crear el PDF
-            html2pdf()
-                .set(opt)
-                .from(content)
-                .toPdf()
-                .get('pdf')
-                .then(function (pdf) {
-                    const totalPages = pdf.internal.getNumberOfPages();
-                    const headerText = `Descargado desde la plataforma (${codigoAleatorio}) el ${fechaDescarga} a las ${horaDescarga}. Usuario: ${usuarioNombre}`;
-                    const headerFontSize = 10;
-                    const headerMarginTop = 25;
-                    const footerFontSize = 10;
-                    const footerMarginBottom = 10;
-                    const textColorGray = [128, 128, 128]; // Código RGB para gris
+                const body = visibleRows.map(tr =>
+                    [...tr.querySelectorAll('td')].map(td => td.textContent)
+                );
 
-                    pdf.setFontSize(headerFontSize);
-                    pdf.setTextColor(...textColorGray);
+                const usuario = JSON.parse(localStorage.getItem("usuarioDatos"));
+                const usuarioNombre = usuario?.Usuario || "Usuario desconocido";
+                const codigo = generateRandomCode();
+                const now = new Date();
+                const fecha = now.toLocaleDateString();
+                const hora = now.toLocaleTimeString();
 
-                    for (let i = 1; i <= totalPages; i++) {
-                        pdf.setPage(i);
+                doc.setFontSize(10);
+                doc.setTextColor(80);
+                doc.text(
+                    `Descargado desde la plataforma (${codigo}) el ${fecha} a las ${hora}. Usuario: ${usuarioNombre}`,
+                    doc.internal.pageSize.getWidth() / 2,
+                    30,
+                    { align: 'center' }
+                );
 
-                        // Agregar el encabezado
-                        pdf.setFontSize(headerFontSize);
-                        pdf.setTextColor(...textColorGray);
-                        const headerWidth = pdf.getTextWidth(headerText);
-                        const pageWidth = pdf.internal.pageSize.getWidth();
-                        const headerX = (pageWidth - headerWidth) / 2; // Centrar el encabezado
-                        pdf.text(headerText, headerX, headerMarginTop);
+                doc.setFontSize(14);
+                doc.setTextColor('#1C4574');
+                doc.setFont(undefined, 'bold');
+                doc.text("Envíos", 40, 50);
 
-                        // Agregar el número de página al pie de página
-                        pdf.setFontSize(footerFontSize);
-                        pdf.setTextColor(...textColorGray);
-                        const pageNumberText = `Página ${i} de ${totalPages}`;
-                        const footerWidth = pdf.getTextWidth(pageNumberText);
-                        const footerX = (pageWidth - footerWidth) / 2; // Centrar el pie de página
-                        const pageHeight = pdf.internal.pageSize.getHeight();
-                        pdf.text(pageNumberText, footerX, pageHeight - footerMarginBottom);
+                doc.autoTable({
+                    head,
+                    body,
+                    startY: 65,
+                    showHead: 'everyPage',
+                    theme: 'grid',
+                    useCss: true,
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 2,
+                        textColor: 0,
+                        lineColor: 0,
+                        lineWidth: 0.3,
+                        overflow: 'linebreak',
+                        valign: 'middle'
+                    },
+                    headStyles: {
+                        fillColor: [28, 69, 116],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center',
+                        valign: 'middle'
+                    },
+                    didDrawPage: function () {
+                        const str = `Página ${doc.internal.getNumberOfPages()}`;
+                        doc.setFontSize(9);
+                        doc.setTextColor(100);
+                        doc.text(
+                            str,
+                            doc.internal.pageSize.getWidth() / 2,
+                            doc.internal.pageSize.getHeight() - 10,
+                            { align: 'center' }
+                        );
                     }
-
-                    // Renderizar el contenido principal después de agregar encabezado y pie de página
-                    html2canvas(content, {
-                        scale: opt.html2canvas.scale,
-                        useCORS: true,
-                        allowTaint: false,
-                        logging: false,
-                        // No necesitamos un margen superior aquí, ya que el margen del PDF lo controla
-                    }).then(function(canvas) {
-                        // Ajustar la altura si excede el espacio disponible
-                        pdf.save();
-                    });
                 });
-        }
+
+                doc.save("envios.pdf");
+            });
+        });
     });
+
+    observer.observe(document.body, { childList: true, subtree: true });
 }
 
-// Iniciar cuando la página esté lista
-document.addEventListener('DOMContentLoaded', () => {
-    waitForElementsAndInit(setupDownloadPDF);
+document.addEventListener("DOMContentLoaded", () => {
+    waitForJsPDFandInit(jsPDF => {
+        waitForElementsAndInit(table => {
+            setupDownloadPDF(jsPDF, table);
+        });
+    });
 });
-
-
 
 ///////////////// CONTENIDO1 ////////////////////
 
@@ -1318,12 +1334,12 @@ function activarDescargaExcelCuandoAparezca() {
         const headers = Array.from(tabla.querySelectorAll("thead th")).map(th => {
           const firstDiv = th.querySelector("div");
           const span = firstDiv?.querySelector("span");
-          return span?.textContent.trim() || ""; // Solo toma el texto del primer span dentro del primer div
+          return span?.textContent || ""; // Solo toma el texto del primer span dentro del primer div
         });
 
         // Extraer los datos del cuerpo
         const rows = Array.from(tabla.querySelectorAll("tbody tr")).map(tr =>
-          Array.from(tr.querySelectorAll("td")).map(td => td.textContent.trim())
+          Array.from(tr.querySelectorAll("td")).map(td => td.textContent)
         );
 
         // Crear una matriz completa para exportar

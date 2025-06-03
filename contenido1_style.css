@@ -353,7 +353,8 @@ td {
 
 /* Botones excel y borrar todo  */
         .boton-borrar-registro,
-        .boton-excel-registro {
+        .boton-excel,
+        .boton-pdf {
             padding: 6px 12px;
             color: white;
             font-weight: bold;
@@ -372,19 +373,37 @@ td {
             transform: scale(1.05);
         }
 
-        .boton-excel-registro {
+        .boton-excel {
             background-color: #c8ffe1d5;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .boton-excel-registro:hover {
+        .boton-excel:hover {
             background-color: #a8f6d0d5;
             transform: scale(1.05);
         }
 
-        .boton-excel-registro img {
+        .boton-excel img {
+            width: 20px;
+            height: 20px;
+        }
+
+
+        .boton-pdf {
+            background-color: #ffeeeed5;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .boton-pdf:hover {
+            background-color: #ffd4d4d5;
+            transform: scale(1.05);
+        }
+
+        .boton-pdf img {
             width: 20px;
             height: 20px;
         }
