@@ -1316,7 +1316,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 //////////////////////////// CONTENIDO2 //////////////////////////////
-// Función que activa la exportación cuando el botón aparece
+// Exportar Excel
 function activarDescargaExcelCuandoAparezca() {
   const observer = new MutationObserver((mutationsList, observer) => {
     const boton = document.getElementById("guardarExcelEnvios");
@@ -1337,10 +1337,12 @@ function activarDescargaExcelCuandoAparezca() {
           return span?.textContent || ""; // Solo toma el texto del primer span dentro del primer div
         });
 
-        // Extraer los datos del cuerpo
-        const rows = Array.from(tabla.querySelectorAll("tbody tr")).map(tr =>
-          Array.from(tr.querySelectorAll("td")).map(td => td.textContent)
-        );
+        // Extraer solo las filas visibles del cuerpo
+        const rows = Array.from(tabla.querySelectorAll("tbody tr"))
+          .filter(tr => tr.offsetParent !== null) // Solo visibles
+          .map(tr =>
+            Array.from(tr.querySelectorAll("td")).map(td => td.textContent)
+          );
 
         // Crear una matriz completa para exportar
         const datos = [headers, ...rows];
@@ -1360,35 +1362,39 @@ function activarDescargaExcelCuandoAparezca() {
 activarDescargaExcelCuandoAparezca();
 
 
+
+// LLENAR MIS ENVIOS 
 window.actualizarTabla = actualizarTabla;
 
+// Espera hasta 60s a que misEnvios esté disponible en localStorage y luego actualiza la tabla
 function esperarMisEnvios() {
     const limiteTiempo = 60000; // 60 segundos
     let intervalo;
 
-    // Temporizador para mostrar error solo después de 60 segundos
+    // Muestra error si pasa el tiempo límite
     const timeout = setTimeout(() => {
         clearInterval(intervalo);
         mostrarErrorCarga();
     }, limiteTiempo);
 
-    // Intervalo para verificar cada 500ms si ya existe misEnvios
+    // Verifica cada 500ms si misEnvios ya está disponible
     intervalo = setInterval(() => {
         if (localStorage.getItem("misEnvios")) {
-            clearTimeout(timeout); // Detener el error programado
-            clearInterval(intervalo); // Detener la espera
-            actualizarTabla(); // Llamar a la función de actualización
+            clearTimeout(timeout);
+            clearInterval(intervalo);
+            actualizarTabla();
         }
     }, 500);
 }
 
+// Observa el DOM y espera a que aparezca la tabla para iniciar el flujo
 const observer3 = new MutationObserver((mutationsList, observer) => {
     for (const mutation of mutationsList) {
         if (mutation.type === "childList") {
             const table = document.getElementById("submissions-table");
             if (table) {
-                observer.disconnect(); // Deja de observar una vez que encuentra el elemento
-                esperarMisEnvios(); // Esperar hasta que haya datos en localStorage
+                observer.disconnect();
+                esperarMisEnvios();
                 break;
             }
         }
@@ -1396,6 +1402,7 @@ const observer3 = new MutationObserver((mutationsList, observer) => {
 });
 observer3.observe(document.body, { childList: true, subtree: true });
 
+// Intenta obtener misEnvios del localStorage y renderizar la tabla
 async function actualizarTabla() {
     try {
         let misEnvios = JSON.parse(localStorage.getItem("misEnvios"));
@@ -1410,11 +1417,13 @@ async function actualizarTabla() {
     }
 }
 
+// Muestra mensaje de error si no hay datos disponibles
 function mostrarErrorCarga() {
     const tabla = document.getElementById("submissions-table");
     tabla.innerHTML = "<tr><td colspan='15'>❌ Error: No se encontraron datos en 60 segundos.</td></tr>";
 }
 
+// Construye el HTML de la tabla con encabezados y filas
 function construirTablaConHeaders(headers, datos, incluirEncabezadoSiVacio = false) {
     let html = "";
     if (datos.length > 0 || incluirEncabezadoSiVacio) {
@@ -1441,6 +1450,7 @@ function construirTablaConHeaders(headers, datos, incluirEncabezadoSiVacio = fal
     return html;
 }
 
+// Ordena los datos y renderiza la tabla con columnas no vacías
 function renderizarTabla(datos) {
     datos.sort((a, b) => {
         const parseFecha = (timestamp) => {
@@ -1453,11 +1463,11 @@ function renderizarTabla(datos) {
     });
 
     const tabla = document.getElementById("submissions-table");
-
     const columnasLlenas = filtrarColumnasLlenas(headers, datos);
     tabla.innerHTML = construirTablaConHeaders(columnasLlenas, datos);
 }
 
+// Devuelve solo las columnas que tengan al menos un valor significativo
 function filtrarColumnasLlenas(headers, datos) {
     return headers.filter(({ key }) =>
         datos.some(row => row[key] !== "" && row[key] !== null && row[key] !== "-" && row[key] !== undefined)
