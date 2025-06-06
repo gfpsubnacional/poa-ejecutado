@@ -28,7 +28,7 @@ const headers = [
     // { key: "fechaFin", label: "R - fecha fin" },
     { key: "mesReporte", label: "R - mes" },
     // { key: "tipoRegistro", label: "Tipo de Registro" },
-    { key: "numerometas", label: "Número de metas" },
+    { key: "numerometas", label: "N° metas" },
     { key: "actividad", label: "Actividad POA" },
     { key: "titulo", label: "Título" },
     // { key: "metaNueva", label: "Meta nueva" },
