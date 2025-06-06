@@ -39,10 +39,10 @@ const headers = [
     // { key: "fechaInicio", label: "Fecha inicio" },
     // { key: "fechaFin", label: "Fecha fin" },
     // { key: "variosConsultores", label: "Intervino más de un consultor" },
-    { key: "participantes", label: "N. participantes" },
+    { key: "participantes", label: "N° participantes" },
     { key: "hombres", label: "Hombres" },
     { key: "mujeres", label: "Mujeres" },
-    { key: "autoridades", label: "Autoridades presentes" },
+    { key: "autoridades", label: "Autoridades" },
     { key: "detalleMeta", label: "Observaciones" }
 ];
 

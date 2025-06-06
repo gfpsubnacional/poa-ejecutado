@@ -473,7 +473,7 @@
 .tablasPOA-envios th:nth-child(1)  { width: 8%;  min-width: 100px; }  /* Usuario */
 .tablasPOA-envios th:nth-child(2)  { width: 10%; min-width: 130px; }  /* R - timestamp */
 .tablasPOA-envios th:nth-child(3)  { width: 6%;  min-width: 70px; }   /* R - mes */
-.tablasPOA-envios th:nth-child(4)  { width: 6%;  min-width: 70px; }   /* Número de metas */
+.tablasPOA-envios th:nth-child(4)  { width: 6%;  min-width: 80px; }   /* Nº metas */
 .tablasPOA-envios th:nth-child(5)  { width: 15%; min-width: 250px; }  /* Actividad POA */
 .tablasPOA-envios th:nth-child(6)  { width: 15%; min-width: 250px; }  /* Título */
 .tablasPOA-envios th:nth-child(7)  { width: 10%; min-width: 130px; }  /* Ámbito */
