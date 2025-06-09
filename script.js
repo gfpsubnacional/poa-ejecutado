@@ -1915,7 +1915,7 @@ inicializarBotonFiltroEjecutadosPOA();
 
 // Constantes y funciones auxiliares
 const TABLA_POA_MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"];
-const TABLA_POA_MESES_CORTE = ["ene", "feb", "mar", "abr"];
+const TABLA_POA_MESES_CORTE = ["ene", "feb", "mar", "abr","may"];
 const TABLA_POA_MES_MAP = {
     "ene": "Enero",
     "feb": "Febrero",
