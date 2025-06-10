@@ -1625,8 +1625,13 @@ function inicializarFiltrosYOrdenParaTablas(claseTabla) {
                         valA = parseFloat(valA.replace(",", ""));
                         valB = parseFloat(valB.replace(",", ""));
                     } else if (tipo === "fecha") {
-                        valA = new Date(valA);
-                        valB = new Date(valB);
+                        function parseFechaHoraEuropea(str) {
+                            const [fecha, hora] = str.split(" ");
+                            const [d, m, a] = fecha.split("/");
+                            return new Date(`${a}-${m.padStart(2, "0")}-${d.padStart(2, "0")}T${hora || "00:00"}`);
+                        }
+                        valA = parseFechaHoraEuropea(valA);
+                        valB = parseFechaHoraEuropea(valB);
                     } else if (tipo === "mes") {
                         valA = MESES.indexOf(valA.toLowerCase());
                         valB = MESES.indexOf(valB.toLowerCase());
@@ -1714,7 +1719,17 @@ function inicializarFiltrosYOrdenParaTablas(claseTabla) {
     };
 
     const detectarTipoDeDato = (valores) => {
-        const todosFechas = valores.every(v => !isNaN(Date.parse(v)));
+        const formatoFechaValido = v => {
+            if (!v) return false;
+            const [fecha, hora] = v.split(" ");
+            const partes = fecha?.split("/");
+            if (partes?.length !== 3) return false;
+            const [d, m, a] = partes;
+            const iso = `${a}-${m.padStart(2, "0")}-${d.padStart(2, "0")}T${hora || "00:00"}`;
+            return !isNaN(Date.parse(iso));
+        };
+
+        const todosFechas = valores.every(formatoFechaValido);
         if (todosFechas) return "fecha";
 
         const todosNumeros = valores.every(v => !isNaN(parseFloat(v.replace(",", ""))));
@@ -3162,8 +3177,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (inicializarTablaPOA("mitablaPOA")) {
                     crearObserverParaTabla(tablaMiPOA, "usuarioDatos"); // Observe for filtering
                     filtrarFilas(tablaMiPOA, criterioFiltro); // Filter initially
-                    fillTableWithEnvios('mitablaPOA', 'misEnvios', () => {
-                        tablasPOAApplyCellProperties('mitablaPOA', 'misEnvios');
+                    fillTableWithEnvios('mitablaPOA', 'Envios', () => {
+                        tablasPOAApplyCellProperties('mitablaPOA', 'Envios');
                     });
                     datosUsuarioProcesados = true;
                     clearInterval(intervaloVerificacionMiTabla); // Stop interval once processed
