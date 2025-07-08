@@ -212,6 +212,7 @@ function mostrarMenu(userData) {
             { id: "boton1", texto: "Registro POA", archivo: "contenido1.html" },
             { id: "boton2", texto: "Envíos", archivo: "contenido2.html" },
             { id: "boton3", texto: "POA 2025", archivo: "contenido4.html" },
+            { id: "boton5", texto: "Informe semestral", archivo: "contenido6.html" },
             { id: "boton4", texto: "Manual de uso", archivo: "contenido5.html" }
         ],
         usuario: [
@@ -1930,7 +1931,7 @@ inicializarBotonFiltroEjecutadosPOA();
 
 // Constantes y funciones auxiliares
 const TABLA_POA_MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"];
-const TABLA_POA_MESES_CORTE = ["ene", "feb", "mar", "abr","may"];
+const TABLA_POA_MESES_CORTE = ["ene", "feb", "mar", "abr","may","jun"];
 const TABLA_POA_MES_MAP = {
     "ene": "Enero",
     "feb": "Febrero",
@@ -2100,77 +2101,77 @@ function inicializarTablaPOA(tablaId) {
         { name: "Ej_total", mes: "total", tipo: "ejecutado" }
     ];
 
-const crearEncabezado = () => {
-    const encabezado1 = document.getElementById(`${tablaId}-encabezado1`);
-    const encabezado2 = document.getElementById(`${tablaId}-encabezado2`);
+    const crearEncabezado = () => {
+        const encabezado1 = document.getElementById(`${tablaId}-encabezado1`);
+        const encabezado2 = document.getElementById(`${tablaId}-encabezado2`);
 
-    if (!encabezado1 || !encabezado2) {
-        return;
-    }
-    encabezado1.innerHTML = "";
-    encabezado2.innerHTML = "";
+        if (!encabezado1 || !encabezado2) {
+            return;
+        }
+        encabezado1.innerHTML = "";
+        encabezado2.innerHTML = "";
 
-    config.columnasFijas.forEach(dato => encabezado1.appendChild(crearTH(dato, { rowSpan: 2 })));
+        config.columnasFijas.forEach(dato => encabezado1.appendChild(crearTH(dato, { rowSpan: 2 })));
 
-    // Crear los encabezados principales con colSpan inicial
-    const thPlanificado = crearTH("Planificado");
-    const thEjecutado = crearTH("Ejecutado");
-    encabezado1.appendChild(thPlanificado);
-    encabezado1.appendChild(thEjecutado);
+        // Crear los encabezados principales con colSpan inicial
+        const thPlanificado = crearTH("Planificado");
+        const thEjecutado = crearTH("Ejecutado");
+        encabezado1.appendChild(thPlanificado);
+        encabezado1.appendChild(thEjecutado);
 
-    // Subencabezados planificados
-    config.meses.forEach(mes => {
-        const th = crearTH(mes);
-        th.setAttribute("data-month", mes);
-        th.setAttribute("data-type", "planificado");
-        encabezado2.appendChild(th);
-    });
-    const thAcumPl = crearTH("Acum");
-    thAcumPl.setAttribute("data-month", "acum");
-    thAcumPl.setAttribute("data-type", "planificado");
-    encabezado2.appendChild(thAcumPl);
+        // Subencabezados planificados
+        config.meses.forEach(mes => {
+            const th = crearTH(mes);
+            th.setAttribute("data-month", mes);
+            th.setAttribute("data-type", "planificado");
+            encabezado2.appendChild(th);
+        });
+        const thAcumPl = crearTH("Acum");
+        thAcumPl.setAttribute("data-month", "acum");
+        thAcumPl.setAttribute("data-type", "planificado");
+        encabezado2.appendChild(thAcumPl);
 
-    const thTotalPl = crearTH("Total");
-    thTotalPl.setAttribute("data-month", "total");
-    thTotalPl.setAttribute("data-type", "planificado");
-    encabezado2.appendChild(thTotalPl);
+        const thTotalPl = crearTH("Total");
+        thTotalPl.setAttribute("data-month", "total");
+        thTotalPl.setAttribute("data-type", "planificado");
+        encabezado2.appendChild(thTotalPl);
 
-    // Subencabezados ejecutados
-    config.meses.forEach(mes => {
-        const th = crearTH(mes);
-        th.setAttribute("data-month", mes);
-        th.setAttribute("data-type", "ejecutado");
-        encabezado2.appendChild(th);
-    });
-    const thTotalEj = crearTH("Total");
-    thTotalEj.setAttribute("data-month", "total");
-    thTotalEj.setAttribute("data-type", "ejecutado");
-    encabezado2.appendChild(thTotalEj);
+        // Subencabezados ejecutados
+        config.meses.forEach(mes => {
+            const th = crearTH(mes);
+            th.setAttribute("data-month", mes);
+            th.setAttribute("data-type", "ejecutado");
+            encabezado2.appendChild(th);
+        });
+        const thTotalEj = crearTH("Total");
+        thTotalEj.setAttribute("data-month", "total");
+        thTotalEj.setAttribute("data-type", "ejecutado");
+        encabezado2.appendChild(thTotalEj);
 
-    // Función para actualizar dinámicamente los colSpan
-    function actualizarColSpan() {
-        const visibles = selector => Array.from(encabezado2.querySelectorAll(selector))
-            .filter(th => th.style.display !== 'none').length;
+        // Función para actualizar dinámicamente los colSpan
+        function actualizarColSpan() {
+            const visibles = selector => Array.from(encabezado2.querySelectorAll(selector))
+                .filter(th => th.style.display !== 'none').length;
 
-        const thPlanificados = visibles('th[data-type="planificado"]');
-        const thEjecutados = visibles('th[data-type="ejecutado"]');
+            const thPlanificados = visibles('th[data-type="planificado"]');
+            const thEjecutados = visibles('th[data-type="ejecutado"]');
 
-        if (thPlanificado) thPlanificado.colSpan = thPlanificados;
-        if (thEjecutado) thEjecutado.colSpan = thEjecutados;
-    }
+            if (thPlanificado) thPlanificado.colSpan = thPlanificados;
+            if (thEjecutado) thEjecutado.colSpan = thEjecutados;
+        }
 
-    // Observer que detecta cualquier cambio en los subencabezados
-    const observer123 = new MutationObserver(() => actualizarColSpan());
-    observer123.observe(encabezado2, {
-        childList: true,
-        subtree: true,
-        attributes: true,         // ⬅️ importante si cambias el display con JS/CSS
-        attributeFilter: ['style'] // ⬅️ optimiza el rendimiento
-    });
+        // Observer que detecta cualquier cambio en los subencabezados
+        const observer123 = new MutationObserver(() => actualizarColSpan());
+        observer123.observe(encabezado2, {
+            childList: true,
+            subtree: true,
+            attributes: true,         // ⬅️ importante si cambias el display con JS/CSS
+            attributeFilter: ['style'] // ⬅️ optimiza el rendimiento
+        });
 
-    // Inicializar colSpan una vez
-    actualizarColSpan();
-};
+        // Inicializar colSpan una vez
+        actualizarColSpan();
+    };
 
     const agregarFila = (tabla, filaData, clasesSubtitulos) => {
         const nuevaFila = tabla.insertRow();
@@ -2376,6 +2377,7 @@ function observarSubtitulosPOA(tablaId) {
 // Llamadas
 observarSubtitulosPOA("tablaPOA");
 observarSubtitulosPOA("mitablaPOA");
+observarSubtitulosPOA("tablaPOASemestral");
 
 
 
@@ -2431,7 +2433,7 @@ function fillTableWithEnvios(tablaId, localStorageKey, callback) {
         if (tableElement) {
             const normalRows = tableElement.querySelectorAll('tbody tr.tablaPOA-normal');
 
-            if (normalRows.length > 10 || (tablaId === 'mitablaPOA' && normalRows.length > 0)) {
+            if (normalRows.length > 10 || ((tablaId === 'mitablaPOA' || tablaId === 'tablaPOASemestral') && normalRows.length > 0)) {
                 clearInterval(intervalId);
 
                 waitForLocalStorageItem(localStorageKey, (envios) => {
@@ -3190,10 +3192,25 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     intervaloVerificacionMiTabla = setInterval(verificarYFiltrarMiTabla, 1000);
 
+    // --- Inicializar tablaPOASemestral ---
+    const observerPOASemestral = new MutationObserver((mutations, obs) => {
+        if (inicializarTablaPOA("tablaPOASemestral")) {
+            obs.disconnect(); // Disconnect self
+            fillTableWithEnvios('tablaPOASemestral', 'Envios', () => {
+                tablasPOAApplyCellProperties('tablaPOASemestral', 'Envios');
+            });
+        }
+    });
+
+    observerPOASemestral.observe(document.body, { childList: true, subtree: true });
+    // Try to initialize immediately in case the table already exists
+    inicializarTablaPOA("tablaPOASemestral");
+
 });
 
 
-// MANUAL
+
+// CONTENIDO5 MANUAL
 
 document.addEventListener('DOMContentLoaded', function () {
     window.manualShowSection = function(id) {
