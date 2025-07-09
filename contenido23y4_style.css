@@ -530,179 +530,96 @@
 
 /* TABLAS SEMESTRALES  */
 
-
-/* Estilos para cada tabla POA (nueva estructura) */
-.tabla-poa-card {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    margin-bottom: 30px;
-    padding: 20px;
+/* Estilos para el contenedor principal de cada tabla semestral */
+.contenedorTablaSemestral {
+    margin-bottom: 2rem;
+    padding: 1rem;
 }
 
-.tabla-poa-card h2 {
-    color: #333;
-    margin-top: 0;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+/* Estilos para el título de cada tabla semestral */
+.tituloTablaSemestral {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
 }
 
-.tabla-poa-semestral { /* Clase para las nuevas tablas */
+/* Estilos para las tablas principales */
+.tablaSemestral {
     width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    font-size: 0.9em;
+    border-collapse: collapse; /* Colapsa los bordes de las celdas */
 }
 
-.tabla-poa-semestral th,
-.tabla-poa-semestral td {
-    border: 1px solid #ddd;
-    padding: 8px 12px;
-    text-align: left;
+/* Estilos para las celdas de encabezado y datos de las tablas principales */
+.tablaSemestral th,
+.tablaSemestral td {
+    border: 1px solid #aaa; /* Bordes de las celdas */
+    padding: 0.4rem 0.6rem; /* Espaciado interno */
+    text-align: left; /* Alineación del texto */
 }
 
-.tabla-poa-semestral thead th {
-    background-color: #0056b3;
-    color: white;
-    position: sticky;
+/* Estilo específico para las celdas de encabezado de las tablas principales */
+.celdaEncabezadoSemestral {
+    background-color: #1C4574; /* Color de fondo del encabezado */
+    font-weight: bold; /* Texto en negrita */
+}
+
+/* Estilos para el fondo oscuro del modal */
+.modalSemestralFondo {
+    position: fixed; /* Posicionamiento fijo para cubrir toda la ventana */
     top: 0;
-    z-index: 10;
-}
-
-.tabla-poa-semestral tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.tabla-poa-semestral tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* Alineación de texto y números */
-.tabla-poa-semestral th:nth-child(n+4),
-.tabla-poa-semestral td:nth-child(n+4) {
-    text-align: center;
-}
-
-/* Columna de Avance */
-.avance-col-nueva { /* Clase para la nueva columna de avance */
-    position: relative;
-    cursor: help; /* Indica que hay un tooltip */
-}
-
-/* Columna de Concatenación de Entidades */
-.entidades-col-nueva {
-    max-width: 150px; /* Ancho máximo para que no se extienda demasiado */
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Estilos para celdas mensuales ocultas */
-.oculto-mensual-nueva { /* Clase para las celdas mensuales */
-    display: none;
-}
-
-/* Estilos para las celdas de totales planificado y ejecutado semestral */
-.total-planificado-semestral-nueva,
-.total-ejecutado-semestral-nueva {
-    cursor: pointer;
-    text-decoration: underline;
-    color: #0056b3;
-    font-weight: bold;
-}
-
-.total-planificado-semestral-nueva:hover,
-.total-ejecutado-semestral-nueva:hover {
-    color: #003d7a;
-}
-
-/* Tooltip para el avance */
-.tooltip-avance { /* Clase para el tooltip de avance */
-    position: absolute;
-    background-color: #333;
-    color: #fff;
-    padding: 5px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    white-space: nowrap;
-    z-index: 20;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-    top: -5px; /* Ajusta la posición inicial */
-    left: 50%;
-    transform: translateX(-50%) translateY(-100%); /* Centra y sube el tooltip */
-    pointer-events: none; /* Asegura que el tooltip no bloquee eventos del ratón */
-}
-
-.avance-col-nueva:hover .tooltip-avance {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(-120%); /* Ligeramente más arriba al aparecer */
-}
-
-/* Estilos para los círculos concéntricos SVG (asegúrate de que los colores base sean compatibles con tus semáforos) */
-.concentric-circles-svg-nueva {
-    vertical-align: middle;
-    margin-left: 5px;
-}
-
-/* Modal Styles */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
     left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Fondo semitransparente oscuro */
+    display: flex; /* Para centrar el modal */
+    justify-content: center; /* Centrado horizontal */
+    align-items: center; /* Centrado vertical */
+    z-index: 9999; /* Asegura que el modal esté por encima de otros elementos */
 }
 
-.modal-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 25px;
-    border: 1px solid #888;
-    width: 80%; /* Could be more responsive */
-    max-width: 800px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    position: relative;
+/* Estilos para el modal (la ventana emergente) */
+.modalSemestral {
+    background: white; /* Fondo blanco */
+    padding: 1rem 1.5rem; /* Espaciado interno */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Sombra para darle profundidad */
+    width: 90%; /* Ocupa el 90% del ancho disponible */
+    max-width: 800px; /* Ancho máximo para evitar que sea demasiado grande en pantallas amplias */
 }
 
-.close-button-nueva { /* Clase para el botón de cerrar modal */
-    color: #aaa;
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
+/* Estilos para el contenedor del contenido dentro del modal */
+.modalSemestralContenido {
+    max-height: 70vh; /* **Limite la altura máxima al 70% de la altura de la ventana** */
+    overflow-y: auto;  /* **Añade una barra de desplazamiento vertical si el contenido excede la altura máxima** */
+    overflow-x: auto; /* **Añade una barra de desplazamiento horizontal si el contenido es demasiado ancho** */
+    padding-right: 15px; /* Un poco de padding para que la barra de desplazamiento no pegue al borde */
+    box-sizing: border-box; /* Asegura que el padding no añada al ancho total */
 }
 
-.close-button-nueva:hover,
-.close-button-nueva:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+/* Estilos para las tablas que se muestran dentro del modal */
+.modalSemestralContenido table {
+    width: 100%; /* La tabla ocupa el 100% del ancho disponible en el contenedor del modal */
+    border-collapse: collapse; /* Colapsa los bordes para una apariencia más limpia */
+    margin-top: 0.5rem; /* Espacio superior */
+    margin-bottom: 15px; /* Espacio inferior entre tablas si hay varias */
+    font-size: 0.9em; /* Ajusta el tamaño de fuente si la tabla es muy densa */
 }
 
-#modal-envios-body-nueva {
-    max-height: 500px; /* Scrollable if content is too long */
-    overflow-y: auto;
-    margin-top: 15px;
+/* Estilos para las celdas de encabezado y datos de las tablas dentro del modal */
+.modalSemestralContenido th,
+.modalSemestralContenido td {
+    border: 1px solid #ddd; /* Bordes sutiles para las celdas */
+    padding: 8px; /* Espaciado interno */
+    text-align: left; /* Alineación del texto */
+    white-space: nowrap; /* Evita que el texto de las celdas se rompa en varias líneas */
 }
 
-#modal-envios-body-nueva p {
-    margin-bottom: 8px;
-    line-height: 1.4;
-}
-
-#modal-envios-body-nueva strong {
-    color: #0056b3;
+/* Estilos para el botón de cerrar del modal */
+.modalSemestralCerrar {
+    margin-top: 1rem; /* Margen superior */
+    padding: 0.4rem 1rem; /* Espaciado interno */
+    background: #d33; /* Color de fondo rojo */
+    color: white; /* Color de texto blanco */
+    border: none; /* Sin borde */
+    border-radius: 4px; /* Bordes redondeados */
+    cursor: pointer; /* Cambia el cursor a una mano al pasar por encima */
 }
