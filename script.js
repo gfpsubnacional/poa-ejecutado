@@ -3196,60 +3196,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // CONTENIDO5 MANUAL
-document.addEventListener("DOMContentLoaded", () => {
-    const esperarDatos = () => {
-        const contenedor = document.getElementById("tablasPOASemestral");
-        const POADatos = JSON.parse(localStorage.getItem("POADatos") || "null");
-        let Envios = JSON.parse(localStorage.getItem("Envios") || "null");
-
-        if (!contenedor || !POADatos || !Envios) {
-            setTimeout(esperarDatos, 300);
-            return;
+document.addEventListener('DOMContentLoaded', function () {
+    window.manualShowSection = function(id) {
+        document.querySelectorAll('.manual-section').forEach(sec => sec.classList.remove('manual-active'));
+        const target = document.getElementById(id);
+        target.classList.add('manual-active');
         }
+})
 
-        const enviosAgrupadosPorActividad = {};
-
-        Envios.forEach(item => {
-            const claveAgrupacion = item.actividad;
-            if (!enviosAgrupadosPorActividad[claveAgrupacion]) {
-                enviosAgrupadosPorActividad[claveAgrupacion] = {
-                    actividad: item.actividad,
-                    ambito: new Set(),
-                    entidad: new Set(),
-                    participantes: 0,
-                    numerometas: 0,
-                    hombres: 0,
-                    mujeres: 0,
-                    detallesOriginales: []
-                };
-            }
-
-            enviosAgrupadosPorActividad[claveAgrupacion].ambito.add(item.ambito);
-            enviosAgrupadosPorActividad[claveAgrupacion].entidad.add(item.entidad);
-            enviosAgrupadosPorActividad[claveAgrupacion].participantes += parseFloat(item.participantes) || 0;
-            enviosAgrupadosPorActividad[claveAgrupacion].numerometas += parseFloat(item.numerometas) || 0;
-            enviosAgrupadosPorActividad[claveAgrupacion].hombres += parseFloat(item.hombres) || 0;
-            enviosAgrupadosPorActividad[claveAgrupacion].mujeres += parseFloat(item.mujeres) || 0;
-            enviosAgrupadosPorActividad[claveAgrupacion].detallesOriginales.push(item);
-        });
-
-        const enviosParaTabla = Object.values(enviosAgrupadosPorActividad).map(grupo => ({
-            actividad: grupo.actividad,
-            ambito: Array.from(grupo.ambito).join(', '),
-            entidad: Array.from(grupo.entidad).join(', '),
-            participantes: Math.round(grupo.participantes) === 0 ? "" : Math.round(grupo.participantes).toString(),
-            Ejecutado: Math.round(grupo.numerometas) === 0 ? "" : Math.round(grupo.numerometas).toString(),
-            hombres: Math.round(grupo.hombres) === 0 ? "" : Math.round(grupo.hombres).toString(),
-            mujeres: Math.round(grupo.mujeres) === 0 ? "" : Math.round(grupo.mujeres).toString(),
-            detallesOriginales: grupo.detallesOriginales
-        }));
-
-        crearTablaSemestral("Datos POA", POADatos, contenedor);
-        crearTablaSemestral("Envios", enviosParaTabla, contenedor);
-    };
-
-    esperarDatos();
-});
 
 
 // CONTENIDO6
@@ -3260,53 +3214,61 @@ document.addEventListener("DOMContentLoaded", () => {
         const Envios = JSON.parse(localStorage.getItem("Envios") || "null");
 
         if (!contenedor || !POADatos || !Envios) {
-            console.log("Esperando datos del localStorage o contenedor HTML...");
             setTimeout(esperarDatos, 300);
             return;
         }
 
-        // --- Pre-procesamiento y Unificación de Datos ---
-
-        // 1. Procesar Datos POA: Consolidar por 'actividad'
-        //    Calculamos el Planificado total y los detalles mensuales por actividad.
         const poaConsolidadoPorActividad = {};
         const mesesPOA = ["ene_pl", "feb_pl", "mar_pl", "abr_pl", "may_pl", "jun_pl"];
+        const columnasAgrupacionPOA = [
+            "Resultado_cod", "Resultado", "Producto_cod", "Producto"
+        ];
 
-        POADatos.forEach(item => {
-            const actividad = item.actividad;
+        POADatos.forEach((item, index) => {
+            let actividad = item.Actividad ? String(item.Actividad).trim() : `Actividad Desconocida POA ${index}`;
+            if (actividad === "") {
+                actividad = `Actividad Vacía POA ${index}`;
+            }
+
             if (!poaConsolidadoPorActividad[actividad]) {
                 poaConsolidadoPorActividad[actividad] = {
                     actividad: actividad,
                     Planificado: 0,
-                    // Inicializamos los totales mensuales para esta actividad
-                    detallesPlanificadoMensual: mesesPOA.reduce((acc, mes) => ({ ...acc, [mes]: 0 }), {})
+                    detallesPlanificadoMensual: {}
                 };
+                mesesPOA.forEach(mes => {
+                    poaConsolidadoPorActividad[actividad].detallesPlanificadoMensual[mes] = 0;
+                });
+                columnasAgrupacionPOA.forEach(col => {
+                    poaConsolidadoPorActividad[actividad][col] = item[col] ?? "";
+                });
             }
 
-            // Sumamos los valores de cada mes del item actual
             mesesPOA.forEach(mes => {
                 const mesValue = parseFloat(item[mes]) || 0;
-                poaConsolidadoPorActividad[actividad].Planificado += mesValue; // Suma al total de la actividad
-                poaConsolidadoPorActividad[actividad].detallesPlanificadoMensual[mes] += mesValue; // Suma al detalle mensual de la actividad
+                poaConsolidadoPorActividad[actividad].detallesPlanificadoMensual[mes] += mesValue;
+                poaConsolidadoPorActividad[actividad].Planificado += mesValue;
             });
         });
 
-
-        // 2. Procesar Datos de Envios: Consolidar por 'actividad'
         const enviosAgrupados = {};
 
         Envios.forEach(item => {
-            const actividad = item.actividad;
+            let actividad = item.actividad ? String(item.actividad).trim() : `Actividad Desconocida Envios`;
+            if (actividad === "") {
+                 actividad = `Actividad Vacía Envios`;
+            }
+
             if (!enviosAgrupados[actividad]) {
                 enviosAgrupados[actividad] = {
                     actividad: actividad,
                     ambito: new Set(),
                     entidad: new Set(),
                     participantes: 0,
-                    Ejecutado: 0, // numerometas renombrado
+                    Ejecutado: 0,
                     hombres: 0,
                     mujeres: 0,
-                    detallesEnviosOriginales: [] // Guarda los detalles originales para el modal
+                    detallesEnviosOriginales: []
                 };
             }
 
@@ -3319,84 +3281,128 @@ document.addEventListener("DOMContentLoaded", () => {
             enviosAgrupados[actividad].detallesEnviosOriginales.push(item);
         });
 
-        // 3. Unir los datos de POA y Envios por 'actividad'
-        const datosUnidos = {};
+        const datosUnidosPorActividad = {};
 
-        // Primero, añadir todas las actividades de POA
         Object.values(poaConsolidadoPorActividad).forEach(poaItem => {
             const actividad = poaItem.actividad;
-            datosUnidos[actividad] = {
+            datosUnidosPorActividad[actividad] = {
                 actividad: actividad,
                 Planificado: poaItem.Planificado,
                 detallesPlanificadoMensual: poaItem.detallesPlanificadoMensual,
-                // Inicializar propiedades de Envios (pueden ser vacías si no hay coincidencia)
+                ...Object.fromEntries(columnasAgrupacionPOA.map(col => [col, poaItem[col]])),
                 ambito: "",
                 entidad: "",
-                participantes: "",
+                participantes: 0,
                 Ejecutado: "",
-                hombres: "",
-                mujeres: "",
+                hombres: 0,
+                mujeres: 0,
                 detallesEnviosOriginales: []
             };
         });
 
-        // Luego, fusionar/añadir datos de Envios
         Object.values(enviosAgrupados).forEach(enviosItem => {
             const actividad = enviosItem.actividad;
-            if (!datosUnidos[actividad]) {
-                // Si la actividad solo existe en Envios, inicializar con Planificado vacío
-                datosUnidos[actividad] = {
+            if (!datosUnidosPorActividad[actividad]) {
+                datosUnidosPorActividad[actividad] = {
                     actividad: actividad,
                     Planificado: "",
-                    detallesPlanificadoMensual: {}, // Objeto vacío si no hay datos de POA
+                    detallesPlanificadoMensual: {},
+                    ...Object.fromEntries(columnasAgrupacionPOA.map(col => [col, ""])),
                 };
             }
-            // Fusionar propiedades de Envios
-            datosUnidos[actividad].ambito = Array.from(enviosItem.ambito).join(', ');
-            datosUnidos[actividad].entidad = Array.from(enviosItem.entidad).join(', ');
-            datosUnidos[actividad].participantes = enviosItem.participantes;
-            datosUnidos[actividad].Ejecutado = enviosItem.Ejecutado;
-            datosUnidos[actividad].hombres = enviosItem.hombres;
-            datosUnidos[actividad].mujeres = enviosItem.mujeres;
-            datosUnidos[actividad].detallesEnviosOriginales = enviosItem.detallesEnviosOriginales;
+            datosUnidosPorActividad[actividad].ambito = Array.from(enviosItem.ambito).join(', ');
+            datosUnidosPorActividad[actividad].entidad = Array.from(enviosItem.entidad).join(', ');
+            datosUnidosPorActividad[actividad].participantes = enviosItem.participantes;
+            datosUnidosPorActividad[actividad].hombres = enviosItem.hombres;
+            datosUnidosPorActividad[actividad].mujeres = enviosItem.mujeres;
+            datosUnidosPorActividad[actividad].Ejecutado = enviosItem.Ejecutado;
+            datosUnidosPorActividad[actividad].detallesEnviosOriginales = enviosItem.detallesEnviosOriginales;
         });
 
-        // Convertir el objeto unido a un array para la tabla, aplicando el formateo final
-        const tablaFinalDatos = Object.values(datosUnidos).map(item => ({
-            actividad: item.actividad,
-            ambito: item.ambito,
-            entidad: item.entidad,
-            participantes: formatNumberForDisplay(item.participantes),
-            hombres: formatNumberForDisplay(item.hombres),
-            mujeres: formatNumberForDisplay(item.mujeres),
-            Planificado: formatNumberForDisplay(item.Planificado),
-            Ejecutado: formatNumberForDisplay(item.Ejecutado),
-            detallesPlanificadoMensual: item.detallesPlanificadoMensual,
-            detallesEnviosOriginales: item.detallesEnviosOriginales
-        }));
+        const todosLosDatosFormateados = Object.values(datosUnidosPorActividad)
+            .map(item => {
+                const planificadoNum = parseFloat(item.Planificado) || 0;
+                const ejecutadoNum = parseFloat(item.Ejecutado) || 0;
 
-        // 4. Crear una única tabla con los datos unidos
-        crearTablaUnificada("Reporte Consolidado de Actividades", tablaFinalDatos, contenedor);
+                let avancePorcentaje = 0;
+                let avanceDisplay = "";
+
+                if (planificadoNum > 0) {
+                    avancePorcentaje = (ejecutadoNum / planificadoNum) * 100;
+                    avanceDisplay = avancePorcentaje.toFixed(0) + "%";
+                } else if (ejecutadoNum > 0 && planificadoNum === 0) {
+                    avanceDisplay = "-";
+                } else {
+                    avanceDisplay = "";
+                }
+
+                return {
+                    actividad: item.actividad,
+                    Resultado_cod: item.Resultado_cod ?? "",
+                    Resultado: item.Resultado ?? "",
+                    Producto_cod: item.Producto_cod ?? "",
+                    Producto: item.Producto ?? "",
+                    ambito: item.ambito,
+                    entidad: item.entidad,
+                    participantes: item.participantes,
+                    hombres: item.hombres,
+                    mujeres: item.mujeres,
+                    Planificado: planificadoNum,
+                    Ejecutado: ejecutadoNum,
+                    Avance: avanceDisplay,
+                    _avanceNumerico: avancePorcentaje,
+                    detallesPlanificadoMensual: item.detallesPlanificadoMensual,
+                    detallesEnviosOriginales: item.detallesEnviosOriginales
+                };
+            })
+            .filter(item => !(item.Planificado === 0 && item.Ejecutado === 0));
+
+        const datosAgrupadosPorProductoResultado = {};
+
+        todosLosDatosFormateados.forEach(item => {
+            const key = `${item.Resultado_cod}|${item.Resultado}|${item.Producto_cod}|${item.Producto}`;
+            if (!datosAgrupadosPorProductoResultado[key]) {
+                datosAgrupadosPorProductoResultado[key] = {
+                    metadata: {
+                        Resultado_cod: item.Resultado_cod,
+                        Resultado: item.Resultado,
+                        Producto_cod: item.Producto_cod,
+                        Producto: item.Producto
+                    },
+                    actividades: []
+                };
+            }
+            datosAgrupadosPorProductoResultado[key].actividades.push(item);
+        });
+
+        contenedor.innerHTML = '';
+        contenedor.classList.add("centrarContenido");
+
+        Object.values(datosAgrupadosPorProductoResultado).forEach(grupo => {
+            if (grupo.actividades.length > 0) {
+                const tituloTabla = `Actividades del producto "${grupo.metadata.Producto}" en el resultado "${grupo.metadata.Resultado_cod}"`;
+                crearTablaUnificada(tituloTabla, grupo.actividades, contenedor);
+            }
+        });
+
+        if (Object.keys(datosAgrupadosPorProductoResultado).length === 0 || todosLosDatosFormateados.length === 0) {
+            contenedor.innerHTML = '<p class="mensaje-centradoSemestral">No hay datos disponibles para generar el reporte o todas las actividades tienen Planificado=0 y Ejecutado=0.</p>';
+        }
     };
 
     esperarDatos();
 });
 
-// --- Función auxiliar para formatear números: enteros y 0 como "" ---
-function formatNumberForDisplay(value) {
+function formatNumberForDisplayForPlanificadoEjecutado(value) {
     const num = parseFloat(value);
-    // Mejora en el manejo de valores no numéricos/vacíos/nulos
     if (isNaN(num) || value === null || value === undefined || value === "") {
-        return "";
+        return 0;
     }
-    const rounded = Math.round(num);
-    return rounded === 0 ? "" : rounded.toString();
+    return Math.round(num);
 }
 
-// --- Función para crear la tabla unificada (similar a la anterior, pero con datos consolidados) ---
 function crearTablaUnificada(titulo, datos, contenedor) {
     if (!Array.isArray(datos) || datos.length === 0) {
-        console.log(`Tabla "${titulo}": No hay datos para mostrar o los datos están vacíos.`);
         return;
     }
 
@@ -3405,20 +3411,63 @@ function crearTablaUnificada(titulo, datos, contenedor) {
         "abr_pl": "Abril", "may_pl": "Mayo", "jun_pl": "Junio"
     };
 
-    // Definir las columnas visibles y su orden para la tabla unificada
-    const clavesVisibles = [
-        "actividad",
-        "ambito",
-        "entidad",
-        "participantes",
-        "hombres",
-        "mujeres",
-        "Planificado",
-        "Ejecutado"
+    const encabezadosMapa = {
+        "actividad": "Actividad",
+        "ambito": "Beneficiarios",
+        "participantes": "Participantes",
+        "hombres": "Hombres",
+        "mujeres": "Mujeres",
+        "Planificado": "Planificado",
+        "Ejecutado": "Ejecutado",
+        "Avance": "Avance"
+    };
+
+    const clavesInternasBase = [
+        "actividad", "ambito",
+        "participantes", "hombres", "mujeres",
+        "Planificado", "Ejecutado", "Avance"
     ];
+
+    const columnasNumericasOpcionales = ["participantes", "hombres", "mujeres"];
+    const columnasTextoOpcionales = ["ambito", "entidad"];
+
+    const clavesVisiblesParaEstaTabla = clavesInternasBase.filter(clave => {
+        if (clave === "actividad" || clave === "Planificado" || clave === "Ejecutado" || clave === "Avance") {
+            return true;
+        }
+
+        if (columnasNumericasOpcionales.includes(clave)) {
+            return datos.some(row => {
+                const value = parseFloat(row[clave]);
+                return !isNaN(value) && value !== 0;
+            });
+        }
+
+        if (columnasTextoOpcionales.includes(clave)) {
+            return datos.some(row => {
+                const value = row[clave];
+                return typeof value === 'string' && value.trim() !== '';
+            });
+        }
+        return false;
+    });
+
+    // Definir anchos fijos en píxeles (o 'em'/'rem') para cada columna.
+    // AJUSTA ESTOS VALORES SEGÚN LA LONGITUD TÍPICA DE TU CONTENIDO.
+    const anchosFijos = {
+        "actividad": "250px", // Actividad puede ser larga
+        "ambito": "180px", // Beneficiarios también puede ser larga
+        "participantes": "100px",
+        "hombres": "80px",
+        "mujeres": "80px",
+        "Planificado": "100px",
+        "Ejecutado": "100px",
+        "Avance": "80px"
+    };
 
     const divTabla = document.createElement("div");
     divTabla.className = "contenedorTablaSemestral";
+    divTabla.classList.add("tabla-centrada");
 
     const tituloElem = document.createElement("h3");
     tituloElem.className = "tituloTablaSemestral";
@@ -3428,12 +3477,21 @@ function crearTablaUnificada(titulo, datos, contenedor) {
     const tabla = document.createElement("table");
     tabla.className = "tablaSemestral";
 
+    const colgroup = document.createElement("colgroup");
+    clavesVisiblesParaEstaTabla.forEach(clave => {
+        const col = document.createElement("col");
+        // Aplicamos el ancho fijo en píxeles.
+        col.style.width = anchosFijos[clave] || "auto"; // Usa 'auto' si no hay un ancho definido para esa clave
+        colgroup.appendChild(col);
+    });
+    tabla.appendChild(colgroup);
+
     const thead = document.createElement("thead");
     const filaEncabezado = document.createElement("tr");
 
-    clavesVisibles.forEach(clave => {
+    clavesVisiblesParaEstaTabla.forEach(clave => {
         const th = document.createElement("th");
-        th.textContent = clave;
+        th.textContent = encabezadosMapa[clave] || clave;
         th.className = "celdaEncabezadoSemestral";
         filaEncabezado.appendChild(th);
     });
@@ -3445,18 +3503,17 @@ function crearTablaUnificada(titulo, datos, contenedor) {
     datos.forEach(obj => {
         const tr = document.createElement("tr");
 
-        clavesVisibles.forEach(clave => {
+        clavesVisiblesParaEstaTabla.forEach(clave => {
             const td = document.createElement("td");
             td.className = "celdaDatoSemestral";
 
             if (clave === "Planificado") {
-                td.textContent = obj.Planificado;
+                td.textContent = formatNumberForDisplayForPlanificadoEjecutado(obj.Planificado);
                 td.style.cursor = "pointer";
                 td.addEventListener("click", () => {
-                    // Nos aseguramos que detallesPlanificadoMensual exista y sea un objeto
                     const detallesPlanificado = obj.detallesPlanificadoMensual || {};
                     const detallesHtml = Object.entries(detallesPlanificado)
-                        .map(([mesKey, valor]) => `<tr><td>${mesesBonitosPOA[mesKey]}</td><td>${formatNumberForDisplay(valor)}</td></tr>`)
+                        .map(([mesKey, valor]) => `<tr><td>${mesesBonitosPOA[mesKey]}</td><td>${formatNumberForDisplayForPlanificadoEjecutado(valor)}</td></tr>`)
                         .join("");
                     const tablaMeses = `
                         <table class="tablaSemestralModal">
@@ -3464,33 +3521,31 @@ function crearTablaUnificada(titulo, datos, contenedor) {
                             <tbody>${detallesHtml}</tbody>
                         </table>
                     `;
-                    mostrarModal(`Detalle Planificado Mensual: "${obj.actividad}"`, tablaMeses);
+                    mostrarModal(`Detalle Planificado Mensual: "${obj.actividad || 'N/A'}"`, tablaMeses);
                 });
             } else if (clave === "Ejecutado") {
-                td.textContent = obj.Ejecutado;
+                td.textContent = formatNumberForDisplayForPlanificadoEjecutado(obj.Ejecutado);
                 td.style.cursor = "pointer";
                 td.addEventListener("click", () => {
-                    const detallesOriginalesEnvios = obj.detallesEnviosOriginales || []; // Asegurarse que exista
+                    const detallesOriginalesEnvios = obj.detallesEnviosOriginales || [];
 
-                    // Tabla 1: Suma de Ejecutado por mesReporte (de Envios)
                     const sumaEjecutadoPorMes = {};
                     detallesOriginalesEnvios.forEach(item => {
                         sumaEjecutadoPorMes[item.mesReporte] = (sumaEjecutadoPorMes[item.mesReporte] || 0) + (parseFloat(item.numerometas) || 0);
                     });
 
-                    let tablaSumaMesesHTML = `<h4>Suma de Ejecutado por Mes para Actividad: "${obj.actividad}"</h4>`;
+                    let tablaSumaMesesHTML = `<h4>Suma de Ejecutado por Mes para Actividad: "${obj.actividad || 'N/A'}"</h4>`;
                     tablaSumaMesesHTML += '<table class="tablaSemestralModal">';
                     tablaSumaMesesHTML += '<thead><tr><th>Mes Reporte</th><th>Suma Ejecutado</th></tr></thead>';
                     tablaSumaMesesHTML += '<tbody>';
                     const mesesEnviosOrdenados = Object.keys(sumaEjecutadoPorMes).sort((a, b) => parseInt(a) - parseInt(b));
                     mesesEnviosOrdenados.forEach(mes => {
                         const suma = sumaEjecutadoPorMes[mes];
-                        tablaSumaMesesHTML += `<tr><td>${mes}</td><td>${formatNumberForDisplay(suma)}</td></tr>`;
+                        tablaSumaMesesHTML += `<tr><td>${mes}</td><td>${formatNumberForDisplayForPlanificadoEjecutado(suma)}</td></tr>`;
                     });
                     tablaSumaMesesHTML += '</tbody></table>';
 
-                    // Tabla 2: Detalle completo de Envios (sin colapsar)
-                    let tablaDetalleCompletoHTML = `<h4>Detalle Completo de Envíos para Actividad: "${obj.actividad}"</h4>`;
+                    let tablaDetalleCompletoHTML = `<h4>Detalle Completo de Envíos para Actividad: "${obj.actividad || 'N/A'}"</h4>`;
                     tablaDetalleCompletoHTML += '<table class="tablaSemestralModal">';
                     tablaDetalleCompletoHTML += '<thead><tr><th>Mes Reporte</th><th>Ejecutado</th><th>Título</th><th>Usuario</th><th>Timestamp</th><th>Entidad</th><th>Participantes</th><th>Hombres</th><th>Mujeres</th><th>Autoridades</th><th>Detalle Meta</th></tr></thead>';
                     tablaDetalleCompletoHTML += '<tbody>';
@@ -3498,14 +3553,14 @@ function crearTablaUnificada(titulo, datos, contenedor) {
                         tablaDetalleCompletoHTML += `
                             <tr>
                                 <td>${item.mesReporte ?? ''}</td>
-                                <td>${formatNumberForDisplay(item.numerometas)}</td>
+                                <td>${formatNumberForDisplayForPlanificadoEjecutado(item.numerometas)}</td>
                                 <td>${item.titulo ?? ''}</td>
                                 <td>${item.usuario ?? ''}</td>
                                 <td>${item.timestamp ?? ''}</td>
                                 <td>${item.entidad ?? ''}</td>
-                                <td>${formatNumberForDisplay(item.participantes)}</td>
-                                <td>${formatNumberForDisplay(item.hombres)}</td>
-                                <td>${formatNumberForDisplay(item.mujeres)}</td>
+                                <td>${formatNumberForDisplayForPlanificadoEjecutado(item.participantes)}</td>
+                                <td>${formatNumberForDisplayForPlanificadoEjecutado(item.hombres)}</td>
+                                <td>${formatNumberForDisplayForPlanificadoEjecutado(item.mujeres)}</td>
                                 <td>${item.autoridades ?? ''}</td>
                                 <td>${item.detalleMeta ?? ''}</td>
                             </tr>
@@ -3514,9 +3569,32 @@ function crearTablaUnificada(titulo, datos, contenedor) {
                     tablaDetalleCompletoHTML += '</tbody></table>';
 
                     const contenidoModalEnvios = tablaSumaMesesHTML + tablaDetalleCompletoHTML;
-                    mostrarModal(`Detalle de Ejecutado: "${obj.actividad}"`, contenidoModalEnvios);
+                    mostrarModal(`Detalle de Ejecutado: "${obj.actividad || 'N/A'}"`, contenidoModalEnvios);
                 });
-            } else {
+            } else if (clave === "Avance") {
+                td.textContent = obj.Avance;
+                const avanceNumerico = obj._avanceNumerico;
+
+                if (typeof avanceNumerico === 'number' && !isNaN(avanceNumerico)) {
+                    if (avanceNumerico < 65) {
+                        td.style.backgroundColor = "#ffcccc";
+                        td.style.color = "#cc0000";
+                        td.style.fontWeight = "bold";
+                    } else if (avanceNumerico >= 65 && avanceNumerico <= 90) {
+                        td.style.backgroundColor = "#fffacd";
+                        td.style.color = "#b8860b";
+                        td.style.fontWeight = "bold";
+                    } else if (avanceNumerico > 90) {
+                        td.style.backgroundColor = "#ccffcc";
+                        td.style.color = "#006400";
+                        td.style.fontWeight = "bold";
+                    }
+                }
+            } else if (columnasNumericasOpcionales.includes(clave)) {
+                const numValue = parseFloat(obj[clave]);
+                td.textContent = (isNaN(numValue) || numValue === 0) ? "" : Math.round(numValue);
+            }
+            else {
                 td.textContent = obj[clave] ?? "";
             }
             tr.appendChild(td);
@@ -3527,11 +3605,8 @@ function crearTablaUnificada(titulo, datos, contenedor) {
     tabla.appendChild(tbody);
     divTabla.appendChild(tabla);
     contenedor.appendChild(divTabla);
-
-    console.log(`Tabla "${titulo}" creada con ${datos.length} filas.`);
 }
 
-// --- La función mostrarModal permanece sin cambios ---
 function mostrarModal(titulo, contenidoHTML) {
     let fondo = document.createElement("div");
     fondo.className = "modalSemestralFondo";
@@ -3542,13 +3617,13 @@ function mostrarModal(titulo, contenidoHTML) {
     modal.innerHTML = `
         <h4>${titulo}</h4>
         <div class="modalSemestralContenido">${contenidoHTML}</div>
-        <button class="modalSemestralCerrar">Cerrar</button>
+        <button class="cerrarModalBtn">X</button>
     `;
 
     fondo.appendChild(modal);
     document.body.appendChild(fondo);
 
-    fondo.querySelector(".modalSemestralCerrar").addEventListener("click", () => {
+    fondo.querySelector(".cerrarModalBtn").addEventListener("click", () => {
         document.body.removeChild(fondo);
     });
 }
