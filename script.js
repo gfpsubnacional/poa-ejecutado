@@ -220,6 +220,7 @@ function mostrarMenu(userData) {
             { id: "boton2", texto: "Mis envíos", archivo: "contenido2.html" },
             { id: "boton3", texto: "Mi POA 2025", archivo: "contenido3.html" },
             { id: "boton4", texto: "POA 2025", archivo: "contenido4.html" },
+            { id: "boton6", texto: "Informe semestral", archivo: "contenido6.html" },
             { id: "boton5", texto: "Manual de uso", archivo: "contenido5.html" }
         ]
     };
@@ -353,16 +354,6 @@ async function cargarEnviosYMisEnvios() {
 // PDF 
 
 
-function waitForJsPDFandInit(callback) {
-    const checkInterval = 100;
-    const intervalId = setInterval(() => {
-        if (window.jspdf?.jsPDF) {
-            clearInterval(intervalId);
-            callback(window.jspdf.jsPDF);
-        }
-    }, checkInterval);
-}
-
 function waitForElementsAndInit(callback) {
     const checkInterval = 100;
     const intervalId = setInterval(() => {
@@ -374,101 +365,110 @@ function waitForElementsAndInit(callback) {
     }, checkInterval);
 }
 
-function generateRandomCode() {
-    return Math.floor(100000 + Math.random() * 900000);
-}
 
 function setupDownloadPDF(jsPDFClass, tableElement) {
-    const observer = new MutationObserver(() => {
-        document.querySelectorAll('.boton-pdf:not([data-listener-attached])').forEach(button => {
-            button.setAttribute('data-listener-attached', 'true');
-            button.addEventListener('click', () => {
-                const doc = new jsPDFClass({ orientation: "landscape", unit: "pt", format: "a4" });
+    // 1. Obtener el botón directamente por su ID
+    const button = document.getElementById('guardarPdfEnvios');
 
-                if (typeof doc.autoTable !== "function") {
-                    console.error("❌ autoTable no está disponible.");
-                    return;
+    // 2. Verificar si el botón existe antes de intentar añadir un listener
+    if (button) {
+        // No necesitamos un MutationObserver ni el atributo data-listener-attached
+        // porque estamos apuntando a un elemento específico y se asume que
+        // esta función se llamará una vez para configurarlo.
+
+        button.addEventListener('click', () => {
+            const doc = new jsPDFClass({ orientation: "landscape", unit: "pt", format: "a4" });
+
+            if (typeof doc.autoTable !== "function") {
+                console.error("❌ autoTable no está disponible.");
+                return;
+            }
+
+            const thead = tableElement.querySelector('thead');
+            const head = [
+                [...thead.querySelectorAll('th')].map(th =>
+                    (th.querySelector('span') || th).textContent
+                )
+            ];
+
+            const tbody = tableElement.querySelector('tbody');
+            const visibleRows = [...tbody.querySelectorAll('tr')].filter(
+                tr => window.getComputedStyle(tr).display !== 'none'
+            );
+
+            const body = visibleRows.map(tr =>
+                [...tr.querySelectorAll('td')].map(td => td.textContent)
+            );
+
+            // Asegúrate de que generateRandomCode() esté definida en tu ámbito.
+            // Por ejemplo:
+            // function generateRandomCode() {
+            //     return Math.random().toString(36).substring(2, 8).toUpperCase();
+            // }
+
+            const usuario = JSON.parse(localStorage.getItem("usuarioDatos"));
+            const usuarioNombre = usuario?.Usuario || "Usuario desconocido";
+            const codigo = typeof generateRandomCode === 'function' ? generateRandomCode() : 'N/A'; // Manejo si generateRandomCode no existe
+            const now = new Date();
+            const fecha = now.toLocaleDateString();
+            const hora = now.toLocaleTimeString();
+
+            doc.setFontSize(10);
+            doc.setTextColor(80);
+            doc.text(
+                `Descargado desde la plataforma (${codigo}) el ${fecha} a las ${hora}. Usuario: ${usuarioNombre}`,
+                doc.internal.pageSize.getWidth() / 2,
+                30,
+                { align: 'center' }
+            );
+
+            doc.setFontSize(14);
+            doc.setTextColor('#1C4574');
+            doc.setFont(undefined, 'bold');
+            doc.text("Envíos", 40, 50);
+
+            doc.autoTable({
+                head,
+                body,
+                startY: 65,
+                showHead: 'everyPage',
+                theme: 'grid',
+                useCss: true,
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 2,
+                    textColor: 0,
+                    lineColor: 0,
+                    lineWidth: 0.3,
+                    overflow: 'linebreak',
+                    valign: 'middle'
+                },
+                headStyles: {
+                    fillColor: [28, 69, 116],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    halign: 'center',
+                    valign: 'middle'
+                },
+                didDrawPage: function () {
+                    const str = `Página ${doc.internal.getNumberOfPages()}`;
+                    doc.setFontSize(9);
+                    doc.setTextColor(100);
+                    doc.text(
+                        str,
+                        doc.internal.pageSize.getWidth() / 2,
+                        doc.internal.pageSize.getHeight() - 10,
+                        { align: 'center' }
+                    );
                 }
-
-                const thead = tableElement.querySelector('thead');
-                const head = [
-                    [...thead.querySelectorAll('th')].map(th =>
-                        (th.querySelector('span') || th).textContent
-                    )
-                ];
-
-                const tbody = tableElement.querySelector('tbody');
-                const visibleRows = [...tbody.querySelectorAll('tr')].filter(
-                    tr => window.getComputedStyle(tr).display !== 'none'
-                );
-
-                const body = visibleRows.map(tr =>
-                    [...tr.querySelectorAll('td')].map(td => td.textContent)
-                );
-
-                const usuario = JSON.parse(localStorage.getItem("usuarioDatos"));
-                const usuarioNombre = usuario?.Usuario || "Usuario desconocido";
-                const codigo = generateRandomCode();
-                const now = new Date();
-                const fecha = now.toLocaleDateString();
-                const hora = now.toLocaleTimeString();
-
-                doc.setFontSize(10);
-                doc.setTextColor(80);
-                doc.text(
-                    `Descargado desde la plataforma (${codigo}) el ${fecha} a las ${hora}. Usuario: ${usuarioNombre}`,
-                    doc.internal.pageSize.getWidth() / 2,
-                    30,
-                    { align: 'center' }
-                );
-
-                doc.setFontSize(14);
-                doc.setTextColor('#1C4574');
-                doc.setFont(undefined, 'bold');
-                doc.text("Envíos", 40, 50);
-
-                doc.autoTable({
-                    head,
-                    body,
-                    startY: 65,
-                    showHead: 'everyPage',
-                    theme: 'grid',
-                    useCss: true,
-                    styles: {
-                        fontSize: 8,
-                        cellPadding: 2,
-                        textColor: 0,
-                        lineColor: 0,
-                        lineWidth: 0.3,
-                        overflow: 'linebreak',
-                        valign: 'middle'
-                    },
-                    headStyles: {
-                        fillColor: [28, 69, 116],
-                        textColor: [255, 255, 255],
-                        fontStyle: 'bold',
-                        halign: 'center',
-                        valign: 'middle'
-                    },
-                    didDrawPage: function () {
-                        const str = `Página ${doc.internal.getNumberOfPages()}`;
-                        doc.setFontSize(9);
-                        doc.setTextColor(100);
-                        doc.text(
-                            str,
-                            doc.internal.pageSize.getWidth() / 2,
-                            doc.internal.pageSize.getHeight() - 10,
-                            { align: 'center' }
-                        );
-                    }
-                });
-
-                doc.save("envios.pdf");
             });
-        });
-    });
 
-    observer.observe(document.body, { childList: true, subtree: true });
+            doc.save("envios.pdf");
+        });
+    } else {
+        console.warn("⚠️ Botón 'guardarPdfEnvios' no encontrado. No se pudo configurar la descarga del PDF.");
+    }
+    // El observer.observe() ya no es necesario aquí.
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -3206,7 +3206,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-// CONTENIDO6
+// CONTENIDO6 SEMESTRAL
 document.addEventListener("DOMContentLoaded", () => {
     const esperarDatos = () => {
         const contenedor = document.getElementById("tablasPOASemestral");
@@ -3256,7 +3256,7 @@ document.addEventListener("DOMContentLoaded", () => {
         Envios.forEach(item => {
             let actividad = item.actividad ? String(item.actividad).trim() : `Actividad Desconocida Envios`;
             if (actividad === "") {
-                 actividad = `Actividad Vacía Envios`;
+                actividad = `Actividad Vacía Envios`;
             }
 
             if (!enviosAgrupados[actividad]) {
@@ -3272,8 +3272,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 };
             }
 
-            enviosAgrupados[actividad].ambito.add(item.ambito);
-            enviosAgrupados[actividad].entidad.add(item.entidad);
+            if (item.ambito && typeof item.ambito === 'string') {
+                item.ambito.split(',').forEach(a => enviosAgrupados[actividad].ambito.add(a.trim()));
+            }
+            if (item.entidad && typeof item.entidad === 'string') {
+                item.entidad.split(',').forEach(e => enviosAgrupados[actividad].entidad.add(e.trim()));
+            }
+
             enviosAgrupados[actividad].participantes += parseFloat(item.participantes) || 0;
             enviosAgrupados[actividad].Ejecutado += parseFloat(item.numerometas) || 0;
             enviosAgrupados[actividad].hombres += parseFloat(item.hombres) || 0;
@@ -3310,8 +3315,31 @@ document.addEventListener("DOMContentLoaded", () => {
                     ...Object.fromEntries(columnasAgrupacionPOA.map(col => [col, ""])),
                 };
             }
-            datosUnidosPorActividad[actividad].ambito = Array.from(enviosItem.ambito).join(', ');
-            datosUnidosPorActividad[actividad].entidad = Array.from(enviosItem.entidad).join(', ');
+            
+            // Procesamiento y ordenamiento para 'ambito'
+            let ambitoArray = Array.from(enviosItem.ambito);
+            if (ambitoArray.includes("Todas las regiones")) {
+                ambitoArray = ambitoArray.filter(item => !item.includes("Región") || item === "Todas las regiones");
+            }
+            if (ambitoArray.includes("Todas las provincias")) {
+                ambitoArray = ambitoArray.filter(item => !item.includes("Provincia") || item === "Todas las provincias");
+            }
+            ambitoArray = ambitoArray.filter(item => item !== "Ninguna"); // Elimina "Ninguna"
+            ambitoArray.sort((a, b) => a.localeCompare(b));
+            datosUnidosPorActividad[actividad].ambito = ambitoArray.join(', ');
+
+            // Procesamiento y ordenamiento para 'entidad'
+            let entidadArray = Array.from(enviosItem.entidad);
+            if (entidadArray.includes("Todas las regiones")) {
+                entidadArray = entidadArray.filter(item => !item.includes("Región") || item === "Todas las regiones");
+            }
+            if (entidadArray.includes("Todas las provincias")) {
+                entidadArray = entidadArray.filter(item => !item.includes("Provincia") || item === "Todas las provincias");
+            }
+            entidadArray = entidadArray.filter(item => item !== "Ninguna"); // Elimina "Ninguna"
+            entidadArray.sort((a, b) => a.localeCompare(b));
+            datosUnidosPorActividad[actividad].entidad = entidadArray.join(', ');
+
             datosUnidosPorActividad[actividad].participantes = enviosItem.participantes;
             datosUnidosPorActividad[actividad].hombres = enviosItem.hombres;
             datosUnidosPorActividad[actividad].mujeres = enviosItem.mujeres;
@@ -3378,8 +3406,22 @@ document.addEventListener("DOMContentLoaded", () => {
         contenedor.innerHTML = '';
         contenedor.classList.add("centrarContenido");
 
+        // 🔵 Obtener criterios de resultado del usuario
+        const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos") || "{}");
+        const resultadosAutorizados = (usuarioDatos.Resultado || "")
+            .split(",")
+            .map(r => r.trim())
+            .filter(r => r); // Elimina vacíos
+
+        // 🔵 Mostrar solo tablas cuyo Resultado_cod empiece con alguno de los asignados
         Object.values(datosAgrupadosPorProductoResultado).forEach(grupo => {
-            if (grupo.actividades.length > 0) {
+            const codigoResultado = grupo.metadata.Resultado_cod || "";
+
+            const resultadoCoincide = resultadosAutorizados.some(autorizado =>
+                codigoResultado.startsWith(autorizado)
+            );
+
+            if (grupo.actividades.length > 0 && resultadoCoincide) {
                 const tituloTabla = `Actividades del producto "${grupo.metadata.Producto}" en el resultado "${grupo.metadata.Resultado_cod}"`;
                 crearTablaUnificada(tituloTabla, grupo.actividades, contenedor);
             }
@@ -3410,6 +3452,8 @@ function crearTablaUnificada(titulo, datos, contenedor) {
         "ene_pl": "Enero", "feb_pl": "Febrero", "mar_pl": "Marzo",
         "abr_pl": "Abril", "may_pl": "Mayo", "jun_pl": "Junio"
     };
+    const ordenMesesEjecutado = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
+
 
     const encabezadosMapa = {
         "actividad": "Actividad",
@@ -3452,11 +3496,9 @@ function crearTablaUnificada(titulo, datos, contenedor) {
         return false;
     });
 
-    // Definir anchos fijos en píxeles (o 'em'/'rem') para cada columna.
-    // AJUSTA ESTOS VALORES SEGÚN LA LONGITUD TÍPICA DE TU CONTENIDO.
     const anchosFijos = {
-        "actividad": "250px", // Actividad puede ser larga
-        "ambito": "180px", // Beneficiarios también puede ser larga
+        "actividad": "250px",
+        "ambito": "180px",
         "participantes": "100px",
         "hombres": "80px",
         "mujeres": "80px",
@@ -3480,8 +3522,7 @@ function crearTablaUnificada(titulo, datos, contenedor) {
     const colgroup = document.createElement("colgroup");
     clavesVisiblesParaEstaTabla.forEach(clave => {
         const col = document.createElement("col");
-        // Aplicamos el ancho fijo en píxeles.
-        col.style.width = anchosFijos[clave] || "auto"; // Usa 'auto' si no hay un ancho definido para esa clave
+        col.style.width = anchosFijos[clave] || "auto";
         colgroup.appendChild(col);
     });
     tabla.appendChild(colgroup);
@@ -3512,16 +3553,43 @@ function crearTablaUnificada(titulo, datos, contenedor) {
                 td.style.cursor = "pointer";
                 td.addEventListener("click", () => {
                     const detallesPlanificado = obj.detallesPlanificadoMensual || {};
-                    const detallesHtml = Object.entries(detallesPlanificado)
-                        .map(([mesKey, valor]) => `<tr><td>${mesesBonitosPOA[mesKey]}</td><td>${formatNumberForDisplayForPlanificadoEjecutado(valor)}</td></tr>`)
-                        .join("");
-                    const tablaMeses = `
-                        <table class="tablaSemestralModal">
-                            <thead><tr><th>Mes</th><th>Valor</th></tr></thead>
-                            <tbody>${detallesHtml}</tbody>
-                        </table>
-                    `;
-                    mostrarModal(`Detalle Planificado Mensual: "${obj.actividad || 'N/A'}"`, tablaMeses);
+                    const mesesPOAKeys = ["ene_pl", "feb_pl", "mar_pl", "abr_pl", "may_pl", "jun_pl"];
+
+                    const tablaModalPlanificado = document.createElement("table");
+                    tablaModalPlanificado.className = "tablaSemestralModal";
+                    tablaModalPlanificado.style.tableLayout = "fixed";
+                    const colgroupModalPlanificado = document.createElement("colgroup");
+                    mesesPOAKeys.forEach(() => {
+                        const col = document.createElement("col");
+                        col.style.width = "80px";
+                        colgroupModalPlanificado.appendChild(col);
+                    });
+                    tablaModalPlanificado.appendChild(colgroupModalPlanificado);
+
+                    const theadModalPlanificado = document.createElement("thead");
+                    const trHeadModalPlanificado = document.createElement("tr");
+                    mesesPOAKeys.forEach(mesKey => {
+                        let th = document.createElement("th");
+                        th.textContent = mesesBonitosPOA[mesKey];
+                        trHeadModalPlanificado.appendChild(th);
+                    });
+                    theadModalPlanificado.appendChild(trHeadModalPlanificado);
+                    tablaModalPlanificado.appendChild(theadModalPlanificado);
+
+                    const tbodyModalPlanificado = document.createElement("tbody");
+                    const trBody = document.createElement("tr");
+                    mesesPOAKeys.forEach(mesKey => {
+                        let tdValor = document.createElement("td");
+                        tdValor.textContent = formatNumberForDisplayForPlanificadoEjecutado(detallesPlanificado[mesKey] || 0);
+                        trBody.appendChild(tdValor);
+                    });
+                    tbodyModalPlanificado.appendChild(trBody);
+                    tablaModalPlanificado.appendChild(tbodyModalPlanificado);
+
+                    const contenidoModalPlanificadoDiv = document.createElement("div");
+                    contenidoModalPlanificadoDiv.appendChild(tablaModalPlanificado);
+
+                    mostrarModal(`Detalle Planificado Mensual: "${obj.actividad || 'N/A'}"`, contenidoModalPlanificadoDiv);
                 });
             } else if (clave === "Ejecutado") {
                 td.textContent = formatNumberForDisplayForPlanificadoEjecutado(obj.Ejecutado);
@@ -3529,53 +3597,158 @@ function crearTablaUnificada(titulo, datos, contenedor) {
                 td.addEventListener("click", () => {
                     const detallesOriginalesEnvios = obj.detallesEnviosOriginales || [];
 
+                    detallesOriginalesEnvios.sort((a, b) => {
+                        const indiceMesA = ordenMesesEjecutado.indexOf(a.mesReporte);
+                        const indiceMesB = ordenMesesEjecutado.indexOf(b.mesReporte);
+
+                        return indiceMesA - indiceMesB;
+                    });
+
                     const sumaEjecutadoPorMes = {};
+                    ordenMesesEjecutado.forEach(mes => {
+                        sumaEjecutadoPorMes[mes] = 0;
+                    });
+
                     detallesOriginalesEnvios.forEach(item => {
-                        sumaEjecutadoPorMes[item.mesReporte] = (sumaEjecutadoPorMes[item.mesReporte] || 0) + (parseFloat(item.numerometas) || 0);
+                        if (ordenMesesEjecutado.includes(item.mesReporte)) {
+                             sumaEjecutadoPorMes[item.mesReporte] += (parseFloat(item.numerometas) || 0);
+                        }
                     });
 
-                    let tablaSumaMesesHTML = `<h4>Suma de Ejecutado por Mes para Actividad: "${obj.actividad || 'N/A'}"</h4>`;
-                    tablaSumaMesesHTML += '<table class="tablaSemestralModal">';
-                    tablaSumaMesesHTML += '<thead><tr><th>Mes Reporte</th><th>Suma Ejecutado</th></tr></thead>';
-                    tablaSumaMesesHTML += '<tbody>';
-                    const mesesEnviosOrdenados = Object.keys(sumaEjecutadoPorMes).sort((a, b) => parseInt(a) - parseInt(b));
-                    mesesEnviosOrdenados.forEach(mes => {
-                        const suma = sumaEjecutadoPorMes[mes];
-                        tablaSumaMesesHTML += `<tr><td>${mes}</td><td>${formatNumberForDisplayForPlanificadoEjecutado(suma)}</td></tr>`;
-                    });
-                    tablaSumaMesesHTML += '</tbody></table>';
+                    const tablaSumaMeses = document.createElement("table");
+                    tablaSumaMeses.className = "tablaSemestralModal";
+                    tablaSumaMeses.style.tableLayout = "fixed";
 
-                    let tablaDetalleCompletoHTML = `<h4>Detalle Completo de Envíos para Actividad: "${obj.actividad || 'N/A'}"</h4>`;
-                    tablaDetalleCompletoHTML += '<table class="tablaSemestralModal">';
-                    tablaDetalleCompletoHTML += '<thead><tr><th>Mes Reporte</th><th>Ejecutado</th><th>Título</th><th>Usuario</th><th>Timestamp</th><th>Entidad</th><th>Participantes</th><th>Hombres</th><th>Mujeres</th><th>Autoridades</th><th>Detalle Meta</th></tr></thead>';
-                    tablaDetalleCompletoHTML += '<tbody>';
-                    detallesOriginalesEnvios.forEach(item => {
-                        tablaDetalleCompletoHTML += `
-                            <tr>
-                                <td>${item.mesReporte ?? ''}</td>
-                                <td>${formatNumberForDisplayForPlanificadoEjecutado(item.numerometas)}</td>
-                                <td>${item.titulo ?? ''}</td>
-                                <td>${item.usuario ?? ''}</td>
-                                <td>${item.timestamp ?? ''}</td>
-                                <td>${item.entidad ?? ''}</td>
-                                <td>${formatNumberForDisplayForPlanificadoEjecutado(item.participantes)}</td>
-                                <td>${formatNumberForDisplayForPlanificadoEjecutado(item.hombres)}</td>
-                                <td>${formatNumberForDisplayForPlanificadoEjecutado(item.mujeres)}</td>
-                                <td>${item.autoridades ?? ''}</td>
-                                <td>${item.detalleMeta ?? ''}</td>
-                            </tr>
-                        `;
+                    const colgroupSuma = document.createElement("colgroup");
+                    ordenMesesEjecutado.forEach(() => {
+                        const col = document.createElement("col");
+                        col.style.width = "80px";
+                        colgroupSuma.appendChild(col);
                     });
-                    tablaDetalleCompletoHTML += '</tbody></table>';
+                    tablaSumaMeses.appendChild(colgroupSuma);
 
-                    const contenidoModalEnvios = tablaSumaMesesHTML + tablaDetalleCompletoHTML;
-                    mostrarModal(`Detalle de Ejecutado: "${obj.actividad || 'N/A'}"`, contenidoModalEnvios);
+                    const theadSuma = document.createElement("thead");
+                    const trHeadSuma = document.createElement("tr");
+                    ordenMesesEjecutado.forEach(mes => {
+                        let th = document.createElement("th");
+                        th.textContent = mes;
+                        trHeadSuma.appendChild(th);
+                    });
+                    theadSuma.appendChild(trHeadSuma);
+                    tablaSumaMeses.appendChild(theadSuma);
+
+                    const tbodySuma = document.createElement("tbody");
+                    const trBodySuma = document.createElement("tr");
+                    ordenMesesEjecutado.forEach(mes => {
+                        let tdSuma = document.createElement("td");
+                        tdSuma.textContent = formatNumberForDisplayForPlanificadoEjecutado(sumaEjecutadoPorMes[mes]);
+                        trBodySuma.appendChild(tdSuma);
+                    });
+                    tbodySuma.appendChild(trBodySuma);
+                    tablaSumaMeses.appendChild(tbodySuma);
+
+                    const contenidoModalEnviosDiv = document.createElement("div");
+                    let h4Suma = document.createElement("h4");
+                    h4Suma.textContent = `Ejecutado por mes`;
+                    contenidoModalEnviosDiv.appendChild(h4Suma);
+                    contenidoModalEnviosDiv.appendChild(tablaSumaMeses);
+
+                    const anchosFijosModalEjecutadoDetalle = {
+                        "Mes Reporte": "100px",
+                        "Ejecutado": "90px",
+                        "Título": "250px",
+                        "Usuario": "120px",
+                        "Timestamp": "150px",
+                        "Entidad": "180px",
+                        "Participantes": "100px",
+                        "Hombres": "80px",
+                        "Mujeres": "80px",
+                        "Autoridades": "150px",
+                        "Detalle Meta": "300px"
+                    };
+
+                    const headersDetalle = ["Mes Reporte", "Ejecutado", "Título", "Usuario", "Timestamp", "Entidad", "Participantes", "Hombres", "Mujeres", "Autoridades", "Detalle Meta"];
+                    const keysDetalle = ["mesReporte", "numerometas", "titulo", "usuario", "timestamp", "entidad", "participantes", "hombres", "mujeres", "autoridades", "detalleMeta"];
+
+                    const columnasVisiblesDetalle = [];
+                    headersDetalle.forEach((header, index) => {
+                        const key = keysDetalle[index];
+                        const tieneDatos = detallesOriginalesEnvios.some(item => {
+                            const value = item[key];
+                            if (typeof value === 'string') {
+                                return value.trim() !== '';
+                            }
+                            if (typeof value === 'number') {
+                                return value !== 0;
+                            }
+                            return value !== null && value !== undefined;
+                        });
+                        if (tieneDatos) {
+                            columnasVisiblesDetalle.push({ header: header, key: key });
+                        }
+                    });
+
+                    if (columnasVisiblesDetalle.length > 0 && detallesOriginalesEnvios.length > 0) {
+                        const tablaDetalleCompleto = document.createElement("table");
+                        tablaDetalleCompleto.className = "tablaSemestralModal";
+                        tablaDetalleCompleto.style.tableLayout = "fixed";
+
+                        const colgroupDetalle = document.createElement("colgroup");
+                        columnasVisiblesDetalle.forEach(colInfo => {
+                            const col = document.createElement("col");
+                            col.style.width = anchosFijosModalEjecutadoDetalle[colInfo.header] || "auto";
+                            colgroupDetalle.appendChild(col);
+                        });
+                        tablaDetalleCompleto.appendChild(colgroupDetalle);
+
+                        const theadDetalle = document.createElement("thead");
+                        const trHeadDetalle = document.createElement("tr");
+                        columnasVisiblesDetalle.forEach(colInfo => {
+                            let th = document.createElement("th");
+                            th.textContent = colInfo.header;
+                            trHeadDetalle.appendChild(th);
+                        });
+                        theadDetalle.appendChild(trHeadDetalle);
+                        tablaDetalleCompleto.appendChild(theadDetalle);
+
+                        const tbodyDetalle = document.createElement("tbody");
+                        detallesOriginalesEnvios.forEach(item => {
+                            const trBody = document.createElement("tr");
+                            columnasVisiblesDetalle.forEach(colInfo => {
+                                const td = document.createElement("td");
+                                let displayValue = item[colInfo.key] ?? '';
+
+                                if (["numerometas", "participantes", "hombres", "mujeres"].includes(colInfo.key)) {
+                                    displayValue = formatNumberForDisplayForPlanificadoEjecutado(displayValue);
+                                }
+
+                                td.textContent = displayValue;
+                                trBody.appendChild(td);
+                            });
+                            tbodyDetalle.appendChild(trBody);
+                        });
+                        tablaDetalleCompleto.appendChild(tbodyDetalle);
+
+                        let h4Detalle = document.createElement("h4");
+                        h4Detalle.textContent = `Detalle`;
+                        contenidoModalEnviosDiv.appendChild(h4Detalle);
+                        contenidoModalEnviosDiv.appendChild(tablaDetalleCompleto);
+                    }
+
+                    if (contenidoModalEnviosDiv.children.length === 0) {
+                        contenidoModalEnviosDiv.textContent = "No hay datos de ejecución detallados disponibles para esta actividad.";
+                    }
+                    mostrarModal(`Detalle de Ejecutado: "${obj.actividad || 'N/A'}"`, contenidoModalEnviosDiv);
                 });
             } else if (clave === "Avance") {
                 td.textContent = obj.Avance;
                 const avanceNumerico = obj._avanceNumerico;
 
-                if (typeof avanceNumerico === 'number' && !isNaN(avanceNumerico)) {
+                if (obj.Avance === "-") {
+                    td.style.backgroundColor = "#ccffcc";
+                    td.style.color = "#006400";
+                    td.style.fontWeight = "bold";
+                } else if (typeof avanceNumerico === 'number' && !isNaN(avanceNumerico)) {
                     if (avanceNumerico < 65) {
                         td.style.backgroundColor = "#ffcccc";
                         td.style.color = "#cc0000";
@@ -3590,11 +3763,22 @@ function crearTablaUnificada(titulo, datos, contenedor) {
                         td.style.fontWeight = "bold";
                     }
                 }
+            } else if (clave === "ambito" || clave === "entidad") {
+                let displayText = obj[clave] ?? "";
+                if (typeof displayText === 'string' && displayText.trim() !== '') {
+                    let items = displayText.split(',')
+                                            .map(item => item.trim())
+                                            .filter(item => item !== '' && item !== 'Ninguna'); // Elimina "Ninguna" aquí también
+
+                    items = Array.from(new Set(items)).sort((a, b) => a.localeCompare(b));
+                    displayText = items.join(', ');
+                }
+                td.textContent = displayText;
+
             } else if (columnasNumericasOpcionales.includes(clave)) {
                 const numValue = parseFloat(obj[clave]);
                 td.textContent = (isNaN(numValue) || numValue === 0) ? "" : Math.round(numValue);
-            }
-            else {
+            } else {
                 td.textContent = obj[clave] ?? "";
             }
             tr.appendChild(td);
@@ -3607,23 +3791,250 @@ function crearTablaUnificada(titulo, datos, contenedor) {
     contenedor.appendChild(divTabla);
 }
 
-function mostrarModal(titulo, contenidoHTML) {
+function mostrarModal(titulo, contenidoDOMElement) {
     let fondo = document.createElement("div");
     fondo.className = "modalSemestralFondo";
 
     let modal = document.createElement("div");
     modal.className = "modalSemestral";
 
-    modal.innerHTML = `
-        <h4>${titulo}</h4>
-        <div class="modalSemestralContenido">${contenidoHTML}</div>
-        <button class="cerrarModalBtn">X</button>
-    `;
+    let h4Titulo = document.createElement("h4");
+    h4Titulo.textContent = titulo;
+    modal.appendChild(h4Titulo);
+
+    let contenidoDiv = document.createElement("div");
+    contenidoDiv.className = "modalSemestralContenido";
+    contenidoDiv.appendChild(contenidoDOMElement);
+    modal.appendChild(contenidoDiv);
+
+    let botonCerrar = document.createElement("button");
+    botonCerrar.className = "cerrarModalBtn";
+    botonCerrar.textContent = "X";
+    modal.appendChild(botonCerrar);
 
     fondo.appendChild(modal);
     document.body.appendChild(fondo);
 
-    fondo.querySelector(".cerrarModalBtn").addEventListener("click", () => {
+    botonCerrar.addEventListener("click", () => {
         document.body.removeChild(fondo);
     });
 }
+
+
+// BOTON PDF SEMESTRAL 
+function waitForJsPDFandInit(callback) {
+    const checkInterval = 100;
+    const intervalId = setInterval(() => {
+        if (window.jspdf?.jsPDF) {
+            clearInterval(intervalId);
+            callback(window.jspdf.jsPDF);
+        }
+    }, checkInterval);
+}
+
+function waitForMyPdfTablesContainer(callback) {
+    const checkInterval = 100;
+    const intervalId = setInterval(() => {
+        const container = document.getElementById('tablasPOASemestral');
+        if (container) {
+            clearInterval(intervalId);
+            callback(container);
+        }
+    }, checkInterval);
+}
+
+function generateRandomCode() {
+    return Math.random().toString(36).substr(2, 6).toUpperCase();
+}
+
+function setupMyPdfDownload(jsPDFClass, tablesContainer) {
+    const button = document.getElementById('guardarPdfSemestrales');
+
+    if (!button) {
+        console.warn("⚠️ Botón 'guardarPdfSemestrales' no encontrado.");
+        return;
+    }
+
+    button.addEventListener('click', () => {
+        const doc = new jsPDFClass({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+
+        if (typeof doc.autoTable !== "function") {
+            console.error("❌ autoTable no está disponible.");
+            return;
+        }
+
+        const anchosFijos = {
+            "Actividad": 180,
+            "Beneficiarios": 140,
+            "Participantes": 80,
+            "Hombres": 60,
+            "Mujeres": 60,
+            "Planificado": 80,
+            "Ejecutado": 80,
+            "Avance": 60
+        };
+
+        const getFontSize = size => size;
+
+        doc.setFont('helvetica', 'normal');
+
+        const margin = 40;
+        let yOffset = margin;
+
+        // Título general
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.text("Tablas para reporte semestral", doc.internal.pageSize.width / 2, yOffset, { align: 'center' });
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'normal');
+        doc.text("Basel Institute on Governance - GFP Subnacional", doc.internal.pageSize.width / 2, yOffset + 20, { align: 'center' });
+        yOffset += 50;
+
+        const elements = [
+            ...tablesContainer.querySelectorAll('h3, table.tablaSemestral')
+        ];
+
+        if (elements.length === 0) {
+            alert('No hay contenido (tablas o títulos) para generar el PDF.');
+            return;
+        }
+
+        for (let i = 0; i < elements.length; i++) {
+            if (elements[i].tagName === 'H3' && elements[i + 1]?.tagName === 'TABLE') {
+                const h3 = elements[i];
+                const table = elements[i + 1];
+                i++; // Saltar tabla
+
+                // Título multilínea centrado
+                const titleText = h3.innerText;
+                const maxWidth = doc.internal.pageSize.width - 2 * margin;
+                const splitTitle = doc.splitTextToSize(titleText, maxWidth);
+                const titleHeight = splitTitle.length * getFontSize(10) + 10;
+
+                const rowsCount = table.querySelectorAll('tbody tr').length;
+                const estimatedTableHeight = rowsCount * (getFontSize(10) + 6) + 30;
+                const espacioTotal = titleHeight + estimatedTableHeight;
+
+                if (yOffset + espacioTotal > doc.internal.pageSize.height - margin) {
+                    doc.addPage();
+                    yOffset = margin;
+                }
+
+                doc.setFontSize(getFontSize(10));
+                doc.setFont(undefined, 'bold');
+                doc.text(splitTitle, margin, yOffset);
+                doc.setFont(undefined, 'normal');
+                yOffset += titleHeight;
+
+                // Procesar tabla
+                const headers = Array.from(table.querySelector('thead tr').children).map(th => th.innerText);
+                const rows = Array.from(table.querySelector('tbody').children).map(tr =>
+                    Array.from(tr.children).map(td => td.innerText)
+                );
+
+                const filteredHeaders = headers.filter(h => anchosFijos[h]);
+                const columnWidths = filteredHeaders.map(h => anchosFijos[h]);
+                const headerIndexMap = new Map(headers.map((h, i) => [h, i]));
+
+                const tableData = [
+                    filteredHeaders,
+                    ...rows.map(row =>
+                        filteredHeaders.map(header => row[headerIndexMap.get(header)] || '')
+                    )
+                ];
+
+                doc.setFontSize(getFontSize(10));
+
+                const tableWidth = columnWidths.reduce((a, b) => a + b, 0);
+                const xStart = (doc.internal.pageSize.width - tableWidth) / 2;
+
+                doc.autoTable({
+                    startY: yOffset,
+                    head: [tableData[0]],
+                    body: tableData.slice(1),
+                    showHead: 'everyPage',
+                    theme: 'grid',
+                    styles: {
+                        font: 'helvetica',
+                        fontSize: getFontSize(10),
+                        cellPadding: 5,
+                        lineColor: 0,
+                        lineWidth: 0.5,
+                        textColor: 0,
+                        valign: 'middle',
+                        overflow: 'linebreak'
+                    },
+                    headStyles: {
+                        fillColor: [28, 69, 116],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    columnStyles: columnWidths.reduce((acc, width, idx) => {
+                        acc[idx] = {
+                            cellWidth: width,
+                            halign: ['Hombres', 'Mujeres', 'Planificado', 'Ejecutado', 'Avance'].includes(filteredHeaders[idx]) ? 'center' : 'left'
+                        };
+                        return acc;
+                    }, {}),
+                    margin: { left: xStart, right: xStart },
+                    didDrawPage: function () {
+                        doc.setFont('helvetica', 'normal');
+                        doc.setFontSize(9);
+                        doc.setTextColor(150); // gris
+
+                        let usuarioNombre = "Usuario desconocido";
+                        try {
+                            const usuario = JSON.parse(localStorage.getItem("usuarioDatos"));
+                            if (usuario?.Usuario) usuarioNombre = usuario.Usuario;
+                        } catch { }
+
+                        const encabezado = `Tablas para reporte semestral. Usuario: ${usuarioNombre}`;
+                        const pageStr = `Página ${doc.internal.getCurrentPageInfo().pageNumber}`;
+
+                        const rightEdge = doc.internal.pageSize.width - margin;
+
+                        doc.text(encabezado, rightEdge, 20, { align: 'right' });
+                        doc.text(pageStr, rightEdge, doc.internal.pageSize.height - 10, { align: 'right' });
+                    }
+                });
+
+                yOffset = doc.autoTable.previous.finalY + getFontSize(25);
+            }
+        }
+
+        // Pie de página final
+        let usuarioNombre = "Usuario desconocido";
+        try {
+            const usuario = JSON.parse(localStorage.getItem("usuarioDatos"));
+            if (usuario?.Usuario) usuarioNombre = usuario.Usuario;
+        } catch (err) {
+            console.warn("⚠️ Error al leer usuarioDatos:", err);
+        }
+
+        const now = new Date();
+        const fecha = now.toLocaleDateString();
+        const hora = now.toLocaleTimeString();
+        const codigo = generateRandomCode();
+
+        doc.setFontSize(10);
+        doc.setTextColor(80);
+        doc.text(
+            `Generado el ${fecha} a las ${hora}. Usuario: ${usuarioNombre} (Código: ${codigo})`,
+            doc.internal.pageSize.getWidth() / 2,
+            doc.internal.pageSize.getHeight() - 20,
+            { align: 'center' }
+        );
+
+        doc.save('POA_Semestral.pdf');
+        console.log('✅ PDF generado y guardado.');
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    waitForJsPDFandInit(jsPDF => {
+        waitForMyPdfTablesContainer(container => {
+            setupMyPdfDownload(jsPDF, container);
+        });
+    });
+});

@@ -524,11 +524,7 @@
 
 
 
-
-
-
-
-/* TABLAS SEMESTRALES  */
+/* TABLAS SEMESTRALES */
 /* Centrar el contenedor principal de las tablas */
 #tablasPOASemestral.centrarContenido {
     display: flex;
@@ -542,7 +538,7 @@
 .contenedorTablaSemestral {
     margin-bottom: 2rem;
     padding: 1rem;
-    width: 95%; /* Puedes mantener este width si quieres que el contenedor de la tabla tenga un ancho, y la tabla se auto-ajustará dentro de él */
+    width: 95%;
     max-width: 1200px;
     box-sizing: border-box;
     margin-left: auto;
@@ -560,12 +556,11 @@
 
 /* Estilos para las tablas principales */
 .tablaSemestral {
-    width: auto; /* Permite que la tabla se ajuste a su contenido */
+    width: auto;
     border-collapse: collapse;
-    table-layout: auto; /* CAMBIO CLAVE: Permite al navegador ajustar anchos según contenido y <col> */
+    table-layout: auto; /* Se mantiene 'auto' para las tablas principales */
     margin-left: auto;
     margin-right: auto;
-    /* max-width: 100%; */ /* Opcional: Para evitar que la tabla desborde su contenedor */
 }
 
 /* Estilos para las celdas de encabezado y datos de las tablas principales */
@@ -574,9 +569,7 @@
     border: 1px solid #aaa;
     padding: 0.4rem 0.6rem;
     font-size: 0.85em;
-    word-wrap: break-word; /* Útil para texto largo */
-    /* Puedes añadir min-width aquí si quieres evitar que las celdas se hagan demasiado pequeñas */
-    /* min-width: 50px; por ejemplo */
+    word-wrap: break-word;
 }
 
 /* Estilo específico para los encabezados */
@@ -600,8 +593,7 @@
 .tablaSemestral td:nth-child(5), /* Mujeres */
 .tablaSemestral td:nth-child(6), /* Planificado */
 .tablaSemestral td:nth-child(7), /* Ejecutado */
-.tablaSemestral td:nth-child(8) /* Avance */
-{
+.tablaSemestral td:nth-child(8) /* Avance */ {
     text-align: center;
 }
 
@@ -653,11 +645,11 @@
     width: 90%;
     max-width: 900px;
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Esto asegura que el contenido dentro del modal no se desborde si no se ajusta */
 }
 
 .modalSemestral h4 {
-    text-align: center;
+    text-align: left;
     margin-top: 0;
     margin-bottom: 1rem;
     color: #1C4574;
@@ -665,27 +657,32 @@
 
 .modalSemestralContenido {
     max-height: 70vh;
-    overflow-y: auto;
-    overflow-x: auto;
-    padding-right: 15px;
+    overflow-y: auto; /* Permite scroll vertical si el contenido es muy alto */
+    overflow-x: auto; /* PERMITE SCROLL HORIZONTAL SI LA TABLA ES MÁS ANCHA */
+    padding-right: 15px; /* Espacio para la barra de scroll si aparece */
     box-sizing: border-box;
     margin-bottom: 1rem;
 }
 
+/* ESTILOS ESPECÍFICOS PARA LAS TABLAS DENTRO DEL MODAL */
 .modalSemestralContenido table {
-    width: 100%;
+    width: auto; /* Cuidado con 100%. auto permite que colgroup controle el ancho total */
     border-collapse: collapse;
     margin-top: 0.8rem;
     margin-bottom: 1rem;
     font-size: 0.8em;
+    table-layout: fixed; /* ¡CRUCIAL para que los anchos de <col> funcionen! */
 }
 
 .modalSemestralContenido th,
 .modalSemestralContenido td {
     border: 1px solid #ddd;
     padding: 6px;
-    text-align: center;
-    white-space: nowrap;
+    text-align: center; /* Se mantiene el centrado, ajusta si es necesario */
+    /* REMOVIDO: white-space: nowrap; - Esto era el problema principal */
+    word-wrap: break-word; /* Permite que el texto largo se ajuste dentro de las celdas */
+    overflow: hidden; /* Oculta el contenido que excede el ancho si no se rompe la palabra */
+    text-overflow: ellipsis; /* Añade puntos suspensivos si el texto se oculta */
 }
 
 .modalSemestralContenido th {
@@ -695,7 +692,7 @@
 }
 
 .modalSemestralContenido h4 {
-    text-align: center;
+    text-align: left;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
     color: #171717;
