@@ -212,7 +212,7 @@ function mostrarMenu(userData) {
             { id: "boton1", texto: "Registro POA", archivo: "contenido1.html" },
             { id: "boton2", texto: "Envíos", archivo: "contenido2.html" },
             { id: "boton3", texto: "POA 2025", archivo: "contenido4.html" },
-            { id: "boton5", texto: "Informe semestral", archivo: "contenido6.html" },
+            // { id: "boton5", texto: "Informe semestral", archivo: "contenido6.html" },
             { id: "boton4", texto: "Manual de uso", archivo: "contenido5.html" }
         ],
         usuario: [
@@ -220,7 +220,7 @@ function mostrarMenu(userData) {
             { id: "boton2", texto: "Mis envíos", archivo: "contenido2.html" },
             { id: "boton3", texto: "Mi POA 2025", archivo: "contenido3.html" },
             { id: "boton4", texto: "POA 2025", archivo: "contenido4.html" },
-            { id: "boton6", texto: "Informe semestral", archivo: "contenido6.html" },
+            // { id: "boton6", texto: "Informe semestral", archivo: "contenido6.html" },
             { id: "boton5", texto: "Manual de uso", archivo: "contenido5.html" }
         ]
     };
@@ -1931,7 +1931,7 @@ inicializarBotonFiltroEjecutadosPOA();
 
 // Constantes y funciones auxiliares
 const TABLA_POA_MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"];
-const TABLA_POA_MESES_CORTE = ["ene", "feb", "mar", "abr","may","jun","jul","ago"]; 
+const TABLA_POA_MESES_CORTE = ["ene", "feb", "mar", "abr","may","jun","jul","ago","set"]; 
 const TABLA_POA_MES_MAP = {
     "ene": "Enero",
     "feb": "Febrero",
