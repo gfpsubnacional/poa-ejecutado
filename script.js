@@ -213,6 +213,7 @@ function mostrarMenu(userData) {
             { id: "boton2", texto: "Envíos", archivo: "contenido2.html" },
             { id: "boton3", texto: "POA 2025", archivo: "contenido4.html" },
             // { id: "boton5", texto: "Informe semestral", archivo: "contenido6.html" },
+            { id: "boton5", texto: "Informe anual", archivo: "contenido7.html" },
             { id: "boton4", texto: "Manual de uso", archivo: "contenido5.html" }
         ],
         usuario: [
@@ -221,6 +222,7 @@ function mostrarMenu(userData) {
             { id: "boton3", texto: "Mi POA 2025", archivo: "contenido3.html" },
             { id: "boton4", texto: "POA 2025", archivo: "contenido4.html" },
             // { id: "boton6", texto: "Informe semestral", archivo: "contenido6.html" },
+            { id: "boton6", texto: "Informe anual", archivo: "contenido7.html" },
             { id: "boton5", texto: "Manual de uso", archivo: "contenido5.html" }
         ]
     };
@@ -3206,7 +3208,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-// CONTENIDO6 SEMESTRAL
+// CONTENIDO6 Y CONTENIDO7 (SEMESTRAL Y ANUAL)
+
+function getConfigPOAPeriodo() {
+    const periodo = (document.body.dataset.poaPeriodo || "semestral").toLowerCase();
+
+    const meses = {
+        semestral: {
+            mesesPOA: ["ene_pl", "feb_pl", "mar_pl", "abr_pl", "may_pl", "jun_pl"],
+            mesesBonitosPOA: {
+                "ene_pl": "Enero", "feb_pl": "Febrero", "mar_pl": "Marzo",
+                "abr_pl": "Abril", "may_pl": "Mayo", "jun_pl": "Junio"
+            },
+            ordenMesesEjecutado: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"],
+            pdfTitulo: "Tablas para reporte semestral",
+            pdfNombre: "POA_Semestral.pdf"
+        },
+        anual: {
+            mesesPOA: ["ene_pl","feb_pl","mar_pl","abr_pl","may_pl","jun_pl","jul_pl","ago_pl","sep_pl","oct_pl","nov_pl","dic_pl"],
+            mesesBonitosPOA: {
+                "ene_pl": "Enero","feb_pl": "Febrero","mar_pl": "Marzo","abr_pl": "Abril","may_pl": "Mayo","jun_pl": "Junio",
+                "jul_pl": "Julio","ago_pl": "Agosto","sep_pl": "Septiembre","oct_pl": "Octubre","nov_pl": "Noviembre","dic_pl": "Diciembre"
+            },
+            ordenMesesEjecutado: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
+            pdfTitulo: "Tablas para reporte anual",
+            pdfNombre: "POA_Anual.pdf"
+        }
+    };
+
+    return meses[periodo] || meses.semestral;
+}
+
+
 document.addEventListener("DOMContentLoaded", () => {
     const esperarDatos = () => {
         const contenedor = document.getElementById("tablasPOASemestral");
@@ -3219,7 +3252,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const poaConsolidadoPorActividad = {};
-        const mesesPOA = ["ene_pl", "feb_pl", "mar_pl", "abr_pl", "may_pl", "jun_pl"];
+        const cfgPOA = getConfigPOAPeriodo();
+        const mesesPOA = cfgPOA.mesesPOA;
         const columnasAgrupacionPOA = [
             "Resultado_cod", "Resultado", "Producto_cod", "Producto"
         ];
@@ -3423,7 +3457,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (grupo.actividades.length > 0 && resultadoCoincide) {
                 const tituloTabla = `Actividades del producto "${grupo.metadata.Producto}" en el resultado "${grupo.metadata.Resultado_cod}"`;
-                crearTablaUnificada(tituloTabla, grupo.actividades, contenedor);
+                crearTablaUnificada(tituloTabla, grupo.actividades, contenedor, cfgPOA);
             }
         });
 
@@ -3443,16 +3477,13 @@ function formatNumberForDisplayForPlanificadoEjecutado(value) {
     return Math.round(num);
 }
 
-function crearTablaUnificada(titulo, datos, contenedor) {
+function crearTablaUnificada(titulo, datos, contenedor, cfgPOA) {
     if (!Array.isArray(datos) || datos.length === 0) {
         return;
     }
 
-    const mesesBonitosPOA = {
-        "ene_pl": "Enero", "feb_pl": "Febrero", "mar_pl": "Marzo",
-        "abr_pl": "Abril", "may_pl": "Mayo", "jun_pl": "Junio"
-    };
-    const ordenMesesEjecutado = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"];
+    const mesesBonitosPOA = cfgPOA.mesesBonitosPOA;
+    const ordenMesesEjecutado = cfgPOA.ordenMesesEjecutado;
 
 
     const encabezadosMapa = {
@@ -3553,7 +3584,7 @@ function crearTablaUnificada(titulo, datos, contenedor) {
                 td.style.cursor = "pointer";
                 td.addEventListener("click", () => {
                     const detallesPlanificado = obj.detallesPlanificadoMensual || {};
-                    const mesesPOAKeys = ["ene_pl", "feb_pl", "mar_pl", "abr_pl", "may_pl", "jun_pl"];
+                    const mesesPOAKeys = cfgPOA.mesesPOA;
 
                     const tablaModalPlanificado = document.createElement("table");
                     tablaModalPlanificado.className = "tablaSemestralModal";
@@ -3856,6 +3887,7 @@ function setupMyPdfDownload(jsPDFClass, tablesContainer) {
     }
 
     button.addEventListener('click', () => {
+        const cfgPOA = getConfigPOAPeriodo();
         const doc = new jsPDFClass({ orientation: 'landscape', unit: 'pt', format: 'a4' });
 
         if (typeof doc.autoTable !== "function") {
@@ -3884,7 +3916,7 @@ function setupMyPdfDownload(jsPDFClass, tablesContainer) {
         // Título general
         doc.setFontSize(14);
         doc.setFont(undefined, 'bold');
-        doc.text("Tablas para reporte semestral", doc.internal.pageSize.width / 2, yOffset, { align: 'center' });
+        doc.text(cfgPOA.pdfTitulo, doc.internal.pageSize.width / 2, yOffset, { align: 'center' });
         doc.setFontSize(12);
         doc.setFont(undefined, 'normal');
         doc.text("Basel Institute on Governance - GFP Subnacional", doc.internal.pageSize.width / 2, yOffset + 20, { align: 'center' });
@@ -3989,7 +4021,7 @@ function setupMyPdfDownload(jsPDFClass, tablesContainer) {
                             if (usuario?.Usuario) usuarioNombre = usuario.Usuario;
                         } catch { }
 
-                        const encabezado = `Tablas para reporte semestral. Usuario: ${usuarioNombre}`;
+                        const encabezado = `${cfgPOA.pdfTitulo}. Usuario: ${usuarioNombre}`;
                         const pageStr = `Página ${doc.internal.getCurrentPageInfo().pageNumber}`;
 
                         const rightEdge = doc.internal.pageSize.width - margin;
@@ -4026,7 +4058,7 @@ function setupMyPdfDownload(jsPDFClass, tablesContainer) {
             { align: 'center' }
         );
 
-        doc.save('POA_Semestral.pdf');
+        doc.save(cfgPOA.pdfNombre);
         console.log('✅ PDF generado y guardado.');
     });
 }
