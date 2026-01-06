@@ -3211,7 +3211,14 @@ document.addEventListener('DOMContentLoaded', function () {
 // CONTENIDO6 Y CONTENIDO7 (SEMESTRAL Y ANUAL)
 
 function getConfigPOAPeriodo() {
-    const periodo = (document.body.dataset.poaPeriodo || "semestral").toLowerCase();
+    const periodo =
+    (
+        document.getElementById("tablasPOASemestral")?.getAttribute("data-poa-periodo") ||
+        document.body?.getAttribute("data-poa-periodo") ||
+        "semestral"
+    )
+    .trim()
+    .toLowerCase();
 
     const meses = {
         semestral: {
