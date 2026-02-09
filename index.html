@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro POA</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <div class="login-container" id="login-container">
+        <div class="login-box">
+            <h2>Iniciar Sesión</h2>
+            <input type="text" id="username" placeholder="Usuario">
+            <input type="password" id="password" placeholder="Contraseña">
+            <button id="login-btn">Login</button>
+        </div>
+    </div>
+    
+    <header class="header">
+        <button class="sidebar-toggle hidden" id="sidebar-toggle">☰</button>
+        <div class="logos">
+            <a href="https://www.gfpsubnacional.pe/inicio/"><img src="images/gfp_darkbg.png" alt="GFP Logo"></a>
+            <a href="https://cooperacionsuiza.pe/seco" target="_blank" rel="nofollow"><img src="images/suiza_darkbg.png" alt="Suiza Logo"></a>
+            <a href="https://baselgovernance.org" target="_blank" rel="nofollow"><img src="images/basel_darkbg.png" alt="Basel Logo"></a>
+            <h5>Registro de POA ejecutado</h5>    
+        </div>
+        <button class="logout hidden" id="logout-btn">Cerrar sesión</button>
+    </header>
+    
+    <div class="main-container">
+        <nav class="sidebar hidden" id="sidebar"></nav>
+        <div class="content-container">
+            <main class="content" id="content"></main>
+        </div>
+    </div>
+    
+    <!-- <footer class="footer">
+        <div class="logos">
+            <a href="https://www.gfpsubnacional.pe/inicio/"><img src="images/gfp_darkbg.png" alt="GFP Logo"></a>
+            <a href="https://cooperacionsuiza.pe/seco" target="_blank" rel="nofollow"><img src="images/suiza_darkbg.png" alt="Suiza Logo"></a>
+            <a href="https://baselgovernance.org" target="_blank" rel="nofollow"><img src="images/basel_darkbg.png" alt="Basel Logo"></a>
+        </div>
+    </footer> -->
+    
+    <script type="module" src="script.js"></script>
+</body>
+</html>

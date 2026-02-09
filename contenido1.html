@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro de POA ejecutado</title>
+    <!-- Enlaces a estilos -->
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <!-- Librerias online -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+        <h2 style="margin: 0; margin-right: 120px;">Registro</h2>
+        
+        <button id="borrarTodoRegistro" class="boton-borrar-registro">
+            ❌ Borrar todo
+        </button>
+
+        <button id="guardarExcelRegistro" class="boton-excel">
+            <img src="https://img.icons8.com/color/24/000000/microsoft-excel-2019--v1.png" alt="Excel">
+        </button>
+    </div>
+
+    <!-- Formulario -->
+    <form id="Formulario">
+        <div class="table-container">
+            <table id="table-formulario-general" class="table-formulario">
+                <!-- <tr>
+                    <td>Fecha de inicio de reporte:</td>
+                    <td><input type="date" id="fecha-inicio" min="2025-01-01" max="2025-12-31"></td>
+                </tr>
+                <tr>
+                    <td>Fecha de fin de reporte:</td>
+                    <td><input type="date" id="fecha-fin" min="2025-01-01" max="2025-12-31"></td>
+                </tr> -->
+                
+                <tr>
+                    <td>Mes del reporte:</td>
+                    <td>
+                        <select id="mes-reporte">
+                            <option hidden>-- Seleccione --</option>
+                            <option>Enero</option>
+                            <option>Febrero</option>
+                            <option>Marzo</option>
+                            <option>Abril</option>
+                            <option>Mayo</option>
+                            <option>Junio</option>
+                            <option>Julio</option>
+                            <option>Agosto</option>
+                            <option>Setiembre</option>
+                            <option>Octubre</option>
+                            <option>Noviembre</option>
+                            <option>Diciembre</option>                            
+                        </select>
+                    </td>
+                </tr>
+
+                <!-- <tr>
+                    <td>Mes del reporte:</td>
+                    <td><input id="mes-reporte" readonly></td>
+                </tr> -->
+            </table>
+        </div>
+        
+        <div id="metas-super-container" >
+            <div id="metas-container">
+                <div class="meta-container" id="meta-1" data-index="1">
+                    <div class="meta-title">Registro 1</div>
+                    <button type="button" class="minimize-meta">−</button>
+                    <button type="button" class="delete-meta">x</button>
+            
+                    <div class="table-container">
+                        <!-- <div class="boton-tiporegistro" id="selectortiporegistro-1">
+                            <div class="selector-tiporegistro" id="indicadortiporegistro-1"></div>
+                            <div class="opcion-tiporegistro-izq opcion-tiporegistro-seleccionada" id="opcionindividualtiporegistro-1">Registro Individual</div>
+                            <div class="opcion-tiporegistro-der opcion-tiporegistro-no-seleccionada" id="opcionmultipletiporegistro-1">Registro Múltiple</div>
+                        </div>
+                        <div id="tiporegistro-1" hidden>Individual</div> -->
+
+
+                        <table class="table-formulario">
+                            <tr>
+                                <td>Actividad POA:</td>
+                                <td>
+                                    <select id="actividad-1">
+                                        <option hidden>-- Seleccione --</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Título:</td>
+                                <td><input id="titulo-1" readonly></td>
+                            </tr>
+        
+                            <!-- <tr>
+                                <td id="nnombreMeta-1">Nombre de meta:</td>
+                                <td id="nombreMeta-1" contenteditable="true"></td>
+                            </tr> -->
+                            <tr>
+                                <td>Número de metas:</td>
+                                <td><input type="number" id="numerometas-1" min="1"></td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Ámbito(s):
+                                </td>
+                                <td>
+                                    <div class="multipleSelect-container">
+                                        <div class="multipleSelect-boton">
+                                            <span id="ambito-1">-- Seleccione --</span>
+                                            <span class="multipleSelect-icon">▼</span>
+                                        </div>
+                                        <ul id="ambitoopciones-1" class="multipleSelect-opciones">                                        
+                                        </ul>
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    Entidad(es):
+                                </td>
+                                <td>
+                                    <div class="multipleSelect-container">
+                                        <div class="multipleSelect-boton">
+                                            <span id="entidad-1">-- Seleccione --</span>
+                                            <span class="multipleSelect-icon">▼</span>
+                                        </div>
+                                        <ul id="entidadopciones-1" class="multipleSelect-opciones">                                        
+                                        </ul>
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            <tr>
+                                <td>Número de participantes:</td>
+                                <td><input type="number" id="participantes-1" min="0"></td>
+                            </tr>
+                            <tr>
+                                <td>Hombres:</td>
+                                <td><input type="number" id="hombres-1" min="0"></td>
+                            </tr>
+                            <tr>
+                                <td>Mujeres:</td>
+                                <td><input type="number" id="mujeres-1" min="0"></td>
+                            </tr>
+                            <tr>
+                                <td>Autoridades presentes:</td>
+                                <td id="autoridades-1" contenteditable="true"></td>
+                            </tr>
+
+                            <tr>
+                                <td>Observaciones:</td>
+                                <td id="detalleMeta-1" contenteditable="true">-</td>
+                            </tr>
+
+                                                        <!-- <tr>
+                                <td>¿Meta nueva?:</td>
+                                <td>
+                                    <select id="metaNueva-1">
+                                        <option hidden>-- Seleccione --</option>
+                                    </select>
+                                </td>
+                            </tr> -->
+                            <!-- <tr>
+                                <td>Estado de meta:</td>
+                                <td>
+                                    <select id="estadoMeta-1">
+                                        <option hidden>-- Seleccione --</option>
+                                    </select>
+                                </td>
+                            </tr> -->
+                            <!-- <tr>
+                                <td>Fecha inicio:</td>
+                                <td><input type="date" id="fechaInicio-1" min="2025-01-01" max="2025-12-31"></td>
+                            </tr>
+                            <tr>
+                                <td>Fecha fin:</td>
+                                <td><input type="date" id="fechaFin-1" min="2025-01-01" max="2025-12-31"></td>
+                            </tr> -->
+
+                            <!-- <tr>
+                                <td>Intervino más de un consultor:</td>
+                                <td>
+                                    <select id="variosConsultores-1">
+                                        <option hidden>-- Seleccione --</option>
+                                    </select>
+                                </td>
+                            </tr> -->
+                        </table>
+
+
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="add-meta">+</button>
+        </div>
+        <button type="button" id="submitButtonRegistro">Enviar</button>
+    </form>
+
+    <!-- Script principal -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>

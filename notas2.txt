@@ -1,0 +1,20 @@
+- Cambiar libremente el año. 
+
+- Emergente también en total 					OK
+- filtro atípicos (-70, +150) sin vista de meses, solo totales. OK
+- nuevo circulo sobre planificado anual. 			OK 
+- Actualizar luz 						OK 
+
+- filtro por región / ámbito de toda la tabla.
+- ver avance por región / por consultor 
+- grafico por región / ámbito adentro del emergente 
+
+
+
+
+Tablas para informe semestral
+Actividades de P2, que aparezcan datos de participantes (suma)
+Tablas por P+R (30 tablas), como en informe semestral pasado (2023-I). 
+
+
+

@@ -1,0 +1,1756 @@
+/* =========================
+   0) TOKENS / BASE
+========================= */
+:root{
+  --font: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+
+  /* =========================
+     COLORES (PALETA MINIMA)
+     (agrupa similares; evita “50 grises”)
+  ========================= */
+
+  /* Base app */
+  --bg: #f4f6f9;                  /* fondo general (body, overlays) */
+  --surface: #ffffff;             /* superficies: tarjetas, cajas, secciones */
+  --text: #171717;                /* texto principal */
+  --muted: #5b5b5b;               /* texto secundario */
+
+  /* Marca / navegación */
+  --primary: #1C4574;             /* header, th, botones primarios */
+  --primary-2: #1C4574;           /* manual-header (variante de primary) */
+  --accent: #ff9d00;              /* estado activo en sidebar */
+
+  /* Estados */
+  --danger: #cf0909;              /* acciones destructivas */
+  --brand: #cf0909;               /* botón principal (login/registro/logout) */
+  --brand-hover: #F5811E;         /* hover del botón principal */
+
+  /* Neutrales UI (solo 2 grises + blanco/negro) */
+  --white: #fff;                  /* texto/blancos recurrentes */
+  --black: #000;                  /* bordes negros (tablas) */
+  --gray: #555;                   /* gris general (sidebar btn / textos grises fuertes) */
+  --gray-dark: #444;              /* sidebar fondo / grises más oscuros */
+
+  /* Bordes / overlays */
+  --border: rgba(0,0,0,.14);      /* bordes suaves generales */
+  --border-strong: rgba(0,0,0,.30); /* bordes más fuertes (cajas/form) */
+  --border-invert: rgba(255,255,255,.10); /* separadores en sidebar */
+  --overlay: rgba(0,0,0,.60);     /* fondo oscurecido modal */
+
+  /* Focus (derivados de primary) */
+  --focus-border: rgba(28,69,116,.5);
+  --focus-ring: rgba(28,69,116,.12);
+
+  /* Sombras (3 niveles) */
+  --shadow-sm: 0 1px 4px rgba(0,0,0,.12);
+  --shadow-md: 0 4px 10px rgba(0,0,0,.12);
+  --shadow-lg: 0 5px 15px rgba(0,0,0,.25);
+
+  /* (compatibilidad con tu código actual) */
+  --shadow: var(--shadow-md);
+
+  /* Fondos suaves (reemplazan varios #f8f9fa / #e8eff5 / #e9e9e9 / #ddd / #dedede) */
+  --surface-soft: rgba(0,0,0,.04); /* fondos suaves en cards/leyendas */
+  --surface-soft-2: rgba(0,0,0,.08); /* headers suaves / hover suaves */
+
+  /* Botones especiales (solo 3 “familias”) */
+  --btn-danger-bg: #cf0909;
+  --btn-danger-bg-hover: #F5811E;
+
+  --btn-soft-border: rgba(0,0,0,.10);
+
+  --btn-excel-bg: rgba(200,255,225,.84);
+  --btn-excel-bg-hover: rgba(168,246,208,.84);
+  --btn-excel-text: #0f3d2e;
+
+  --btn-pdf-bg: rgba(255,238,238,.84);
+  --btn-pdf-bg-hover: rgba(255,212,212,.84);
+  --btn-pdf-text: #6d1a1a;
+
+  /* Sidebar */
+  --sidebar-btn-border: rgba(255,255,255,.08);
+  --sidebar-hover-bg: #ffcc00;
+
+  /* Manual botones */
+  --manual-btn: #1C4574;
+  --manual-btn-hover: #0056b3;
+
+  /* POA */
+  --poa-resultado: rgb(255, 192, 0);
+  --poa-acum: rgba(237,237,237,.84);
+
+  /* Tooltip */
+  --tooltip-bg: rgba(0,0,0,0.82);
+  --circle-bg-stroke: rgba(255,255,255,0.3);
+
+  /* Cerrar modal alterno */
+  --close-btn: #d33;
+
+  /* =========================
+     TAMAÑOS / RADIUS
+  ========================= */
+  --radius: 10px;
+  --radius-sm: 6px;
+
+  --btn-h: 36px;
+  --btn-pad: 10px 14px;
+
+  --cell-max-h: 90px;
+  --cell-max-h-sm: 70px;
+  --scrollbar: thin;
+}
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body{
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg);
+  display: flex;
+  height: 100vh;
+}
+
+/* Utilidades */
+.hidden{ display:none !important; }
+.error{ color: var(--danger); }
+
+
+/* =========================
+   1) TITULOS / TEXTOS
+========================= */
+h2{
+  color: var(--primary);
+  text-align: left;
+  margin: 0;
+}
+
+/* =========================
+   2) CONTENEDORES LOGIN/ADMIN
+========================= */
+#login-container, #admin-container{
+  width: 350px;
+  margin: 30px auto;
+  border-radius: var(--radius);
+  padding: 50px;
+  box-shadow: var(--shadow);
+}
+
+#login-container{
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* Overlay de login: siempre cubre TODO el viewport y se oculta con .hidden */
+.login-container{
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg);
+  z-index: 9999;
+}
+
+.login-box{
+  background: var(--surface);
+  padding: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  min-width: 320px;
+}
+
+#form-container,
+#main-container{
+  display:flex;
+  flex-direction:row;
+  align-items:flex-start;
+  justify-content:flex-start;
+  width:100%;
+}
+
+.main-container{
+  display:flex;
+  flex:1;
+  padding-top: 60px;
+}
+
+/* =========================
+   3) INPUTS / SELECTS
+========================= */
+input[type="text"],
+input[type="password"],
+input[type="email"]{
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--surface);
+  outline: none;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus{
+  border-color: var(--focus-border);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* inputs en login-box */
+.login-box input{
+  display:block;
+  width:100%;
+  margin: 10px 0;
+  padding: 10px;
+}
+
+/* =========================
+   4) BOTONES (UNIFICADOS)
+========================= */
+button{
+  font-family: inherit;
+
+  /* 👇 CENTRADO GLOBAL (horizontal + vertical) para TODO botón */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center; 
+
+  /* evita “desfase” por line-height */
+  line-height: 1;
+
+  /* si algún botón hereda text-align raro, lo neutraliza */
+  text-align: center;
+}
+/* Botón rojo principal (registro/login/logout) */
+#submitButtonRegistro,
+.login-box button,
+.logout{
+  height: var(--btn-h);
+  padding: var(--btn-pad);
+  background: var(--brand);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background .2s ease, transform .15s ease;
+}
+
+#submitButtonRegistro{
+  margin-top: 70px;
+}
+
+#submitButtonRegistro:hover,
+.login-box button:hover,
+.logout:hover{
+  background: var(--brand-hover);
+  transform: translateY(-1px);
+}
+
+/* Botones sidebar (menu) */
+.sidebar button{
+  display:block;
+  width:100%;
+  height: var(--btn-h);
+  padding: 10px;
+  margin: 6px 0;
+  background: var(--gray);
+  color: var(--white);
+  border: 1px solid var(--sidebar-btn-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: background .2s ease, color .2s ease;
+}
+
+.sidebar button:hover{
+  background: var(--sidebar-hover-bg);
+  color: var(--black);
+}
+
+.sidebar button.active{
+  background: var(--accent);
+  color: var(--black);
+}
+
+
+/* =========================
+   OVERRIDE: botones con esquinas rectas
+   (login, logout, sidebar)
+========================= */
+.logout,
+.sidebar button{
+  border-radius: 0 !important;
+}
+
+
+/* El h2 "Iniciar sesión" (solo dentro del login) centrado */
+.login-box h2{
+  text-align: center;
+}
+
+/* Botón de login ocupa todo el ancho del contenedor */
+.login-box button{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+/* Botones "excel/pdf/borrar" */
+.boton-borrar-registro,
+.boton-excel,
+.boton-pdf{
+  height: var(--btn-h);
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform .15s ease, background .2s ease, filter .2s ease;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.boton-borrar-registro{
+  background-color: var(--btn-danger-bg);
+  color: var(--white);
+}
+.boton-borrar-registro:hover{
+  background-color: var(--btn-danger-bg-hover);
+  transform: translateY(-1px);
+}
+
+.boton-excel{
+  background-color: var(--btn-excel-bg);
+  color: var(--btn-excel-text);
+  border: 1px solid var(--btn-soft-border);
+}
+.boton-excel:hover{
+  background-color: var(--btn-excel-bg-hover);
+  transform: translateY(-1px);
+}
+.boton-excel img{ width:20px; height:20px; }
+
+.boton-pdf{
+  background-color: var(--btn-pdf-bg);
+  color: var(--btn-pdf-text);
+  border: 1px solid var(--btn-soft-border);
+}
+.boton-pdf:hover{
+  background-color: var(--btn-pdf-bg-hover);
+  transform: translateY(-1px);
+}
+.boton-pdf img{ width:20px; height:20px; }
+
+/* Botón "add-meta" y acciones de meta */
+.add-meta{
+  margin: -20px auto;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 10;
+  background: var(--primary);
+  color: var(--white);
+  width: fit-content;
+  max-width: 400px;
+  text-align: center;
+  display: block;
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  transition: filter .2s ease, transform .15s ease;
+}
+.add-meta:hover{
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.minimize-meta, .delete-meta{
+  position:absolute;
+  top:-15px;
+  color: var(--white);
+  border:none;
+  cursor:pointer;
+  padding: 4px 8px;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  transition: filter .2s ease, transform .15s ease;
+}
+.minimize-meta{
+  right: 15px;
+  background: var(--primary);
+}
+.delete-meta{
+  right: -10px;
+  background: var(--danger);
+}
+.minimize-meta:hover,
+.delete-meta:hover{
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* =========================
+   5) HEADER / FOOTER / SIDEBAR / CONTENT
+========================= */
+.header, .footer{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  color: var(--white);
+  width:100%;
+  position: fixed;
+  height:60px;
+  z-index:20;
+  background-color: var(--primary);
+  padding: 5px 10px;
+}
+
+.header{ top:0; }
+.footer{ bottom:0; }
+
+.header h5{
+  font-size: .8em;
+  text-align:center;
+  margin:0;
+}
+
+.logos{
+  display:flex;
+  align-items:center;
+  flex-grow:1;
+  justify-content:center;
+  gap:10px;
+  overflow:hidden;
+}
+.logos img{ height:40px; width:auto; }
+
+.sidebar-toggle{
+  background:none;
+  border:none;
+  font-size:24px;
+  cursor:pointer;
+  color: var(--white);
+  margin:10px;
+}
+
+.sidebar{
+  width:230px;
+  background: var(--gray-dark);
+  color: var(--white);
+  padding:10px;
+  position:fixed;
+  height: calc(100vh - 60px);
+  left:0;
+  overflow-y:auto;
+  z-index:50;
+  font-size: 10pt;
+  border-right: 1px solid var(--sidebar-btn-border);
+}
+
+.sidebar.hidden{
+  width:0;
+  overflow:hidden;
+  padding:0;
+}
+
+.sidebar ul{
+  list-style:none;
+  padding:0;
+}
+.sidebar ul li{
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--border-invert);
+}
+
+/* content */
+.content-container{
+  transition: margin-left .3s ease-in-out;
+  margin-left: 230px;
+  display:flex;
+  flex-direction:column;
+  overflow:auto;
+  width: calc(100vw - 230px);
+}
+
+.sidebar.hidden + .content-container{
+  margin-left:0;
+  width:100vw;
+}
+
+.content{
+  padding: 20px;
+  padding-bottom: 100px;
+  min-width: 300px;
+}
+
+/* =========================
+   6) SELECTOR TIPO REGISTRO
+========================= */
+.boton-tiporegistro{
+  margin: 0 auto;
+  display:flex;
+  justify-content:center;
+  height:30px;
+  width:270px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  position:relative;
+  cursor:pointer;
+  background: var(--surface);
+}
+
+.selector-tiporegistro{
+  position:absolute;
+  top:0;
+  left:0;
+  width:50%;
+  height:100%;
+  background-color: var(--primary);
+  transition:left .3s ease;
+  border-radius: var(--radius-sm);
+}
+
+.opcion-tiporegistro-izq, .opcion-tiporegistro-der{
+  position:relative;
+  width:50%;
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size: 13px;
+}
+.opcion-tiporegistro-izq{ left:0; color: var(--white); }
+.opcion-tiporegistro-der{ right:0; color: var(--black); }
+
+.opcion-tiporegistro-seleccionada{ color: var(--white) !important; }
+.opcion-tiporegistro-no-seleccionada{ color: var(--black); }
+
+/* =========================
+   7) TABLAS - BASE
+========================= */
+table{ border-collapse: collapse; }
+
+th, td{
+  padding: 2px 4px;
+  vertical-align: middle;
+}
+
+th{
+  background-color: var(--primary);
+  color: var(--white);
+  text-align:center;
+}
+
+td{ text-align:left; }
+
+/* Contenedores de tabla */
+.table-container{ max-width: 600px; }
+
+/* =========================
+   8) TABLA FORMULARIO
+========================= */
+#Formulario{ width: fit-content; }
+
+#metas-super-container,
+#metas-container{
+  width: fit-content;
+  justify-content:flex-start;
+  margin-left:0;
+  margin-right:auto;
+  padding:0;
+}
+
+#metas-container{
+  display:flex;
+  flex-direction:column;
+}
+
+.meta-container{
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 10px;
+  margin: 20px 0;
+  width: 400px;
+  position: relative;
+  box-shadow: var(--shadow);
+  background: var(--surface);
+}
+
+.meta-title{
+  font-weight: 700;
+  color: var(--primary);
+    background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0) 0%,
+    var(--surface) 50%,
+    var(--surface) 100%
+    );
+  padding: 0 10px;
+  position:absolute;
+  top:-12px;
+  left:15px;
+}
+
+.table-formulario{
+  border-collapse: separate;
+  border-spacing: 8px;
+}
+
+.table-formulario td{
+  vertical-align: top;
+  font-size: 13px;
+  font-family: var(--font);
+}
+
+.table-formulario td:first-child{
+  width: 100px;
+  vertical-align: middle;
+  color: var(--muted);
+}
+
+.table-formulario td:nth-child(2){
+  width: 280px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 10px;
+  vertical-align: middle;
+  background: var(--surface);
+}
+
+.table-formulario select,
+.table-formulario input{
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: inherit;
+  font-family: inherit;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+#table-formulario-general td:nth-child(2){
+  width: 150px !important;
+}
+
+/* =========================
+   9) MULTIPLE SELECT
+========================= */
+.multipleSelect-container{
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.multipleSelect-boton{
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+.multipleSelect-opciones{
+  position:absolute;
+  width:100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  list-style:none;
+  margin:0;
+  overflow-y:auto;
+  box-shadow: var(--shadow-md);
+  box-sizing:border-box;
+  display:none;
+  z-index:20;
+  border-radius: var(--radius-sm);
+  max-height: 180px;
+  scrollbar-width: var(--scrollbar);
+}
+
+.multipleSelect-opciones li{
+  list-style:none;
+  padding: 4px 8px;
+  margin:0;
+}
+
+.multipleSelect-opciones li label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  padding: 3px 2px;
+  width:100%;
+  border-radius: 6px;
+}
+
+.multipleSelect-opciones label:hover{
+  background: var(--surface-soft);
+}
+
+.multipleSelect-icon{ font-size: 12px; }
+
+.multipleSelect-opciones input[type="checkbox"]{
+  padding:0;
+  margin:0;
+  width:auto;
+}
+
+.multipleSelect-container td,
+.multipleSelect-container input,
+.multipleSelect-container select{
+  width:100%;
+  box-sizing:border-box;
+  padding:0;
+  margin:0;
+}
+
+/* Evitar doble borde: celda (td) + multipleSelect */
+.table-formulario td:nth-child(2):has(.multipleSelect-container){
+  border: none;
+  padding: 0;                 /* opcional: para que el borde sea solo del control */
+  background: transparent;    /* opcional */
+}
+
+/* El control se encarga del borde/radio */
+.table-formulario td:nth-child(2):has(.multipleSelect-container) .multipleSelect-boton{
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 10px;              /* si quieres que “calce” con tus otras celdas */
+}
+
+
+/* =========================
+   10) FILTROS (POA / ENVIOS)
+========================= */
+.checkbox-container label{
+  display:block;
+  margin-bottom: 5px;
+}
+
+.filter-container{
+  position:absolute;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 8px;
+  display:none;
+  max-height: 180px;
+  overflow-y:auto;
+  width: 180px;
+  white-space: nowrap;
+  z-index: 1000;
+  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-sm);
+  scrollbar-width: var(--scrollbar);
+}
+
+.filter-cell{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  position:relative;
+}
+
+.filter-button{
+  cursor:pointer;
+  border:none;
+  padding: 5px;
+  background:none;
+  font-size: 16px;
+  opacity: .9;
+}
+.filter-button::before{ content:'\2630'; }
+
+.filter-active{
+  background-color: var(--surface-soft-2);
+  border-radius: 6px;
+}
+
+/* =========================
+   11) MANUAL
+========================= */
+.manual-header{
+  background: var(--primary-2);
+  color: var(--white);
+  padding: 1rem;
+  text-align:center;
+}
+
+.manual-nav{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap: .3rem;
+  background: var(--surface-soft);
+  padding: .5rem;
+}
+
+.manual-nav button{
+  height: var(--btn-h);
+  padding: 0.5rem 1rem;
+  border:none;
+  background: var(--manual-btn);
+  color: var(--white);
+  border-radius: var(--radius-sm);
+  cursor:pointer;
+  transition: filter .2s ease, transform .15s ease;
+}
+.manual-nav button:hover{
+  background: var(--manual-btn-hover);
+  transform: translateY(-1px);
+}
+
+.manual-section{
+  display:none;
+  padding: 2rem;
+  max-width: 900px;
+  margin: 1rem auto;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+.manual-active{ display:block; }
+
+.manual-section ul{ margin-left: 1.5rem; }
+
+.manual-section img{
+  display:block;
+  margin: 20px auto;
+  max-width: 600px;
+  max-height: 400px;
+  height:auto;
+  width:auto;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.faq-item{ margin-bottom: 1.5em; }
+
+/* =========================
+   12) LEYENDA INFOGRAFIA
+========================= */
+.leg-infografia{
+  display:inline-flex;
+  flex-wrap:wrap;
+  align-items:center;
+  font-family: var(--font);
+  font-size: 13px;
+  gap:10px;
+  margin-left: 20px;
+  background: var(--surface-soft);
+  padding: 6px 10px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--btn-soft-border);
+}
+
+.leg-explicacion{
+  font-weight: 600;
+  color: var(--gray);
+  margin-right: 10px;
+  white-space: nowrap;
+  position: relative;
+}
+
+.leg-badge{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 10px solid;
+  border-radius: 6px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 12px;
+  position: relative;
+}
+
+/* (mantengo estos 4 como colores de “semaforo” porque son semánticos) */
+.leg-rojo     { border-color: rgb(255, 100, 120); }
+.leg-amarillo { border-color: rgb(255, 240, 100); }
+.leg-verde    { border-color: rgb(140, 243, 138); }
+.leg-extra    { border-color: rgb(105, 173, 255); }
+
+.leg-tooltip-container{
+  position: relative;
+  display:inline-block;
+  cursor: default;
+}
+.leg-tooltip{
+  position:absolute;
+  top:120%;
+  left:50%;
+  transform: translateX(-50%);
+  background: var(--gray-900, #333);
+  color: var(--white);
+  font-size: 11px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  white-space: normal;
+  opacity:0;
+  visibility:hidden;
+  transition: opacity .2s ease-in-out;
+  z-index:10;
+  width: max-content;
+  max-width: 220px;
+  text-align:left;
+}
+.leg-tooltip::after{
+  content:"";
+  position:absolute;
+  bottom:100%;
+  left:50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent var(--gray-900, #333) transparent;
+}
+.leg-tooltip-container:hover .leg-tooltip{
+  opacity:1;
+  visibility:visible;
+}
+
+/* =========================
+   13) TABLA POA (PRINCIPAL)
+========================= */
+.tablaPOA{
+  border-collapse: collapse;
+  width:100%;
+  font-size: 12px;
+  table-layout: fixed;
+  background: var(--surface);
+}
+
+.tablaPOA{
+  border-top: 1px solid var(--black);
+}
+
+
+
+.tablaPOA th,
+.tablaPOA td{
+  border: 0;
+  padding: 4px;
+  background: var(--surface);
+
+  box-shadow:
+    inset -0.5px 0 0 var(--black),
+    inset 0 -0.5px 0 var(--black);
+}
+
+.tablaPOA th{
+  background-color: var(--primary);
+  color: var(--white);
+  text-align:center;
+}
+
+.tablaPOA td{ text-align:left; }
+
+.tablaPOA-contenedor{
+  width:100%;
+  height:100%;
+}
+
+
+.tablaPOA thead{
+  position: sticky;
+  top:0;
+  z-index:30;
+}
+
+.tablaPOA-Resultado, .tablaPOA-Resultado td{ background-color: var(--poa-resultado); }
+.tablaPOA-Producto,  .tablaPOA-Producto td{ background-color: var(--surface-soft-2); }
+
+.tablaPOA-subtitulo td{ text-align:left !important; }
+.tablaPOA-total{ background-color: var(--surface-soft-2); }
+.tablaPOA-acum{ background-color: var(--poa-acum); }
+
+.tablaPOA-normal td{ text-align:left; }
+.tablaPOA-oculto{ display:none !important; }
+
+.tablaPOA-subtitulo{
+  cursor:pointer;
+  position:relative;
+}
+.tablaPOA-triangulo{
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform: translateY(-50%);
+  font-weight: 800;
+}
+
+/* Column widths */
+.tablaPOA th:nth-child(1){ width: 250px; }
+.tablaPOA th:nth-child(2){ width: 100px; }
+.tablaPOA th:nth-child(3){ width: 70px; }
+.tablaPOA th:nth-child(4){ width: 80px; }
+.tablaPOA th:nth-child(5){ width: 180px; }
+.tablaPOA th:nth-child(n+6):nth-child(-n+7){ width: 500px; }
+
+.tablaPOA td:nth-child(n+6){ text-align:center; }
+.tablasPOA-month-cell{ text-align:center; }
+
+/* Contenido scrolleable dentro de celda (POA) */
+.tablaPOA-scrollable{
+  max-height: var(--cell-max-h-sm);
+  overflow-y:auto;
+  overflow-x:hidden;
+  text-align: inherit;
+  word-wrap: break-word;
+  white-space: normal;
+  padding: 0;
+  margin: 0;
+  scrollbar-width: var(--scrollbar);
+}
+
+/* Tooltip ejecutado */
+[data-type="ejecutado"]:hover{
+  cursor:pointer;
+  position:relative;
+}
+
+[data-type="ejecutado"] .tablasPOA-tooltip-container{
+  visibility:hidden;
+  width:auto;
+  background-color: var(--tooltip-bg);
+  color: var(--white);
+  text-align:center;
+  border-radius: 6px;
+  padding: 6px 10px;
+  position:absolute;
+  z-index:1000;
+  bottom:100%;
+  left:50%;
+  transform: translateX(-50%);
+  opacity:0;
+  transition: opacity .2s ease;
+  white-space: nowrap;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width: 120px;
+  box-sizing:border-box;
+  flex-wrap: nowrap;
+  justify-content:center;
+}
+
+[data-type="ejecutado"]:hover .tablasPOA-tooltip-container{
+  visibility: visible;
+  opacity: 1;
+}
+
+[data-type="ejecutado"].tooltip-right .tablasPOA-tooltip-container{
+  left:auto;
+  right:0;
+  transform:none;
+}
+
+[data-type="ejecutado"] .tablasPOA-tooltip-container::after{
+  content:"";
+  position:absolute;
+  top:100%;
+  left:50%;
+  margin-left:-5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--tooltip-bg) transparent transparent transparent;
+}
+
+[data-type="ejecutado"].tooltip-right .tablasPOA-tooltip-container::after{
+  left:auto;
+  right:10px;
+  margin-left:0;
+}
+
+/* círculos tooltip */
+.tablasPOA-percentage-circle-svg-wrapper{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+.tablasPOA-circle-bg{
+  stroke: var(--circle-bg-stroke);
+  stroke-width: 2;
+  fill:none;
+}
+.tablasPOA-circle-progress{
+  stroke-width: 2;
+  fill:none;
+  transition: stroke-dasharray .2s linear;
+}
+
+/* =========================
+   14) MODAL TABLAS POA
+========================= */
+.tablasPOA-modal{
+  display:none;
+  position: fixed;
+  z-index: 1001;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  overflow:auto;
+  background-color: var(--overlay);
+  justify-content:center;
+  align-items:center;
+  padding: 20px;
+}
+
+.tablasPOA-modal-content{
+  background: var(--surface);
+  margin:auto;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 1100px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  display:flex;
+  flex-direction:column;
+  max-height: 90%;
+}
+
+.tablasPOA-modal-scrollable-content{
+  max-height: calc(90vh - 150px);
+  overflow-y:auto;
+  margin-top: 15px;
+  padding-right: 5px;
+  scrollbar-width: var(--scrollbar);
+}
+
+.tablasPOA-close-button{
+  color: var(--white);
+  background-color: var(--danger);
+  border-radius: 50%;
+  width:30px;
+  height:30px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  line-height:1;
+  font-size: 20px;
+  font-weight: 800;
+  position:absolute;
+  top:-10px;
+  right:-10px;
+  cursor:pointer;
+  box-shadow: var(--shadow-sm);
+  transition: filter .2s ease;
+}
+.tablasPOA-close-button:hover,
+.tablasPOA-close-button:focus{
+  filter: brightness(1.15);
+  text-decoration:none;
+}
+
+.tablasPOA-modal-header-info{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  margin-bottom: 0;
+}
+
+.tablasPOA-modal-header-info #tablasPOAModalPercentageDisplay{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:stretch;
+  gap:20px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.tablasPOA-modal-header-info p{
+  margin:0;
+  font-size: .9em;
+}
+
+.tablasPOA-percentage-indicator{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: var(--shadow-sm);
+  font-size: .9em;
+  background: var(--surface);
+}
+
+.tablasPOA-percentage-indicator span{
+  margin-top: 4px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* =========================
+   15) TABLAS ENVIOS (modal / general)
+========================= */
+.tablasPOA-envios{
+  border-collapse: collapse;
+  width: auto;              /* 👈 no fuerza a la página */
+  display: inline-table;    /* 👈 se ajusta al contenido */
+  font-size: 13px;
+  table-layout: auto;
+  background: var(--surface);
+}
+
+/* Contenido scrolleable dentro de celda (ENVIOS) */
+.tablasPOA-envios-scrollable{
+  max-height: var(--cell-max-h);
+  overflow-y: auto;
+  overflow-x: hidden;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  scrollbar-width: var(--scrollbar);
+}
+
+
+.tablasPOA-envios th, .tablasPOA-envios td{
+  border: 1px solid var(--black);
+  padding: 4px 6px;
+  vertical-align: middle;
+}
+
+.tablasPOA-envios th{
+  background-color: var(--primary);
+  color: var(--white);
+  text-align:center;
+  font-size: 13px;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.tablasPOA-envios thead{
+  position: sticky;
+  top:0;
+  z-index:2;
+  background-color: var(--primary);
+}
+
+.tablasPOA-envios td{
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: var(--cell-max-h);
+  padding: 4px 6px;
+  scrollbar-width: var(--scrollbar);
+}
+
+/* anchos mínimos */
+.tablasPOA-envios th:nth-child(1)  { width: 8%;  min-width: 100px; }
+.tablasPOA-envios th:nth-child(2)  { width: 10%; min-width: 130px; }
+.tablasPOA-envios th:nth-child(3)  { width: 6%;  min-width: 80px;  }
+.tablasPOA-envios th:nth-child(4)  { width: 6%;  min-width: 80px;  }
+.tablasPOA-envios th:nth-child(5)  { width: 15%; min-width: 250px; }
+.tablasPOA-envios th:nth-child(6)  { width: 15%; min-width: 250px; }
+.tablasPOA-envios th:nth-child(7)  { width: 10%; min-width: 130px; }
+.tablasPOA-envios th:nth-child(8)  { width: 5%;  min-width: 120px; }
+.tablasPOA-envios th:nth-child(9)  { width: 5%;  min-width: 120px; }
+.tablasPOA-envios th:nth-child(10) { width: 3%;  min-width: 100px; }
+.tablasPOA-envios th:nth-child(11) { width: 3%;  min-width: 100px; }
+.tablasPOA-envios th:nth-child(12) { width: 7%;  min-width: 150px; }
+.tablasPOA-envios th:nth-child(13) { width: 15%; min-width: 250px; }
+
+
+
+/* =========================
+   16) TABLAS SEMESTRALES
+========================= */
+#tablasPOASemestral.centrarContenido{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width:100%;
+  padding: 20px 0;
+}
+
+.contenedorTablaSemestral{
+  margin-bottom: 2rem;
+  padding: 1rem;
+  width: 95%;
+  max-width: 1200px;
+  box-sizing: border-box;
+  margin-left:auto;
+  margin-right:auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.tituloTablaSemestral{
+  margin-bottom: .8rem;
+  font-size: 1em;
+  text-align:center;
+  color: var(--primary);
+  font-weight: 650;
+}
+
+.tablaSemestral{
+  width:auto;
+  border-collapse: collapse;
+  table-layout: auto;
+  margin-left:auto;
+  margin-right:auto;
+  background: var(--surface);
+}
+
+.tablaSemestral th, .tablaSemestral td{
+  border: 1px solid var(--border-strong);
+  padding: .4rem .6rem;
+  font-size: .85em;
+  word-wrap: break-word;
+}
+
+.celdaEncabezadoSemestral{
+  background-color: var(--primary);
+  color: var(--white);
+  font-weight: 800;
+  vertical-align: middle;
+  text-align:center;
+}
+
+.tablaSemestral td{ text-align:left; }
+
+.tablaSemestral td:nth-child(3),
+.tablaSemestral td:nth-child(4),
+.tablaSemestral td:nth-child(5),
+.tablaSemestral td:nth-child(6),
+.tablaSemestral td:nth-child(7),
+.tablaSemestral td:nth-child(8){
+  text-align:center;
+}
+
+.mensaje-centradoSemestral{
+  text-align:center;
+  width:100%;
+  margin-top: 50px;
+  font-size: 1.1em;
+  color: var(--gray);
+}
+
+/* Modal semestral */
+.modalSemestralFondo{
+  position: fixed;
+  top:0; left:0;
+  width:100%;
+  height:100%;
+  background: var(--overlay);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index: 9999;
+}
+
+.modalSemestral{
+  background: var(--surface);
+  padding: 1.5rem 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  width: 90%;
+  max-width: 900px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.modalSemestral h4{
+  text-align:left;
+  margin-top:0;
+  margin-bottom: 1rem;
+  color: var(--primary);
+}
+
+.modalSemestralContenido{
+  max-height: 70vh;
+  overflow-y:auto;
+  overflow-x:auto;
+  padding-right: 15px;
+  box-sizing:border-box;
+  margin-bottom: 1rem;
+  scrollbar-width: var(--scrollbar);
+}
+
+.modalSemestralContenido table{
+  width:auto;
+  border-collapse: collapse;
+  margin-top: .8rem;
+  margin-bottom: 1rem;
+  font-size: .8em;
+  table-layout: fixed;
+}
+
+.modalSemestralContenido th,
+.modalSemestralContenido td{
+  border: 1px solid var(--border);
+  padding: 6px;
+  text-align:center;
+  word-wrap: break-word;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+.modalSemestralContenido th{
+  background-color: var(--surface-soft-2);
+  font-weight: 800;
+  color: var(--text);
+}
+
+.modalSemestralContenido h4{
+  text-align:left;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+  color: var(--text);
+  font-size: 1em;
+}
+
+.cerrarModalBtn{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:30px;
+  height:30px;
+  background-color: var(--close-btn);
+  color: var(--white);
+  border:none;
+  border-radius:50%;
+  font-size: 1.2em;
+  font-weight: 800;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  box-shadow: var(--shadow-sm);
+  transition: filter .2s ease, transform .15s ease;
+  z-index: 10000;
+}
+.cerrarModalBtn:hover{
+  filter: brightness(1.10);
+  transform: translateY(-1px);
+}
+.cerrarModalBtn:active{
+  transform: translateY(0px);
+}
+
+
+
+
+/* =========================
+   POA CONFIG (Mes de corte) - UI bonita
+========================= */
+#poaMesCorteAdmin{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 18px 18px 16px;
+  max-width: 980px;
+}
+
+#poaMesCorteAdmin h2{
+  margin-bottom: 10px;
+}
+
+#poaMesCorteAdmin h3{
+  margin-top: 14px;
+  color: var(--primary);
+}
+
+#poaMesCorteAdmin p{
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+ 
+/* Meses: en fila, wrap si no entra */
+#poaMesCorteChecks{
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0 8px;
+}
+
+/* Cada "pill" */
+#poaMesCorteChecks .poa-mes-pill{
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  transition: background .15s ease, transform .12s ease, border-color .15s ease, box-shadow .15s ease;
+  box-shadow: 0 1px 0 rgba(0,0,0,.03);
+}
+
+/* Texto del mes */
+#poaMesCorteChecks .poa-mes-pill .poa-mes-name{
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* Oculta el checkbox real pero lo deja accesible */
+#poaMesCorteChecks .poa-mes-pill input[type="checkbox"]{
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Check visual (círculo) */
+#poaMesCorteChecks .poa-mes-pill .poa-check{
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid var(--border-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+  transition: transform .12s ease, background .15s ease, border-color .15s ease, color .15s ease;
+  color: transparent;
+  background: transparent;
+}
+
+/* Hover suave del pill */
+#poaMesCorteChecks .poa-mes-pill:hover{
+  transform: translateY(-1px);
+  border-color: var(--focus-border);
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+
+/* Estado: dentro del corte (seleccionado) */
+#poaMesCorteChecks .poa-mes-pill.is-in-range{
+  background: var(--surface-soft);
+  border-color: rgba(28,69,116,.25);
+}
+
+/* Estado: mes final de corte */
+#poaMesCorteChecks .poa-mes-pill.is-cutoff{
+  border-color: rgba(28,69,116,.55);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* Check activo cuando está dentro del rango */
+#poaMesCorteChecks .poa-mes-pill.is-in-range .poa-check{
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--white);
+  transform: scale(1.02);
+}
+
+/* Previsualización (hover) hasta el mes donde estás apuntando */
+#poaMesCorteChecks.is-previewing .poa-mes-pill.is-preview{
+  background: rgba(28,69,116,.10);
+  border-color: rgba(28,69,116,.30);
+}
+
+/* Reportes visibles: que se vean como controles consistentes */
+#poaMesCorteAdmin label{
+  border-radius: var(--radius-sm);
+}
+#poaMesCorteAdmin input[type="checkbox"]{
+  accent-color: var(--primary);
+}
+
+/* Footer de acciones */
+#poaMesCorteAdmin #poaMesCorteGuardar.menu-btn{
+  height: var(--btn-h);
+  padding: var(--btn-pad);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: var(--white);
+  cursor: pointer;
+  transition: filter .2s ease, transform .15s ease;
+  box-shadow: var(--shadow-sm);
+}
+#poaMesCorteAdmin #poaMesCorteGuardar.menu-btn:hover{
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+#poaMesCorteAdmin #poaMesCorteEstado{
+  font-size: 13px;
+  color: var(--muted);
+}
+
+
+/* ===========================
+   SUBTÍTULOS (colspan)
+   - Texto sticky a la izquierda (con “aire”)
+   - Triángulo sticky a la derecha (con “aire”)
+   - Ambos centrados verticalmente SIEMPRE
+=========================== */
+
+/* TD del subtítulo: sin padding extra */
+#tablaPOA tr.tablaPOA-subtitulo > td{
+  position: relative;
+  padding: 0;
+}
+
+/* Contenedor principal del subtítulo (controla el alto REAL) */
+#tablaPOA .tablaPOA-subtituloWrap{
+  position: relative;
+  width: 100%;
+
+  padding: 4px 4px;     /* <-- aquí ajustas altura */
+  line-height: 1.1;
+
+  display: flex;
+  align-items: center;   /* ✅ centra verticalmente */
+  justify-content: space-between;
+  gap: 10px;
+
+  /* opcional: fija un mínimo para que todo sea estable */
+  /* min-height: 24px; */
+}
+
+/* Texto sticky a la izquierda visible */
+#tablaPOA .tablaPOA-subtituloTexto{
+  position: sticky;
+  left: 4px;            /* mismo “aire” que el padding lateral del wrap */
+  z-index: 2;
+}
+
+/* Triángulo sticky a la derecha visible */
+#tablaPOA .tablaPOA-subtituloTri{
+  position: sticky;
+  right: 12px;           /* mismo “aire” que el padding lateral del wrap */
+  z-index: 3;
+  /* neutraliza posibles offsets heredados */
+  transform: translateY(0);
+}
+
+
+
+
+
+
+/* ===========================
+   PRIMERA COLUMNA STICKY (tablaPOA)
+   (agregar al FINAL del CSS)
+=========================== */
+#tablaPOA tr:not(#tablaPOA-encabezado2)  th:first-child,
+#tablaPOA tr:not(#tablaPOA-encabezado2)  td:first-child{
+  position: sticky;
+  left: 0;
+}
+
+#tablaPOA tr:not(#tablaPOA-encabezado2)  th:first-child,
+#tablaPOA tr:not(#tablaPOA-encabezado2)  td:first-child{
+  box-shadow:
+    inset 0.5px 0 0 var(--black),     /* 👈 izquierda (clave) */
+    inset -0.5px 0 0 var(--black),    /* derecha (mantiene la rejilla) */
+    inset 0 -0.5px 0 var(--black);    /* abajo (mantiene la rejilla) */
+}
+
+
+
+
+
+
+/* Timestamp cell: botón + texto alineados */
+.enviosTimestampCell{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Botón (¡) en círculo */
+.enviosCodigoBtn{
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid var(--primary);
+  background: var(--surface);
+  color: var(--primary);
+  font-weight: 900;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.enviosCodigoBtn:hover{
+  background: var(--surface-soft);
+}
+
+/* Caja del código centrado */
+.enviosCodigoCode{
+  text-align: center;
+  font-weight: 900;
+  font-size: 18px;
+  letter-spacing: 1px;
+  padding: 10px 12px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 8px;
+}
+
+
+.enviosCodigoWrap{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.enviosCodigoCopyBtn{
+  height: 28px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-soft);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.enviosCodigoCopyBtn:hover{
+  background: var(--surface-soft-2);
+}
+
+.enviosCodigoAviso{
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+}

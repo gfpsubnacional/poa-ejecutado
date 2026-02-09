@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+<!-- jsPDF core (sin UMD) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.legacy.min.js"></script>
+
+<!-- jsPDF autoTable plugin (compatible con legacy) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.3/jspdf.plugin.autotable.min.js"></script>
+    </head>
+<body data-poa-periodo="semestral">
+
+<div class="tablaPOA-contenedor">
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+        <h2>Tablas Semestrales - POA</h2>
+        <button id="guardarPdfSemestrales" class="boton-pdf" title="Descargar vista actual en PDF">
+            <img src="https://img.icons8.com/color/100/000000/pdf-2--v1.png" alt="PDF">
+        </button>
+    </div>
+
+    <div id="tablasPOASemestral" data-poa-periodo="semestral">
+        </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

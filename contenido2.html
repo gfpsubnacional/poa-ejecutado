@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Envíos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+        <h2>Mis envíos</h2>
+        <button id="guardarExcelEnvios" class="boton-excel" title="Descargar vista actual en Excel">
+            <img src="https://img.icons8.com/color/100/000000/microsoft-excel-2019--v1.png" alt="Excel">
+        </button>
+        <button id="guardarPdfEnvios" class="boton-pdf" title="Descargar vista actual en PDF">
+            <img src="https://img.icons8.com/color/100/000000/pdf-2--v1.png" alt="PDF">
+        </button>
+
+    </div>
+    
+    <div class="table-misenvios-contenedor">
+        <div id="user-submissions">
+            <table id="submissions-table" class="tablasPOA-envios"></table>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
