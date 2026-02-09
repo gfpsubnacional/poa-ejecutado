@@ -866,6 +866,16 @@ td{ text-align:left; }
   border: 1px solid var(--btn-soft-border);
 }
 
+/* SOLO para el h2 que tiene la leyenda POA */
+.tablaPOA-contenedor > h2{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  line-height: 1.2;
+  margin: 0 0 12px 0;   /* 👈 espacio debajo */
+}
+
+
 .leg-explicacion{
   font-weight: 600;
   color: var(--gray);
@@ -938,7 +948,8 @@ td{ text-align:left; }
    13) TABLA POA (PRINCIPAL)
 ========================= */
 .tablaPOA{
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   width:100%;
   font-size: 12px;
   table-layout: fixed;
@@ -978,7 +989,7 @@ td{ text-align:left; }
 
 .tablaPOA thead{
   position: sticky;
-  top:0;
+  top:1px;
   z-index:30;
 }
 
@@ -1668,8 +1679,8 @@ td{ text-align:left; }
    PRIMERA COLUMNA STICKY (tablaPOA)
    (agregar al FINAL del CSS)
 =========================== */
-.tablaPOA tr:not(.tablaPOA-encabezado2):not(.mitablaPOA-encabezado2) th:first-child,
-.tablaPOA tr:not(.tablaPOA-encabezado2):not(.mitablaPOA-encabezado2) td:first-child{
+.tablaPOA tr:not(#tablaPOA-encabezado2):not(#mitablaPOA-encabezado2) th:first-child,
+.tablaPOA tr:not(#tablaPOA-encabezado2):not(#mitablaPOA-encabezado2) td:first-child{
   position: sticky;
   left: 0;
   box-shadow:
@@ -1677,7 +1688,6 @@ td{ text-align:left; }
     inset -0.5px 0 0 var(--black),    /* derecha */
     inset 0 -0.5px 0 var(--black);    /* abajo */
 }
-
 
 
 
