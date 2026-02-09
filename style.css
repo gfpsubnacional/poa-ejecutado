@@ -1621,13 +1621,13 @@ td{ text-align:left; }
 =========================== */
 
 /* TD del subtítulo: sin padding extra */
-#tablaPOA tr.tablaPOA-subtitulo > td{
+.tablaPOA tr.tablaPOA-subtitulo > td{
   position: relative;
   padding: 0;
 }
 
 /* Contenedor principal del subtítulo (controla el alto REAL) */
-#tablaPOA .tablaPOA-subtituloWrap{
+.tablaPOA .tablaPOA-subtituloWrap{
   position: relative;
   width: 100%;
 
@@ -1644,14 +1644,14 @@ td{ text-align:left; }
 }
 
 /* Texto sticky a la izquierda visible */
-#tablaPOA .tablaPOA-subtituloTexto{
+.tablaPOA .tablaPOA-subtituloTexto{
   position: sticky;
   left: 4px;            /* mismo “aire” que el padding lateral del wrap */
   z-index: 2;
 }
 
 /* Triángulo sticky a la derecha visible */
-#tablaPOA .tablaPOA-subtituloTri{
+.tablaPOA .tablaPOA-subtituloTri{
   position: sticky;
   right: 12px;           /* mismo “aire” que el padding lateral del wrap */
   z-index: 3;
@@ -1668,20 +1668,15 @@ td{ text-align:left; }
    PRIMERA COLUMNA STICKY (tablaPOA)
    (agregar al FINAL del CSS)
 =========================== */
-#tablaPOA tr:not(#tablaPOA-encabezado2)  th:first-child,
-#tablaPOA tr:not(#tablaPOA-encabezado2)  td:first-child{
+.tablaPOA tr:not(.tablaPOA-encabezado2):not(.mitablaPOA-encabezado2) th:first-child,
+.tablaPOA tr:not(.tablaPOA-encabezado2):not(.mitablaPOA-encabezado2) td:first-child{
   position: sticky;
   left: 0;
-}
-
-#tablaPOA tr:not(#tablaPOA-encabezado2)  th:first-child,
-#tablaPOA tr:not(#tablaPOA-encabezado2)  td:first-child{
   box-shadow:
-    inset 0.5px 0 0 var(--black),     /* 👈 izquierda (clave) */
-    inset -0.5px 0 0 var(--black),    /* derecha (mantiene la rejilla) */
-    inset 0 -0.5px 0 var(--black);    /* abajo (mantiene la rejilla) */
+    inset 0.5px 0 0 var(--black),     /* izquierda */
+    inset -0.5px 0 0 var(--black),    /* derecha */
+    inset 0 -0.5px 0 var(--black);    /* abajo */
 }
-
 
 
 
