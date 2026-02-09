@@ -2671,53 +2671,48 @@ function inicializarTablaPOA(tablaId) {
     leerExcel("POA 2026_bd.xlsx");
 
     function poaFixSubtitulosSticky() {
-    const tabla = document.getElementById("tablaPOA");
-    if (!tabla) return;
+        const tablas = document.querySelectorAll(".tablaPOA");
+        if (!tablas.length) return;
 
-    const tds = tabla.querySelectorAll("tr.tablaPOA-subtitulo > td");
-    tds.forEach(td => {
-        // evita doble wrap
-        if (td.querySelector(":scope > .tablaPOA-subtituloWrap")) return;
+        tablas.forEach(tabla => {
+            const tds = tabla.querySelectorAll("tr.tablaPOA-subtitulo > td");
+            tds.forEach(td => {
+                // evita doble wrap
+                if (td.querySelector(":scope > .tablaPOA-subtituloWrap")) return;
 
-        // 1) saca el triangulito si existe (ya lo agregas tú)
-        const tri = td.querySelector(":scope > .tablaPOA-triangulo");
+                const tri = td.querySelector(":scope > .tablaPOA-triangulo");
 
-        // 2) obtén el texto “plano” del td (sin el tri)
-        //    (si tienes nodos raros, esto igual funciona: reconstruimos)
-        const texto = (td.childNodes[0]?.nodeType === Node.TEXT_NODE)
-        ? td.childNodes[0].textContent
-        : td.textContent;
+                const texto = (td.childNodes[0]?.nodeType === Node.TEXT_NODE)
+                    ? td.childNodes[0].textContent
+                    : td.textContent;
 
-        const textoLimpio = (tri ? texto.replace(tri.textContent, "") : texto).trim();
+                const textoLimpio = (tri ? texto.replace(tri.textContent, "") : texto).trim();
 
-        // 3) limpia el td
-        td.innerHTML = "";
+                td.innerHTML = "";
 
-        // 4) arma wrapper + sticky izquierdo (texto) + sticky derecho (tri)
-        const wrap = document.createElement("div");
-        wrap.className = "tablaPOA-subtituloWrap";
+                const wrap = document.createElement("div");
+                wrap.className = "tablaPOA-subtituloWrap";
 
-        const elTexto = document.createElement("span");
-        elTexto.className = "tablaPOA-subtituloTexto";
-        elTexto.textContent = textoLimpio;
-        elTexto.style.display = "flex";
-        elTexto.style.alignItems = "center";
+                const elTexto = document.createElement("span");
+                elTexto.className = "tablaPOA-subtituloTexto";
+                elTexto.textContent = textoLimpio;
+                elTexto.style.display = "flex";
+                elTexto.style.alignItems = "center";
 
+                const elTri = document.createElement("span");
+                elTri.className = "tablaPOA-subtituloTri tablaPOA-triangulo";
+                elTri.textContent = tri ? tri.textContent : "▼";
+                elTri.setAttribute("aria-hidden", "true");
+                elTri.style.display = "flex";
+                elTri.style.alignItems = "center";
+                elTri.style.justifyContent = "center";
+                elTri.style.lineHeight = "1";
 
-        const elTri = document.createElement("span");
-        elTri.className = "tablaPOA-subtituloTri tablaPOA-triangulo";
-        elTri.textContent = tri ? tri.textContent : "▼";
-        elTri.setAttribute("aria-hidden", "true");
-        elTri.style.display = "flex";
-        elTri.style.alignItems = "center";
-        elTri.style.justifyContent = "center";
-        elTri.style.lineHeight = "1";
-
-
-        wrap.appendChild(elTexto);
-        wrap.appendChild(elTri);
-        td.appendChild(wrap);
-    });
+                wrap.appendChild(elTexto);
+                wrap.appendChild(elTri);
+                td.appendChild(wrap);
+            });
+        });
     }
 
     return true;

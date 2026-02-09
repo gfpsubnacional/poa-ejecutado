@@ -1759,3 +1759,18 @@ td{ text-align:left; }
   color: var(--primary);
   font-weight: 600;
 }
+
+
+/* ===========================
+   POA: colorear celdas por data-month
+   - acum: gris claro
+   - total: gris un poco más marcado (pero no oscuro)
+   (agregar al FINAL del CSS)
+=========================== */
+.tablaPOA td[data-month="acum"]{
+  background: rgba(0,0,0,.06) ;  /* gris claro */
+}
+
+.tablaPOA td[data-month="total"]{
+  background: rgba(0,0,0,.10) ;  /* gris menos claro (un poco más fuerte) */
+}
