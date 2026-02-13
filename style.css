@@ -251,6 +251,7 @@ button{
 }
 
 #submitButtonRegistro:hover,
+#logout-btn:hover,
 .login-box button:hover,
 .logout:hover{
   background: var(--brand-hover);
@@ -288,7 +289,6 @@ button{
    OVERRIDE: botones con esquinas rectas
    (login, logout, sidebar)
 ========================= */
-.logout,
 .sidebar button{
   border-radius: 0 !important;
 }

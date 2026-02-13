@@ -184,17 +184,17 @@ async function login() {
         }
 
         localStorage.setItem("usuarioDatos", JSON.stringify(userData));
-        console.log("Datos de consultor en LS:", userData);
+        // console.log("Datos de consultor en LS:", userData);
 
         await cargarMesCorteDesdeFirestore();
 
         datosPOA = XLSX.utils.sheet_to_json(workbook.Sheets['POA2026_ej']);
         localStorage.setItem("POADatos", JSON.stringify(datosPOA));
-        console.log("Datos POA en LS:", JSON.parse(localStorage.getItem("POADatos")));
+        // console.log("Datos POA en LS:", JSON.parse(localStorage.getItem("POADatos")));
 
         varios = XLSX.utils.sheet_to_json(workbook.Sheets['varios']);
         localStorage.setItem("varios", JSON.stringify(varios));
-        console.log("Datos varios en LS:", JSON.parse(localStorage.getItem("varios")));
+        // console.log("Datos varios en LS:", JSON.parse(localStorage.getItem("varios")));
 
         await cargarEnviosYMisEnvios();  // 🔄 Asegura que esto también termine
 
@@ -550,8 +550,8 @@ async function cargarEnviosYMisEnvios() {
         localStorage.setItem("Envios", JSON.stringify(todosLosEnvios));
         localStorage.setItem("misEnvios", JSON.stringify(misEnvios));
 
-        console.log("✔ Todos los envíos guardados en localStorage['Envios']", JSON.parse(localStorage.getItem("Envios")));
-        console.log("✔ Mis envíos guardados en localStorage['misEnvios']", JSON.parse(localStorage.getItem("misEnvios")));
+        // console.log("✔ Todos los envíos guardados en localStorage['Envios']", JSON.parse(localStorage.getItem("Envios")));
+        // console.log("✔ Mis envíos guardados en localStorage['misEnvios']", JSON.parse(localStorage.getItem("misEnvios")));
 
     } catch (error) {
         console.error("Error al consultar la base de datos:", error);
