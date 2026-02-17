@@ -2848,6 +2848,14 @@ function crearObserverParaTabla(tabla, localStorageKey) {
  * @param {string} tablaId - El ID de la tabla HTML.
  * @param {string} localStorageKey - La clave de localStorage donde se encuentran los envíos.
  */
+
+const poaNormActividad = (s) =>
+  String(s ?? "")
+    .replace(/\u00A0/g, " ")   // NBSP -> espacio normal
+    .replace(/\s+/g, " ")     // colapsa espacios internos
+    .trim();                  // quita extremos
+
+
 function fillTableWithEnvios(tablaId, localStorageKey, callback) {
     let intervalId;
 
@@ -2869,29 +2877,49 @@ function fillTableWithEnvios(tablaId, localStorageKey, callback) {
 
                     const enviosAgrupados = {};
                     envios.forEach(envio => {
-                        const actividad = envio.actividad;
+                    const actividadKey = poaNormActividad(envio.actividad);
                         const mesReporte = envio.mesReporte;
                         const mesLower = mesReporte ? mesReporte.toLowerCase().substring(0, 3) : '';
                         const numeroMetas = parseInt(envio.numerometas, 10);
 
-                        if (actividad && mesLower && TABLA_POA_MESES.includes(mesLower) && !isNaN(numeroMetas)) {
-                            if (!enviosAgrupados[actividad]) {
-                                enviosAgrupados[actividad] = {};
-                            }
-                            if (!enviosAgrupados[actividad][mesLower]) {
-                                enviosAgrupados[actividad][mesLower] = 0;
-                            }
-                            enviosAgrupados[actividad][mesLower] += numeroMetas;
+                        if (actividadKey && mesLower && TABLA_POA_MESES.includes(mesLower) && !isNaN(numeroMetas)) {
+                            if (!enviosAgrupados[actividadKey]) enviosAgrupados[actividadKey] = {};
+                            if (!enviosAgrupados[actividadKey][mesLower]) enviosAgrupados[actividadKey][mesLower] = 0;
+                            enviosAgrupados[actividadKey][mesLower] += numeroMetas;
                         } else {
                             console.warn(`[fillTableWithEnvios - ${tablaId}] Skipping invalid envio data:`, envio);
                         }
                     });
 
+                    // console.log("enviosAgrupados:", enviosAgrupados);
+
+
+                    // ---- DEBUG: envíos con actividad que no existe en la tabla ----
+                    const actividadesTablaSet = new Set(
+                    [...normalRows]
+                        .map(r => r.querySelector('td:first-child .tablaPOA-scrollable')?.textContent)
+                        .filter(Boolean)
+                        .map(poaNormActividad)
+                    );
+
+                    const actividadesEnviosSet = new Set(Object.keys(enviosAgrupados));
+
+                    const actividadesEnviosNoEnTabla = [...actividadesEnviosSet].filter(a => !actividadesTablaSet.has(a));
+
+                    if (actividadesEnviosNoEnTabla.length) {
+                    console.log(JSON.stringify({
+                        tabla: tablaId,
+                        actividadesEnviosNoEnTabla: actividadesEnviosNoEnTabla,
+                        actividadesTabla: [...actividadesTablaSet].sort()
+                    }, null, 2));
+                    }
+
+
                     normalRows.forEach(row => {
                         const actividadCell = row.querySelector('td:first-child .tablaPOA-scrollable');
                         if (actividadCell) {
-                            const actividadTabla = actividadCell.textContent;
-                            const enviosParaActividad = enviosAgrupados[actividadTabla];
+                            const actividadTablaKey = poaNormActividad(actividadCell.textContent);
+                            const enviosParaActividad = enviosAgrupados[actividadTablaKey];
 
                             if (enviosParaActividad) {
                                 TABLA_POA_MESES.forEach(mes => {
