@@ -3176,11 +3176,10 @@ function tablasPOAApplyCellProperties(tableId, localStorageKey) {
 
         const nombreMesReporte = TABLA_POA_MES_MAP[monthName] || "(desconocido)";
         details = currentEnviosData.filter(envio => {
-            const matchActividad = envio.actividad === activityName;
-            const matchMes = envio.mesReporte === nombreMesReporte;
+            const matchActividad = poaNormActividad(envio.actividad) === poaNormActividad(activityName);
+            const matchMes = String(envio.mesReporte || "").trim().toLowerCase() === String(nombreMesReporte || "").trim().toLowerCase();
             return matchActividad && matchMes;
         });
-
 
         // Set the detailed data attributes here for modal to use
         cell.dataset.plannedValue = plannedVal;
@@ -3283,11 +3282,10 @@ function tablasPOAApplyCellProperties(tableId, localStorageKey) {
 
         const nombreMesReporte = TABLA_POA_MES_MAP[monthName] || "(desconocido)";
         details = currentEnviosData.filter(envio => {
-            const matchActividad = envio.actividad === activityName;
-            const matchMes = envio.mesReporte === nombreMesReporte;
+            const matchActividad = poaNormActividad(envio.actividad) === poaNormActividad(activityName);
+            const matchMes = String(envio.mesReporte || "").trim().toLowerCase() === String(nombreMesReporte || "").trim().toLowerCase();
             return matchActividad && matchMes;
         });
-
 
         // Set the detailed data attributes here for modal to use
         cell.dataset.plannedValue = plannedVal;
@@ -3372,10 +3370,10 @@ function tablasPOAApplyCellProperties(tableId, localStorageKey) {
         let details;
 
         details = currentEnviosData.filter(envio => {
-            const matchActividad = envio.actividad === activityName;
+            const matchActividad = poaNormActividad(envio.actividad) === poaNormActividad(activityName);
             return matchActividad;
         });
-
+        
         // Set the detailed data attributes here for modal to use
         cell.dataset.plannedValue = plannedVal;
         cell.dataset.plannedValueAcum = plannedValAcum;

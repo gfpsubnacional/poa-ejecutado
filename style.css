@@ -81,7 +81,7 @@
 
   /* Tooltip */
   --tooltip-bg: rgba(0,0,0,0.82);
-  --circle-bg-stroke: rgba(255,255,255,0.3);
+  --circle-bg-stroke: rgba(116, 116, 116, 0.747);
 
   /* Cerrar modal alterno */
   --close-btn: #d33;
