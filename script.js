@@ -535,8 +535,10 @@ async function cargarEnviosYMisEnvios() {
 
         snapshot.forEach(doc => {
             const data = doc.data();
-            todosLosEnvios.push(data);
-
+            todosLosEnvios.push({
+                ...data,
+                __docId: doc.id
+            });
             const usuarioDatos = JSON.parse(localStorage.getItem("usuarioDatos") || "{}");
 
             if (usuarioDatos.Tipo === "admin" || data.usuario === usuarioActual) {
